@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App & General Navigation -->
+    <string name="app_name">SSMTS Operator</string>
+    <string name="title_dashboard">Operational Dashboard</string>
+    <string name="title_booking_history">Booking History &amp; Feeds</string>
+    <string name="title_operator_scanner">Operator QR Scanner</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_history">History</string>
+    <string name="nav_scanner">Scan QR</string>
+
+    <!-- Operational Dashboard Metrics (FR-M4-01) -->
+    <string name="metric_pending_title">Pending Bookings</string>
+    <string name="metric_pending_desc">Slots awaiting operator validation</string>
+    <string name="metric_approved_future_title">Approved Future</string>
+    <string name="metric_approved_future_desc">Scheduled within 7-day window</string>
+    <string name="metric_completed_today_title">Completed Today</string>
+    <string name="metric_completed_today_desc">Transfers finalized today</string>
+
+    <!-- Active Booking Spotlight Widget (FR-M4-01.3) -->
+    <string name="spotlight_badge_label">ACTIVE SPOTLIGHT</string>
+    <string name="spotlight_no_active">No upcoming active reservation scheduled for today.</string>
+    <string name="spotlight_bay_prefix">Bay: %1$s</string>
+    <string name="spotlight_countdown_prefix">Starts in: %1$s</string>
+    <string name="spotlight_estimated_prefix">Estimated: %1$.2f kWh</string>
+
+    <!-- Offline Banner & Cache (FR-M4-01.5) -->
+    <string name="banner_offline_mode">Offline Mode — Displaying cached records</string>
+    <string name="banner_last_synced_format">Last synchronized: %1$s</string>
+    <string name="action_retry_sync">Retry Sync</string>
+
+    <!-- Current & Pending Booking Feeds (FR-M4-02) -->
+    <string name="tab_all">All</string>
+    <string name="tab_today_active">Today\'s Active</string>
+    <string name="tab_pending_queue">Pending Queue</string>
+    <string name="feed_empty_active">No active energy transfer slots for today.</string>
+    <string name="feed_empty_pending">No pending reservations awaiting approval.</string>
+
+    <!-- Booking History, Search & Filter (FR-M4-03) -->
+    <string name="search_reservations_hint">Search by station, NIC, or reservation ID…</string>
+    <string name="filter_chip_all">All</string>
+    <string name="filter_chip_pending">Pending</string>
+    <string name="filter_chip_approved">Approved</string>
+    <string name="filter_chip_completed">Completed</string>
+    <string name="filter_chip_cancelled">Cancelled</string>
+
+    <!-- Booking History Item Details (FR-M4-03.5) -->
+    <string name="label_station">Station: %1$s</string>
+    <string name="label_prosumer_nic">Prosumer NIC: %1$s</string>
+    <string name="label_bay">Bay: %1$s</string>
+    <string name="label_scheduled_time">Scheduled: %1$s</string>
+    <string name="label_estimated_kwh">Estimated: %1$.2f kWh</string>
+    <string name="label_metered_kwh">Metered: %1$.2f kWh</string>
+    <string name="label_kwh_unit">kWh</string>
+
+    <!-- Empty State View (FR-M4-03.6) -->
+    <string name="history_empty_title">No Reservations Found</string>
+    <string name="history_empty_desc">No reservations match the specified search query or selected filter chips.</string>
+
+    <!-- Grid Operator Scanner & Camera (FR-M4-05) -->
+    <string name="scanner_instruction">Align prosumer QR code inside the viewfinder</string>
+    <string name="scanner_torch_toggle">Toggle Flashlight</string>
+    <string name="scanner_fast_test_button">Fast Test QR</string>
+    <string name="permission_camera_title">Camera Permission Required</string>
+    <string name="permission_camera_rationale">Camera hardware access is required to scan prosumer transaction QR tokens for energy transfer validation.</string>
+    <string name="btn_grant_permission">Grant Camera Access</string>
+    <string name="permission_denied_banner">Camera access was denied. Use Fast Test QR or enable camera in system settings.</string>
+
+    <!-- QR Server Verification & Handshake Modal (FR-M4-06) -->
+    <string name="handshake_title">Reservation Verified</string>
+    <string name="handshake_subtitle">Cryptographic token validated by central API.</string>
+    <string name="handshake_reservation_id">Reservation ID: %1$s</string>
+    <string name="handshake_prosumer">Prosumer NIC: %1$s</string>
+    <string name="handshake_station">Station: %1$s</string>
+    <string name="handshake_bay">Allocated Bay: %1$s</string>
+    <string name="btn_proceed_finalize">Proceed to Transfer</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- QR Error Rejection Dialogs (FR-M4-06.3) -->
+    <string name="qr_error_title">QR Verification Failed</string>
+    <string name="err_already_completed">This reservation has already been completed and finalized.</string>
+    <string name="err_invalid_signature">Invalid cryptographic QR signature. Token may have been altered.</string>
+    <string name="err_reservation_not_found">Reservation record not found in system.</string>
+    <string name="err_not_approved">Reservation is not in Approved state.</string>
+    <string name="err_outside_window">Current time is outside the scheduled operational window.</string>
+    <string name="err_malformed_qr">Malformed QR payload. Expected SSMTS-QR standard format.</string>
+    <string name="btn_dismiss">Dismiss</string>
+
+    <!-- Energy-Transfer Finalization & Metering (FR-M4-07) -->
+    <string name="finalize_dialog_title">Finalize Energy Transfer</string>
+    <string name="finalize_dialog_subtitle">Enter actual delivered power measured by station meter.</string>
+    <string name="label_metered_input">Actual Metered Power (kWh)</string>
+    <string name="hint_metered_kwh">e.g. 24.65</string>
+    <string name="error_invalid_kwh_range">Enter a valid energy value between 0.01 and 999.99 kWh.</string>
+    <string name="label_operator_notes">Operational Notes (Optional)</string>
+    <string name="hint_operator_notes">e.g. Transfer completed without voltage anomalies.</string>
+    <string name="btn_confirm_transfer">Confirm &amp; Finalize</string>
+    <string name="transfer_in_progress">Finalizing transfer with central Web API…</string>
+
+    <!-- Transfer Completed Receipt (FR-M4-07.4) -->
+    <string name="receipt_title">Transfer Finalized</string>
+    <string name="receipt_subtitle">Energy transfer completed and committed successfully.</string>
+    <string name="receipt_metered_kwh_format">Delivered: %1$.2f kWh</string>
+    <string name="receipt_operator_format">Operator: %1$s</string>
+    <string name="receipt_timestamp_format">Time: %1$s</string>
+    <string name="btn_done">Done</string>
+
+    <!-- Status Badge Values -->
+    <string name="status_completed">Completed</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_cancelled">Cancelled</string>
+</resources>

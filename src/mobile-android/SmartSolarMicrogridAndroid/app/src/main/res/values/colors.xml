@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Palette: Clean Modern Solar/Grid Theme -->
+    <color name="color_primary">#1B5E20</color>
+    <color name="color_primary_variant">#2E7D32</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#C8E6C9</color>
+    <color name="color_on_primary_container">#002105</color>
+
+    <!-- Secondary Accent: Energy / Battery Warmth -->
+    <color name="color_secondary">#F57F17</color>
+    <color name="color_secondary_variant">#FFB300</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_secondary_container">#FFF3E0</color>
+    <color name="color_on_secondary_container">#4E2600</color>
+
+    <!-- Tertiary Accent: Modern Electric Cyan -->
+    <color name="color_tertiary">#00838F</color>
+    <color name="color_on_tertiary">#FFFFFF</color>
+    <color name="color_tertiary_container">#E0F7FA</color>
+    <color name="color_on_tertiary_container">#002022</color>
+
+    <!-- Neutral Surfaces & Backgrounds -->
+    <color name="surface_background">#F8FAF8</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="surface_card_stroke">#E0E0E0</color>
+    <color name="surface_card_elevated">#FFFFFF</color>
+    <color name="surface_divider">#EEEEEE</color>
+
+    <!-- Typography Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="text_inverse">#FFFFFF</color>
+
+    <!--
+      MANDATORY STATUS BADGE PALETTE (FR-M4-03.4)
+      Completed: Container #E8F5E9, Text #2E7D32
+      Approved:  Container #E3F2FD, Text #1565C0
+      Pending:   Container #FFF8E1, Text #F57F17
+      Cancelled: Container #FFEBEE, Text #C62828
+    -->
+    <color name="status_completed_container">#E8F5E9</color>
+    <color name="status_completed_text">#2E7D32</color>
+    <color name="status_completed_stroke">#C8E6C9</color>
+
+    <color name="status_approved_container">#E3F2FD</color>
+    <color name="status_approved_text">#1565C0</color>
+    <color name="status_approved_stroke">#BBDEFB</color>
+
+    <color name="status_pending_container">#FFF8E1</color>
+    <color name="status_pending_text">#F57F17</color>
+    <color name="status_pending_stroke">#FFE082</color>
+
+    <color name="status_cancelled_container">#FFEBEE</color>
+    <color name="status_cancelled_text">#C62828</color>
+    <color name="status_cancelled_stroke">#FFCDD2</color>
+
+    <!-- Spotlight Widget Gradient Colors -->
+    <color name="spotlight_gradient_start">#0D3B16</color>
+    <color name="spotlight_gradient_end">#1B5E20</color>
+    <color name="spotlight_accent_pill">#33FFFFFF</color>
+
+    <!-- Camera Viewfinder & Scanner Overlay -->
+    <color name="scanner_scrim_overlay">#99000000</color>
+    <color name="scanner_reticle_frame">#00E676</color>
+    <color name="scanner_reticle_glow">#3300E676</color>
+
+    <!-- Feedback & Offline Banner -->
+    <color name="offline_banner_bg">#FFF3E0</color>
+    <color name="offline_banner_text">#E65100</color>
+    <color name="error_bg">#FFEBEE</color>
+    <color name="error_text">#C62828</color>
+</resources>
