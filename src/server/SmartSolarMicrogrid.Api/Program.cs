@@ -1,6 +1,8 @@
 // Description: Central application entry point and ASP.NET Core service configuration.
 
 using SmartSolarMicrogrid.Api.Configuration;
+using SmartSolarMicrogrid.Api.Data;
+using SmartSolarMicrogrid.Api.Repositories;
 using SmartSolarMicrogrid.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +14,13 @@ builder.Services.AddControllers();
 builder.Services.Configure<QrSecurityOptions>(
     builder.Configuration.GetSection(QrSecurityOptions.SectionName));
 
-// Register Cryptographic QR Signature Service as Singleton
+// Register Data Access and Repositories
+builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
+// Register Domain Services
 builder.Services.AddSingleton<IQrSignatureService, QrSignatureService>();
+builder.Services.AddScoped<IOperatorVerificationService, OperatorVerificationService>();
 
 var app = builder.Build();
 
