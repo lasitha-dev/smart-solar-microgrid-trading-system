@@ -21,6 +21,7 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 // Register Domain Services
 builder.Services.AddSingleton<IQrSignatureService, QrSignatureService>();
 builder.Services.AddScoped<IOperatorVerificationService, OperatorVerificationService>();
+builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
 
 var app = builder.Build();
 

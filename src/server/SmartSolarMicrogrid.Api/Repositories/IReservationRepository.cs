@@ -1,11 +1,12 @@
-// Description: Repository abstraction defining data access queries and atomic mutations for EnergyReservation records.
+// Description: Repository abstraction defining data access queries, aggregations, and mutations for EnergyReservation records.
 
+using SmartSolarMicrogrid.Api.DTOs;
 using SmartSolarMicrogrid.Api.Models;
 
 namespace SmartSolarMicrogrid.Api.Repositories;
 
 /// <summary>
-/// Description: Repository contract for managing EnergyReservation MongoDB persistence.
+/// Description: Repository contract for managing EnergyReservation MongoDB persistence, dashboard metrics, and history feeds.
 /// </summary>
 public interface IReservationRepository
 {
@@ -28,4 +29,14 @@ public interface IReservationRepository
     /// Inserts a new reservation document into MongoDB.
     /// </summary>
     Task CreateAsync(EnergyReservation reservation);
+
+    /// <summary>
+    /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.
+    /// </summary>
+    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync();
+
+    /// <summary>
+    /// Queries reservations with multi-criteria filtering by status, debounced search query, and calendar date.
+    /// </summary>
+    Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date);
 }

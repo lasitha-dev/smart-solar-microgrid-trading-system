@@ -17,6 +17,7 @@ public class OperatorVerificationServiceTests
     private readonly IQrSignatureService _qrSignatureService;
     private readonly FakeReservationRepository _fakeRepo;
     private readonly IOperatorVerificationService _service;
+    private readonly IDashboardQueryService _dashboardService;
     private readonly ReservationsController _controller;
 
     public OperatorVerificationServiceTests()
@@ -31,7 +32,8 @@ public class OperatorVerificationServiceTests
         _qrSignatureService = new QrSignatureService(Options.Create(options));
         _fakeRepo = new FakeReservationRepository();
         _service = new OperatorVerificationService(_qrSignatureService, _fakeRepo, Options.Create(options));
-        _controller = new ReservationsController(_service);
+        _dashboardService = new DashboardQueryService(_fakeRepo);
+        _controller = new ReservationsController(_service, _dashboardService);
     }
 
     [Fact]
@@ -226,5 +228,95 @@ public class FakeReservationRepository : IReservationRepository
     {
         _store[reservation.Id] = reservation;
         return Task.CompletedTask;
+    }
+
+    public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
+    {
+        var nowUtc = DateTime.UtcNow;
+        var todayStartUtc = nowUtc.Date;
+        var todayEndUtc = todayStartUtc.AddDays(1);
+        var sevenDaysFuture = nowUtc.AddDays(7);
+
+        var pendingCount = _store.Values.Count(r => r.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
+        var approvedFutureCount = _store.Values.Count(r =>
+            r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
+            r.ScheduledDateTime >= nowUtc.AddMinutes(-30) &&
+            r.ScheduledDateTime <= sevenDaysFuture);
+
+        var completedTodayCount = _store.Values.Count(r =>
+            r.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) &&
+            ((r.FinalizedAt >= todayStartUtc && r.FinalizedAt < todayEndUtc) ||
+             (r.ScheduledDateTime >= todayStartUtc && r.ScheduledDateTime < todayEndUtc)));
+
+        var spotlightDoc = _store.Values
+            .Where(r => r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
+                        r.ScheduledDateTime >= nowUtc.AddMinutes(-30))
+            .OrderBy(r => r.ScheduledDateTime)
+            .FirstOrDefault();
+
+        ActiveSpotlightDto? spotlight = null;
+        if (spotlightDoc != null)
+        {
+            spotlight = new ActiveSpotlightDto
+            {
+                ReservationId = spotlightDoc.Id,
+                StationName = spotlightDoc.StationName,
+                AllocatedBayId = spotlightDoc.AllocatedBayId,
+                ScheduledDateTime = spotlightDoc.ScheduledDateTime,
+                Status = spotlightDoc.Status,
+                EstimatedKwh = spotlightDoc.EstimatedKwh
+            };
+        }
+
+        return Task.FromResult(new DashboardMetricsResponseDto
+        {
+            PendingReservationsCount = pendingCount,
+            ApprovedFutureReservationsCount = approvedFutureCount,
+            CompletedTodayCount = completedTodayCount,
+            ActiveSpotlight = spotlight
+        });
+    }
+
+    public Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date)
+    {
+        var query = _store.Values.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(status) && !status.Equals("All", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(r =>
+                r.StationName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                r.ProsumerNic.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                r.Id.Contains(term, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (date.HasValue)
+        {
+            var dayStart = date.Value.Date;
+            var dayEnd = dayStart.AddDays(1);
+            query = query.Where(r => r.ScheduledDateTime >= dayStart && r.ScheduledDateTime < dayEnd);
+        }
+
+        var results = query
+            .OrderByDescending(r => r.ScheduledDateTime)
+            .Select(r => new ReservationItemDto
+            {
+                ReservationId = r.Id,
+                ProsumerNic = r.ProsumerNic,
+                StationName = r.StationName,
+                ScheduledDateTime = r.ScheduledDateTime,
+                AllocatedBayId = r.AllocatedBayId,
+                EstimatedKwh = r.EstimatedKwh,
+                MeteredEnergyKwh = r.MeteredEnergyKwh,
+                Status = r.Status,
+                QrCode = r.QrCode
+            }).ToList();
+
+        return Task.FromResult(results);
     }
 }

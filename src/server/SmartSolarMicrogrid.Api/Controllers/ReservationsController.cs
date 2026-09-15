@@ -1,4 +1,4 @@
-// Description: Controller handling Operator QR verification and energy transfer finalization endpoints.
+// Description: Controller handling Operator QR verification, energy transfer finalization, dashboard metrics, and reservation feeds.
 
 using Microsoft.AspNetCore.Mvc;
 using SmartSolarMicrogrid.Api.DTOs;
@@ -11,10 +11,38 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 public class ReservationsController : ControllerBase
 {
     private readonly IOperatorVerificationService _verificationService;
+    private readonly IDashboardQueryService _dashboardQueryService;
 
-    public ReservationsController(IOperatorVerificationService verificationService)
+    public ReservationsController(
+        IOperatorVerificationService verificationService,
+        IDashboardQueryService dashboardQueryService)
     {
         _verificationService = verificationService;
+        _dashboardQueryService = dashboardQueryService;
+    }
+
+    /// <summary>
+    /// Aggregates operational dashboard metrics including live pending count, approved future count, and active spotlight.
+    /// GET /api/reservations/dashboard-metrics
+    /// </summary>
+    [HttpGet("dashboard-metrics")]
+    [ProducesResponseType(typeof(DashboardMetricsResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDashboardMetrics()
+    {
+        var metrics = await _dashboardQueryService.GetDashboardMetricsAsync();
+        return Ok(metrics);
+    }
+
+    /// <summary>
+    /// Retrieves reservations supporting status filtering, case-insensitive text search, and date filtering.
+    /// GET /api/reservations
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<ReservationItemDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetReservations([FromQuery] ReservationFilterQueryDto query)
+    {
+        var reservations = await _dashboardQueryService.GetFilteredReservationsAsync(query);
+        return Ok(reservations);
     }
 
     /// <summary>
