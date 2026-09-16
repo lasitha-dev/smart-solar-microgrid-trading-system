@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_background">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md">
+
+            <!-- Offline Fallback Banner (FR-M4-01.5) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardOfflineBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/status_pending_container"
+                app:cardCornerRadius="@dimen/radius_badge"
+                app:cardElevation="@dimen/elevation_none"
+                app:strokeColor="@color/status_pending_stroke"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/spacing_md">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvOfflineTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/banner_offline_mode"
+                            android:textColor="@color/status_pending_text"
+                            android:textSize="@dimen/text_size_body"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvLastSynced"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_xxs"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_size_caption"
+                            tools:text="Last synchronized: Just now" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRetrySync"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/action_retry_sync"
+                        android:textColor="@color/status_pending_text" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Dashboard Title Header -->
+            <TextView
+                android:id="@+id/tvDashboardTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_dashboard"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_display"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDashboardSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="Real-time trading slot monitoring and grid verification"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+
+            <!-- Active Booking Spotlight Card (FR-M4-01.3) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSpotlight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:minHeight="@dimen/spotlight_card_min_height"
+                app:cardCornerRadius="@dimen/radius_spotlight"
+                app:cardElevation="@dimen/elevation_spotlight"
+                app:strokeWidth="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_card_spotlight"
+                    android:padding="@dimen/spacing_lg">
+
+                    <!-- Spotlight Populated Content -->
+                    <LinearLayout
+                        android:id="@+id/layoutSpotlightContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvSpotlightBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_status_approved"
+                            android:paddingHorizontal="@dimen/badge_padding_horizontal"
+                            android:paddingVertical="@dimen/badge_padding_vertical"
+                            android:text="@string/spotlight_badge_label"
+                            android:textColor="@color/status_approved_text"
+                            android:textSize="@dimen/text_size_micro"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvSpotlightStation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_sm"
+                            android:textColor="@color/text_inverse"
+                            android:textSize="@dimen/text_size_title"
+                            android:textStyle="bold"
+                            tools:text="Colombo Central Microgrid Hub" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_xs"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tvSpotlightBay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_inverse"
+                                android:textSize="@dimen/text_size_body"
+                                tools:text="Bay: BAY-03" />
+
+                            <TextView
+                                android:id="@+id/tvSpotlightEstimatedPower"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/spacing_md"
+                                android:textColor="@color/text_inverse"
+                                android:textSize="@dimen/text_size_body"
+                                tools:text="Estimated: 35.00 kWh" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvSpotlightCountdown"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_md"
+                            android:textColor="@color/color_secondary_variant"
+                            android:textSize="@dimen/text_size_subhead"
+                            android:textStyle="bold"
+                            tools:text="Starts in: 02h 15m 30s" />
+                    </LinearLayout>
+
+                    <!-- Spotlight Empty State -->
+                    <TextView
+                        android:id="@+id/tvSpotlightEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="@string/spotlight_no_active"
+                        android:textColor="@color/text_inverse"
+                        android:textSize="@dimen/text_size_body"
+                        android:visibility="gone"
+                        tools:visibility="gone" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Metrics Header Label -->
+            <TextView
+                android:id="@+id/tvMetricsSectionHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xl"
+                android:letterSpacing="0.08"
+                android:text="OPERATIONAL METRICS"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_caption"
+                android:textStyle="bold" />
+
+            <!-- Card 1: Pending Reservations Counter (FR-M4-01.1) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPendingReservations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:minHeight="@dimen/metric_card_min_height"
+                app:cardBackgroundColor="@color/surface_card"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="@dimen/elevation_card"
+                app:strokeColor="@color/surface_card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <TextView
+                        android:id="@+id/tvPendingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/status_pending_text"
+                        android:textSize="@dimen/text_size_counter"
+                        android:textStyle="bold"
+                        tools:text="7" />
+
+                    <TextView
+                        android:id="@+id/tvPendingTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:text="@string/metric_pending_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_size_subhead"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPendingDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xxs"
+                        android:text="@string/metric_pending_desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_size_caption" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 2: Approved Future Reservations Counter (FR-M4-01.2) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardApprovedFuture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:minHeight="@dimen/metric_card_min_height"
+                app:cardBackgroundColor="@color/surface_card"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="@dimen/elevation_card"
+                app:strokeColor="@color/surface_card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <TextView
+                        android:id="@+id/tvApprovedFutureCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/status_approved_text"
+                        android:textSize="@dimen/text_size_counter"
+                        android:textStyle="bold"
+                        tools:text="14" />
+
+                    <TextView
+                        android:id="@+id/tvApprovedFutureTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:text="@string/metric_approved_future_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_size_subhead"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvApprovedFutureDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xxs"
+                        android:text="@string/metric_approved_future_desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_size_caption" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 3: Completed Today Counter -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCompletedToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:minHeight="@dimen/metric_card_min_height"
+                app:cardBackgroundColor="@color/surface_card"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="@dimen/elevation_card"
+                app:strokeColor="@color/surface_card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <TextView
+                        android:id="@+id/tvCompletedTodayCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/status_completed_text"
+                        android:textSize="@dimen/text_size_counter"
+                        android:textStyle="bold"
+                        tools:text="9" />
+
+                    <TextView
+                        android:id="@+id/tvCompletedTodayTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:text="@string/metric_completed_today_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_size_subhead"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvCompletedTodayDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xxs"
+                        android:text="@string/metric_completed_today_desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_size_caption" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Loading Spinner Indicator -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:visibility="gone" />
+
+            <!-- Error State Container -->
+            <LinearLayout
+                android:id="@+id/layoutError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvErrorMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/status_cancelled_text"
+                    android:textSize="@dimen/text_size_body"
+                    tools:text="Unable to connect to microgrid server" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnErrorRetry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:text="@string/action_retry_sync" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
