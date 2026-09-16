@@ -221,4 +221,39 @@ class DashboardRepositoryTest {
         assertEquals("RES-SYNC-1", cachedRecords[0].reservationId)
         assertEquals("Galle Hub", cachedRecords[0].stationName)
     }
+
+    /**
+     * Verifies getTodayActiveReservationsStream and getPendingQueueReservationsStream return partitioned data.
+     */
+    @Test
+    fun operationalFeeds_streamCorrectReservations() = runBlocking {
+        val now = System.currentTimeMillis()
+        val todayApproved = ReservationCacheEntity(
+            reservationId = "RES-T1",
+            prosumerNic = "199011111111",
+            stationName = "Colombo Central",
+            scheduledTime = now + 1000L,
+            allocatedBay = "BAY-01",
+            status = "APPROVED",
+            lastSyncedAt = now
+        )
+        val pending = ReservationCacheEntity(
+            reservationId = "RES-P1",
+            prosumerNic = "200022222222",
+            stationName = "Kandy Central",
+            scheduledTime = now + 2000L,
+            allocatedBay = "BAY-02",
+            status = "PENDING",
+            lastSyncedAt = now
+        )
+        reservationDao.upsertReservations(listOf(todayApproved, pending))
+
+        val todayActive = repository.getTodayActiveReservationsStream().first()
+        val pendingQueue = repository.getPendingQueueReservationsStream().first()
+
+        assertEquals(1, todayActive.size)
+        assertEquals("RES-T1", todayActive[0].id)
+        assertEquals(1, pendingQueue.size)
+        assertEquals("RES-P1", pendingQueue[0].id)
+    }
 }

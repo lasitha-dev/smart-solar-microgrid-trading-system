@@ -349,6 +349,81 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Feeds Section Header Label (FR-M4-02) -->
+            <TextView
+                android:id="@+id/tvFeedsSectionHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xl"
+                android:letterSpacing="0.08"
+                android:text="@string/title_operational_feeds"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_caption"
+                android:textStyle="bold" />
+
+            <!-- Feed Selection Toggle (FR-M4-02.1 & FR-M4-02.2) -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleGroupFeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                app:checkedButton="@+id/btnTabTodayActive"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTabTodayActive"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tab_today_active"
+                    android:textSize="@dimen/text_size_caption" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTabPendingQueue"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tab_pending_queue"
+                    android:textSize="@dimen/text_size_caption" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Bookings Feed RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBookingsFeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_dashboard_booking" />
+
+            <!-- Feed Empty State Container -->
+            <LinearLayout
+                android:id="@+id/layoutFeedEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:background="@drawable/bg_card_spotlight"
+                android:backgroundTint="@color/surface_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvFeedEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/feed_empty_active"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_size_body" />
+            </LinearLayout>
+
             <!-- Loading Spinner Indicator -->
             <ProgressBar
                 android:id="@+id/progressBar"

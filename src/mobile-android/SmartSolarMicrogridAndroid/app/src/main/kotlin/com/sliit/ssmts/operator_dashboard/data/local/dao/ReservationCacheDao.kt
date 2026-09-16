@@ -35,6 +35,24 @@ interface ReservationCacheDao {
     fun getReservationsByStatusFlow(status: String): Flow<List<ReservationCacheEntity>>
 
     /**
+     * Observes cached approved reservations scheduled within a specified calendar day window (FR-M4-02.1).
+     *
+     * @param startOfDayMillis Epoch start timestamp of the calendar day.
+     * @param endOfDayMillis Epoch end timestamp of the calendar day.
+     * @return Flow emitting matching cached reservation entities.
+     */
+    @Query(
+        """
+        SELECT * FROM tbl_reservations_cache 
+        WHERE UPPER(status) = 'APPROVED' 
+          AND scheduled_time >= :startOfDayMillis 
+          AND scheduled_time < :endOfDayMillis 
+        ORDER BY scheduled_time ASC
+        """
+    )
+    fun getTodayActiveReservationsFlow(startOfDayMillis: Long, endOfDayMillis: Long): Flow<List<ReservationCacheEntity>>
+
+    /**
      * Searches and filters cached reservations by keyword (NIC, station, or ID) and optional status.
      *
      * @param status Optional status filter or null to match all statuses.

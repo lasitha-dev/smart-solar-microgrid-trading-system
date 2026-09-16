@@ -140,6 +140,38 @@ class DashboardRepositoryImpl(
     }
 
     /**
+     * Observes active reservations scheduled for the current calendar date (FR-M4-02.1).
+     *
+     * @return Flow emitting active reservation domain models.
+     */
+    override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfDayMillis = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        val endOfDayMillis = calendar.timeInMillis
+
+        return dao.getTodayActiveReservationsFlow(startOfDayMillis, endOfDayMillis)
+            .map { entities -> entities.map { it.toDomain() } }
+            .flowOn(dispatcher)
+    }
+
+    /**
+     * Observes pending reservations awaiting operator or administrative validation (FR-M4-02.2).
+     *
+     * @return Flow emitting pending reservation domain models.
+     */
+    override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> {
+        return dao.getReservationsByStatusFlow("PENDING")
+            .map { entities -> entities.map { it.toDomain() } }
+            .flowOn(dispatcher)
+    }
+
+    /**
      * Synchronizes local SQLite reservation cache with the central C# Web API.
      *
      * @return NetworkResult indicating synchronization success or failure.

@@ -1,6 +1,6 @@
 /**
  * Description: ViewModel managing state for operational metrics counter cards, active booking spotlight,
- * offline fallback indication, and swipe-to-refresh synchronization (FR-M4-01).
+ * offline fallback indication, swipe-to-refresh synchronization, and real-time operational feeds (FR-M4-01, FR-M4-02).
  */
 package com.sliit.ssmts.operator_dashboard.ui.dashboard
 
@@ -8,18 +8,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
+import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import com.sliit.ssmts.operator_dashboard.domain.repository.IDashboardRepository
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
 import com.sliit.ssmts.operator_dashboard.util.NetworkResult
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
  * State holder and business coordinator for the operational dashboard UI.
  *
- * @property repository Injected repository abstraction for retrieving operational metrics.
+ * @property repository Injected repository abstraction for retrieving operational metrics and cached booking feeds.
  */
 class DashboardViewModel(
     private val repository: IDashboardRepository
@@ -31,8 +35,58 @@ class DashboardViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+    private val _selectedFeedTab = MutableStateFlow(DashboardFeedTab.TODAY_ACTIVE)
+    val selectedFeedTab: StateFlow<DashboardFeedTab> = _selectedFeedTab.asStateFlow()
+
+    private val _todayActiveBookings = MutableStateFlow<List<Reservation>>(emptyList())
+    val todayActiveBookings: StateFlow<List<Reservation>> = _todayActiveBookings.asStateFlow()
+
+    private val _pendingQueueBookings = MutableStateFlow<List<Reservation>>(emptyList())
+    val pendingQueueBookings: StateFlow<List<Reservation>> = _pendingQueueBookings.asStateFlow()
+
+    val feedReservations: StateFlow<List<Reservation>> = combine(
+        _selectedFeedTab,
+        _todayActiveBookings,
+        _pendingQueueBookings
+    ) { tab, todayActive, pendingQueue ->
+        when (tab) {
+            DashboardFeedTab.TODAY_ACTIVE -> todayActive
+            DashboardFeedTab.PENDING_QUEUE -> pendingQueue
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
     init {
         loadMetrics(forceRefresh = false)
+        observeFeeds()
+    }
+
+    /**
+     * Initiates real-time observation of today's active slots and pending reservation queues.
+     */
+    private fun observeFeeds() {
+        viewModelScope.launch {
+            repository.getTodayActiveReservationsStream().collect { reservations ->
+                _todayActiveBookings.value = reservations
+            }
+        }
+        viewModelScope.launch {
+            repository.getPendingQueueReservationsStream().collect { reservations ->
+                _pendingQueueBookings.value = reservations
+            }
+        }
+    }
+
+    /**
+     * Changes the active feed tab between today's active slots and the pending queue.
+     *
+     * @param tab Selected operational feed tab.
+     */
+    fun selectFeedTab(tab: DashboardFeedTab) {
+        _selectedFeedTab.value = tab
     }
 
     /**

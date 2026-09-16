@@ -30,9 +30,12 @@
     <string name="action_retry_sync">Retry Sync</string>
 
     <!-- Current & Pending Booking Feeds (FR-M4-02) -->
+    <string name="title_operational_feeds">OPERATIONAL BOOKING FEEDS</string>
     <string name="tab_all">All</string>
     <string name="tab_today_active">Today\'s Active</string>
     <string name="tab_pending_queue">Pending Queue</string>
+    <string name="tab_today_active_format">Today\'s Active (%1$d)</string>
+    <string name="tab_pending_queue_format">Pending Queue (%1$d)</string>
     <string name="feed_empty_active">No active energy transfer slots for today.</string>
     <string name="feed_empty_pending">No pending reservations awaiting approval.</string>
 

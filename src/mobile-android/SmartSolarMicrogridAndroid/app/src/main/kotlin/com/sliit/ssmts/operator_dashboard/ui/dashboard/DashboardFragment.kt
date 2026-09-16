@@ -1,6 +1,6 @@
 /**
  * Description: Operational Dashboard Fragment rendering live counters, active spotlight card,
- * countdown timers, offline indicator banner, and pull-to-refresh interactions (FR-M4-01).
+ * countdown timers, offline indicator banner, and real-time operational booking feeds (FR-M4-01, FR-M4-02).
  */
 package com.sliit.ssmts.operator_dashboard.ui.dashboard
 
@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sliit.ssmts.operator_dashboard.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
@@ -24,18 +25,16 @@ import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
 import com.sliit.ssmts.operator_dashboard.util.TimeFormatter
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 /**
- * Fragment rendering live operational metrics cards and active booking spotlight widget.
+ * Fragment rendering live operational metrics cards, active booking spotlight, and real-time booking feeds.
  */
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var feedAdapter: BookingsFeedAdapter
 
     private val viewModel: DashboardViewModel by viewModels {
         val database = SsmtsDatabase.getInstance(requireContext().applicationContext)
@@ -76,6 +75,19 @@ class DashboardFragment : Fragment() {
         binding.btnErrorRetry.setOnClickListener {
             viewModel.loadMetrics(forceRefresh = true)
         }
+
+        feedAdapter = BookingsFeedAdapter()
+        binding.rvBookingsFeed.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvBookingsFeed.adapter = feedAdapter
+
+        binding.toggleGroupFeed.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.btnTabTodayActive -> viewModel.selectFeedTab(DashboardFeedTab.TODAY_ACTIVE)
+                    R.id.btnTabPendingQueue -> viewModel.selectFeedTab(DashboardFeedTab.PENDING_QUEUE)
+                }
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -89,6 +101,32 @@ class DashboardFragment : Fragment() {
                 launch {
                     viewModel.isRefreshing.collect { refreshing ->
                         binding.swipeRefreshLayout.isRefreshing = refreshing
+                    }
+                }
+                launch {
+                    viewModel.todayActiveBookings.collect { list ->
+                        binding.btnTabTodayActive.text = getString(R.string.tab_today_active_format, list.size)
+                    }
+                }
+                launch {
+                    viewModel.pendingQueueBookings.collect { list ->
+                        binding.btnTabPendingQueue.text = getString(R.string.tab_pending_queue_format, list.size)
+                    }
+                }
+                launch {
+                    viewModel.feedReservations.collect { reservations ->
+                        feedAdapter.submitList(reservations)
+                        val isEmpty = reservations.isEmpty()
+                        binding.rvBookingsFeed.isVisible = !isEmpty
+                        binding.layoutFeedEmpty.isVisible = isEmpty
+                        if (isEmpty) {
+                            val emptyMsgRes = if (viewModel.selectedFeedTab.value == DashboardFeedTab.TODAY_ACTIVE) {
+                                R.string.feed_empty_active
+                            } else {
+                                R.string.feed_empty_pending
+                            }
+                            binding.tvFeedEmptyMessage.setText(emptyMsgRes)
+                        }
                     }
                 }
             }

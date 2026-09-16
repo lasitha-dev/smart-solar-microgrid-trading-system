@@ -151,6 +151,14 @@ class DashboardOfflineSyncTest {
             emit(emptyList())
         }
 
+        override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
+            emit(emptyList())
+        }
+
+        override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
+            emit(emptyList())
+        }
+
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             syncReservationsCalled = true
             syncReservationsCallCount++

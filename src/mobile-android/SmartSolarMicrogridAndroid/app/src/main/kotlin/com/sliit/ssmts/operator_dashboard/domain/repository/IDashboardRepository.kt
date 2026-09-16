@@ -31,6 +31,20 @@ interface IDashboardRepository {
     fun getCachedReservationsStream(status: String? = null, search: String? = null): Flow<List<Reservation>>
 
     /**
+     * Observes active reservations scheduled for the current calendar date (FR-M4-02.1).
+     *
+     * @return Flow emitting active reservation domain models.
+     */
+    fun getTodayActiveReservationsStream(): Flow<List<Reservation>>
+
+    /**
+     * Observes pending reservations awaiting operator or administrative validation (FR-M4-02.2).
+     *
+     * @return Flow emitting pending reservation domain models.
+     */
+    fun getPendingQueueReservationsStream(): Flow<List<Reservation>>
+
+    /**
      * Synchronizes local SQLite reservation cache with the central C# Web API.
      *
      * @return NetworkResult indicating synchronization success or failure.

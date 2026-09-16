@@ -191,6 +191,30 @@ class ReservationCacheDaoTest {
         assertEquals(0, all.size)
     }
 
+    /**
+     * Verifies getTodayActiveReservationsFlow returns only approved reservations scheduled within today's window.
+     */
+    @Test
+    fun getTodayActiveReservationsFlow_filtersByApprovedStatusAndDayWindow() = runBlocking {
+        val startOfDay = 10_000L
+        val endOfDay = 20_000L
+
+        val beforeTodayApproved = createTestEntity(id = "RES-BEFORE", scheduledTime = 9_000L, status = "APPROVED")
+        val todayApproved1 = createTestEntity(id = "RES-TODAY-1", scheduledTime = 12_000L, status = "APPROVED")
+        val todayApproved2 = createTestEntity(id = "RES-TODAY-2", scheduledTime = 15_000L, status = "APPROVED")
+        val todayPending = createTestEntity(id = "RES-TODAY-PENDING", scheduledTime = 14_000L, status = "PENDING")
+        val afterTodayApproved = createTestEntity(id = "RES-AFTER", scheduledTime = 25_000L, status = "APPROVED")
+
+        reservationCacheDao.upsertReservations(
+            listOf(beforeTodayApproved, todayApproved1, todayApproved2, todayPending, afterTodayApproved)
+        )
+
+        val activeToday = reservationCacheDao.getTodayActiveReservationsFlow(startOfDay, endOfDay).first()
+        assertEquals(2, activeToday.size)
+        assertEquals("RES-TODAY-1", activeToday[0].reservationId)
+        assertEquals("RES-TODAY-2", activeToday[1].reservationId)
+    }
+
     private fun createTestEntity(
         id: String,
         nic: String = "199012345678",
