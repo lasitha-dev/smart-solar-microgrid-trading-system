@@ -96,6 +96,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     testImplementation("androidx.room:room-testing:$roomVersion")
     testImplementation("androidx.test:core:1.6.1")
+    testImplementation("org.robolectric:robolectric:4.12.2")
     testImplementation("io.mockk:mockk:1.13.11")
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
