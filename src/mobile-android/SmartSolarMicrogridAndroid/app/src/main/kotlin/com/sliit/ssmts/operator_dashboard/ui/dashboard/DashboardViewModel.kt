@@ -68,12 +68,18 @@ class DashboardViewModel(
     }
 
     /**
-     * Executes manual swipe-to-refresh, updating the isRefreshing indicator.
+     * Executes manual swipe-to-refresh, coordinating remote reservation synchronization
+     * and live metrics polling while managing the isRefreshing indicator.
      */
     fun refresh() {
+        _isRefreshing.value = true
         viewModelScope.launch {
-            _isRefreshing.value = true
             try {
+                try {
+                    repository.syncRemoteReservations()
+                } catch (_: Exception) {
+                    // Remote sync failure falls back to local cache gracefully
+                }
                 loadMetrics(forceRefresh = true)
             } finally {
                 _isRefreshing.value = false

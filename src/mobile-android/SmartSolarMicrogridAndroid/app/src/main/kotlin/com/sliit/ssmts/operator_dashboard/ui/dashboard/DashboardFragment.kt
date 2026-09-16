@@ -22,6 +22,7 @@ import com.sliit.ssmts.operator_dashboard.databinding.FragmentDashboardBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.ActiveSpotlightReservation
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
+import com.sliit.ssmts.operator_dashboard.util.TimeFormatter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,6 +60,11 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupInteractions() {
+        binding.swipeRefreshLayout.setColorSchemeResources(
+            R.color.color_primary,
+            R.color.color_secondary
+        )
+
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
         }
@@ -120,7 +126,7 @@ class DashboardFragment : Fragment() {
         // Offline Banner (FR-M4-01.5)
         binding.cardOfflineBanner.isVisible = metrics.isOfflineCached
         if (metrics.isOfflineCached) {
-            val syncFormatted = SimpleDateFormat("HH:mm:ss", Locale.US).format(Date(metrics.lastSyncedAtMillis))
+            val syncFormatted = TimeFormatter.formatSyncTime(metrics.lastSyncedAtMillis)
             binding.tvLastSynced.text = getString(R.string.banner_last_synced_format, syncFormatted)
         }
 
@@ -137,23 +143,12 @@ class DashboardFragment : Fragment() {
             binding.tvSpotlightBay.text = getString(R.string.spotlight_bay_prefix, spotlight.allocatedBayId)
             binding.tvSpotlightEstimatedPower.text = getString(R.string.spotlight_estimated_prefix, spotlight.estimatedKwh)
 
-            val countdownText = calculateCountdown(spotlight.scheduledTimeMillis)
+            val countdownText = TimeFormatter.formatCountdown(spotlight.scheduledTimeMillis)
             binding.tvSpotlightCountdown.text = getString(R.string.spotlight_countdown_prefix, countdownText)
         } else {
             binding.layoutSpotlightContent.isVisible = false
             binding.tvSpotlightEmpty.isVisible = true
         }
-    }
-
-    private fun calculateCountdown(targetMillis: Long): String {
-        val diffMillis = targetMillis - System.currentTimeMillis()
-        if (diffMillis <= 0) {
-            return "Now"
-        }
-        val hours = TimeUnit.MILLISECONDS.toHours(diffMillis)
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMillis) % 60
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(diffMillis) % 60
-        return String.format(Locale.US, "%02dh %02dm %02ds", hours, minutes, seconds)
     }
 
     /**
