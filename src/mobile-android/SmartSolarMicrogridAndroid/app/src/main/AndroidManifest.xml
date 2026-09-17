@@ -29,6 +29,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ssmts.OperatorDashboard">
 
+        <!-- Booking History, Search & Filter Activity (FR-M4-03) -->
+        <activity
+            android:name=".ui.history.BookingHistoryActivity"
+            android:exported="false"
+            android:label="@string/title_booking_history" />
+
     </application>
 
 </manifest>
