@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared App Configuration -->
+    <string name="app_name">Smart Solar Microgrid</string>
+
+    <!-- Slot Selection Screen (Phase 4.1) -->
+    <string name="title_slot_selection">Select Date &amp; Time</string>
+    <string name="btn_select_date">Choose Date</string>
+    <string name="label_selected_date">Selected Date: %s</string>
+    <string name="label_available_slots">Available Energy Slots</string>
+    <string name="msg_no_slots">No slots available for this date.</string>
+    <string name="label_available">Available</string>
+
+    <!-- Create Reservation Screen (Phase 4.2) -->
+    <string name="title_create_reservation">New Reservation</string>
+    <string name="label_selected_slot">Selected Energy Slot</string>
+    <string name="hint_prosumer_nic">Prosumer NIC (e.g. 200112345678)</string>
+    <string name="hint_estimated_kwh">Estimated Energy (kWh)</string>
+    <string name="btn_confirm_booking">Confirm Booking</string>
+    <string name="msg_booking_success">Reservation created successfully!</string>
+    <string name="err_invalid_nic">Please enter a valid NIC number.</string>
+    <string name="err_invalid_kwh">Please enter a value between 0.1 and 500.0 kWh.</string>
+
+    <!-- Booking Summary Screen (Phase 5) -->
+    <string name="title_booking_summary">Booking Summary</string>
+    <string name="label_reservation_details">Reservation Details</string>
+    <string name="label_reservation_id">Reservation ID</string>
+    <string name="label_station">Station</string>
+    <string name="label_scheduled_time">Scheduled Time</string>
+    <string name="label_prosumer_nic">Prosumer NIC</string>
+    <string name="btn_reschedule">Reschedule</string>
+    <string name="btn_cancel_reservation">Cancel Booking</string>
+
+    <!-- Status Badges -->
+    <string name="status_pending">Pending</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_completed">Completed</string>
+
+    <!-- Update / Cancel Dialogs (Phase 6) -->
+    <string name="title_reschedule">Reschedule Reservation</string>
+    <string name="title_cancel_confirm">Cancel Reservation?</string>
+    <string name="msg_cancel_confirm">Are you sure you want to cancel this reservation? This action cannot be undone.</string>
+    <string name="msg_12_hour_rule">Cannot modify — less than 12 hours until scheduled time.</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_dismiss">Dismiss</string>
+</resources>

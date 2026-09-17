@@ -1,0 +1,64 @@
+# ==========================================
+# User Uploads & Reference Documents
+# ==========================================
+docs/references/*
+!docs/references/README.md
+!docs/references/.gitkeep
+*.pdf
+
+# ==========================================
+# Environment & Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+*.local
+
+# ==========================================
+# Operating System & IDEs
+# ==========================================
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ==========================================
+# .NET / C# (Server)
+# ==========================================
+bin/
+obj/
+*.DotSettings.user
+appsettings.Development.json
+appsettings.Production.json
+
+# ==========================================
+# Node / Web Frontend
+# ==========================================
+node_modules/
+dist/
+build/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Android / Gradle (Mobile)
+# ==========================================
+.gradle/
+local.properties
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+.agents/
+node_modules/
+.env

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing Scale -->
+    <dimen name="spacing_xxs">2dp</dimen>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Corner Radii -->
+    <dimen name="radius_xs">4dp</dimen>
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_badge">8dp</dimen>
+    <dimen name="radius_card">16dp</dimen>
+    <dimen name="radius_spotlight">20dp</dimen>
+    <dimen name="radius_pill">50dp</dimen>
+
+    <!-- Elevations -->
+    <dimen name="elevation_none">0dp</dimen>
+    <dimen name="elevation_card">2dp</dimen>
+    <dimen name="elevation_spotlight">4dp</dimen>
+    <dimen name="elevation_dialog">8dp</dimen>
+
+    <!-- Typography Sizing -->
+    <dimen name="text_size_micro">10sp</dimen>
+    <dimen name="text_size_caption">12sp</dimen>
+    <dimen name="text_size_body">14sp</dimen>
+    <dimen name="text_size_subhead">16sp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+    <dimen name="text_size_display">24sp</dimen>
+    <dimen name="text_size_counter">36sp</dimen>
+
+    <!-- Component Sizing -->
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="search_bar_height">56dp</dimen>
+    <dimen name="chip_height">36dp</dimen>
+    <dimen name="status_badge_height">26dp</dimen>
+    <dimen name="badge_padding_horizontal">10dp</dimen>
+    <dimen name="badge_padding_vertical">4dp</dimen>
+
+    <!-- Scanner Viewfinder Geometry (Used by Member 4, kept for consistency) -->
+    <dimen name="scanner_framing_size">260dp</dimen>
+    <dimen name="scanner_corner_thickness">4dp</dimen>
+    <dimen name="scanner_corner_length">32dp</dimen>
+    <dimen name="scanner_torch_btn_size">56dp</dimen>
+
+    <!-- Metric Card Dimensions -->
+    <dimen name="metric_card_min_height">110dp</dimen>
+    <dimen name="spotlight_card_min_height">160dp</dimen>
+</resources>
