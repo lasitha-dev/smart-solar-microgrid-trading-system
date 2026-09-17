@@ -48,6 +48,7 @@
     <string name="filter_chip_cancelled">Cancelled</string>
 
     <!-- Booking History Item Details (FR-M4-03.5) -->
+    <string name="label_ref_id">Ref: #%1$s</string>
     <string name="label_station">Station: %1$s</string>
     <string name="label_prosumer_nic">Prosumer NIC: %1$s</string>
     <string name="label_bay">Bay: %1$s</string>
