@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollFilterChips"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingHorizontal="@dimen/spacing_md"
+    android:paddingVertical="@dimen/spacing_xs"
+    android:scrollbars="none">
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupFilters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:checkedChip="@+id/chipFilterAll"
+        app:selectionRequired="true"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <!-- 1. All Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterAll"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/chip_height"
+            android:text="@string/filter_chip_all"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_caption" />
+
+        <!-- 2. Pending Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterPending"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/chip_height"
+            android:text="@string/filter_chip_pending"
+            android:textColor="@color/status_pending_text"
+            android:textSize="@dimen/text_size_caption" />
+
+        <!-- 3. Approved Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterApproved"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/chip_height"
+            android:text="@string/filter_chip_approved"
+            android:textColor="@color/status_approved_text"
+            android:textSize="@dimen/text_size_caption" />
+
+        <!-- 4. Completed Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterCompleted"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/chip_height"
+            android:text="@string/filter_chip_completed"
+            android:textColor="@color/status_completed_text"
+            android:textSize="@dimen/text_size_caption" />
+
+        <!-- 5. Cancelled Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFilterCancelled"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/chip_height"
+            android:text="@string/filter_chip_cancelled"
+            android:textColor="@color/status_cancelled_text"
+            android:textSize="@dimen/text_size_caption" />
+
+    </com.google.android.material.chip.ChipGroup>
+</HorizontalScrollView>
