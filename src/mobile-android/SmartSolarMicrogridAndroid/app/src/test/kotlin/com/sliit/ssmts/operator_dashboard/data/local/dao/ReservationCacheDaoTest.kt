@@ -32,6 +32,14 @@ class ReservationCacheDaoTest {
     private lateinit var database: SsmtsDatabase
     private lateinit var reservationCacheDao: ReservationCacheDao
 
+    companion object {
+        private const val SPEC_RESERVATION_ID = "664fa10b9c3e2e1a4f001201"
+        private const val SPEC_PROSUMER_NIC = "200012345678"
+        private const val SPEC_STATION_NAME = "Peradeniya Agro-Voltaic Hub"
+        private const val SPEC_ALLOCATED_BAY = "BAY-02"
+        private const val SPEC_METERED_KWH = 24.65
+    }
+
     /**
      * Initializes an in-memory SQLite database before each test execution.
      */
@@ -116,6 +124,40 @@ class ReservationCacheDaoTest {
     }
 
     /**
+     * Verifies Table 6 specification: updating finalized record with 24.65 kWh transitions status
+     * from Approved to Completed in SQLite cache.
+     */
+    @Test
+    fun updateFinalizationStatus_specReservation_transitionsApprovedToCompletedWith24_65Kwh() = runBlocking {
+        val initial = createTestEntity(
+            id = SPEC_RESERVATION_ID,
+            nic = SPEC_PROSUMER_NIC,
+            station = SPEC_STATION_NAME,
+            bay = SPEC_ALLOCATED_BAY,
+            status = "APPROVED",
+            meteredKwh = null
+        )
+        reservationCacheDao.upsertReservation(initial)
+
+        val syncTime = 1726659900000L
+        val updatedRows = reservationCacheDao.updateFinalizationStatus(
+            id = SPEC_RESERVATION_ID,
+            status = "COMPLETED",
+            meteredKwh = SPEC_METERED_KWH,
+            lastSyncedAt = syncTime
+        )
+        assertEquals(1, updatedRows)
+
+        val fetched = reservationCacheDao.getReservationById(SPEC_RESERVATION_ID)
+        assertNotNull(fetched)
+        assertEquals("COMPLETED", fetched?.status)
+        assertEquals(SPEC_METERED_KWH, fetched?.meteredKwh ?: 0.0, 0.001)
+        assertEquals(syncTime, fetched?.lastSyncedAt)
+        assertEquals(SPEC_PROSUMER_NIC, fetched?.prosumerNic)
+        assertEquals(SPEC_STATION_NAME, fetched?.stationName)
+    }
+
+    /**
      * Verifies that updateFinalizationStatus updates status to Completed and records metered kWh.
      */
     @Test
@@ -136,6 +178,75 @@ class ReservationCacheDaoTest {
         assertEquals("COMPLETED", fetched?.status)
         assertEquals(48.75, fetched?.meteredKwh ?: 0.0, 0.001)
         assertEquals(9999L, fetched?.lastSyncedAt)
+    }
+
+    /**
+     * Verifies that re-inserting an entity with an existing ID replaces the record (OnConflictStrategy.REPLACE).
+     */
+    @Test
+    fun upsertReservation_duplicateId_replacesExistingRecord() = runBlocking {
+        val original = createTestEntity(id = "RES-DUP", bay = "BAY-01", status = "PENDING")
+        reservationCacheDao.upsertReservation(original)
+
+        val updated = createTestEntity(id = "RES-DUP", bay = "BAY-99", status = "APPROVED")
+        reservationCacheDao.upsertReservation(updated)
+
+        val fetched = reservationCacheDao.getReservationById("RES-DUP")
+        assertNotNull(fetched)
+        assertEquals("BAY-99", fetched?.allocatedBay)
+        assertEquals("APPROVED", fetched?.status)
+
+        // Verify table size is still 1
+        val all = reservationCacheDao.getAllReservationsFlow().first()
+        assertEquals(1, all.size)
+    }
+
+    /**
+     * Verifies deleteById selectively removes the target reservation and leaves other records intact.
+     */
+    @Test
+    fun deleteById_removesTargetReservationOnly() = runBlocking {
+        val res1 = createTestEntity(id = "DEL-1")
+        val res2 = createTestEntity(id = "DEL-2")
+        reservationCacheDao.upsertReservations(listOf(res1, res2))
+
+        val deletedRows = reservationCacheDao.deleteById("DEL-1")
+        assertEquals(1, deletedRows)
+
+        assertNull(reservationCacheDao.getReservationById("DEL-1"))
+        assertNotNull(reservationCacheDao.getReservationById("DEL-2"))
+    }
+
+    /**
+     * Verifies deleteById on a non-existent identifier returns zero rows removed.
+     */
+    @Test
+    fun deleteById_nonExistentId_returnsZero() = runBlocking {
+        val deletedRows = reservationCacheDao.deleteById("NON-EXISTENT-ID")
+        assertEquals(0, deletedRows)
+    }
+
+    /**
+     * Verifies getReservationById returns null when the reservation does not exist in SQLite.
+     */
+    @Test
+    fun getReservationById_nonExistent_returnsNull() = runBlocking {
+        val result = reservationCacheDao.getReservationById("DOES-NOT-EXIST")
+        assertNull(result)
+    }
+
+    /**
+     * Verifies updateFinalizationStatus returns zero rows modified when updating a non-existent ID.
+     */
+    @Test
+    fun updateFinalizationStatus_nonExistent_returnsZero() = runBlocking {
+        val updatedRows = reservationCacheDao.updateFinalizationStatus(
+            id = "GHOST-ID",
+            status = "COMPLETED",
+            meteredKwh = 10.0,
+            lastSyncedAt = 12345L
+        )
+        assertEquals(0, updatedRows)
     }
 
     /**
@@ -176,6 +287,22 @@ class ReservationCacheDaoTest {
         val spotlight = reservationCacheDao.getActiveSpotlight(now)
         assertNotNull(spotlight)
         assertEquals("NEAREST", spotlight?.reservationId)
+    }
+
+    /**
+     * Verifies getActiveSpotlight returns null when no future approved reservations exist.
+     */
+    @Test
+    fun getActiveSpotlight_noFutureApprovedReservations_returnsNull() = runBlocking {
+        val now = 10_000L
+        val pastApproved = createTestEntity(id = "PAST-APPROVED", status = "APPROVED", scheduledTime = 5_000L)
+        val futurePending = createTestEntity(id = "FUTURE-PENDING", status = "PENDING", scheduledTime = 15_000L)
+        val futureCompleted = createTestEntity(id = "FUTURE-COMPLETED", status = "COMPLETED", scheduledTime = 20_000L)
+
+        reservationCacheDao.upsertReservations(listOf(pastApproved, futurePending, futureCompleted))
+
+        val spotlight = reservationCacheDao.getActiveSpotlight(now)
+        assertNull(spotlight)
     }
 
     /**
