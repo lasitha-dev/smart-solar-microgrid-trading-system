@@ -14,13 +14,23 @@ import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import android.widget.Toast
 import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
+import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
+import com.sliit.ssmts.operator_dashboard.data.repository.OperatorVerificationRepositoryImpl
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorScannerBinding
+import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 import com.sliit.ssmts.operator_dashboard.util.QrParseResult
 import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
+import kotlinx.coroutines.launch
 
 /**
  * Native camera viewfinder handling hardware access, torch activation, and permission safety.
@@ -28,6 +38,21 @@ import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
 class OperatorScannerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOperatorScannerBinding
+
+    var viewModelFactory: ViewModelProvider.Factory? = null
+
+    val viewModel: OperatorScannerViewModel by viewModels {
+        viewModelFactory ?: run {
+            val database = SsmtsDatabase.getInstance(applicationContext)
+            val api = ApiClient.createOperatorDashboardApi("https://10.0.2.2:7143/")
+            val repository = OperatorVerificationRepositoryImpl(
+                api = api,
+                reservationDao = database.reservationCacheDao(),
+                auditDao = database.operatorAuditDao()
+            )
+            OperatorScannerViewModel.Factory(repository)
+        }
+    }
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var camera: Camera? = null
@@ -48,11 +73,16 @@ class OperatorScannerActivity : AppCompatActivity() {
 
         setupListeners()
         checkAndRequestPermissions()
+        observeViewModel()
     }
 
     var onPayloadProcessedListener: ((String) -> Unit)? = null
 
     private fun setupListeners() {
+        onPayloadProcessedListener = { payload ->
+            viewModel.verifyQrToken(payload)
+        }
+
         binding.btnScannerBack.setOnClickListener {
             finish()
         }
@@ -192,6 +222,49 @@ class OperatorScannerActivity : AppCompatActivity() {
                 false
             }
         }
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    renderUiState(state)
+                }
+            }
+        }
+    }
+
+    private fun renderUiState(state: ScannerUiState) {
+        when (state) {
+            is ScannerUiState.Idle -> {
+                binding.layoutVerificationLoading.isVisible = false
+            }
+            is ScannerUiState.Verifying -> {
+                binding.layoutVerificationLoading.isVisible = true
+            }
+            is ScannerUiState.Handshake -> {
+                binding.layoutVerificationLoading.isVisible = false
+                showHandshakeModal(state.reservation)
+            }
+            is ScannerUiState.Rejection -> {
+                binding.layoutVerificationLoading.isVisible = false
+                ScannerRejectionDialog.show(this, state.errorCode, state.message) {
+                    viewModel.resetScannerState()
+                }
+            }
+        }
+    }
+
+    private fun showHandshakeModal(reservation: QrVerificationResult) {
+        val modal = TransferHandshakeModal.newInstance(reservation).apply {
+            onCancelClicked = {
+                viewModel.resetScannerState()
+            }
+            onProceedClicked = {
+                // Prepared for Sub-phase 7.4: TransferFinalizeDialog
+            }
+        }
+        modal.show(supportFragmentManager, TransferHandshakeModal.TAG)
     }
 
     override fun onDestroy() {

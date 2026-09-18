@@ -81,6 +81,9 @@
     <string name="btn_grant_permission">Grant Camera Access</string>
     <string name="permission_denied_banner">Camera access was denied. Use Fast Test QR or enable camera in system settings.</string>
 
+    <string name="verifying_qr_token">Verifying QR token with central Web API…</string>
+    <string name="err_verification_generic">Unable to verify reservation. Please check network connectivity.</string>
+
     <!-- QR Server Verification & Handshake Modal (FR-M4-06) -->
     <string name="handshake_title">Reservation Verified</string>
     <string name="handshake_subtitle">Cryptographic token validated by central API.</string>
