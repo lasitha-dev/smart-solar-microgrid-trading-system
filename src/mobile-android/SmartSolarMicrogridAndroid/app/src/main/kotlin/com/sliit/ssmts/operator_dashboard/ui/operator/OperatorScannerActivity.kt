@@ -16,8 +16,11 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import android.widget.Toast
 import com.sliit.ssmts.operator_dashboard.R
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorScannerBinding
+import com.sliit.ssmts.operator_dashboard.util.QrParseResult
+import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
 
 /**
  * Native camera viewfinder handling hardware access, torch activation, and permission safety.
@@ -47,6 +50,8 @@ class OperatorScannerActivity : AppCompatActivity() {
         checkAndRequestPermissions()
     }
 
+    var onPayloadProcessedListener: ((String) -> Unit)? = null
+
     private fun setupListeners() {
         binding.btnScannerBack.setOnClickListener {
             finish()
@@ -58,6 +63,14 @@ class OperatorScannerActivity : AppCompatActivity() {
 
         binding.btnTorchToggle.setOnClickListener {
             toggleTorch()
+        }
+
+        binding.btnFastTestQr.setOnClickListener {
+            showFastTestDialog()
+        }
+
+        binding.btnPermissionUseFastTest.setOnClickListener {
+            showFastTestDialog()
         }
     }
 
@@ -141,6 +154,44 @@ class OperatorScannerActivity : AppCompatActivity() {
             ContextCompat.getColor(this, R.color.color_secondary_variant)
         }
         binding.btnTorchToggle.setColorFilter(tintColor)
+    }
+
+    /**
+     * Displays the Viva Fast Test QR selection dialog for single-device demonstration (Rule 6.3).
+     */
+    fun showFastTestDialog() {
+        FastTestQrDialog.show(this) { payload ->
+            processScannedPayload(payload)
+        }
+    }
+
+    /**
+     * Processes a detected or simulated QR payload string, validating syntax defensively
+     * before delegating to the verification listener or ViewModel.
+     *
+     * @param payload Raw QR payload string to validate and process.
+     * @return True if payload passes client syntax validation; false if rejected.
+     */
+    fun processScannedPayload(payload: String): Boolean {
+        return when (val parseResult = QrPayloadParser.validateAndParse(payload)) {
+            is QrParseResult.Success -> {
+                Toast.makeText(
+                    this,
+                    getString(R.string.scanner_payload_injected_toast, parseResult.payload.reservationId),
+                    Toast.LENGTH_SHORT
+                ).show()
+                onPayloadProcessedListener?.invoke(payload)
+                true
+            }
+            is QrParseResult.Failure -> {
+                Toast.makeText(
+                    this,
+                    getString(R.string.scanner_payload_malformed_toast),
+                    Toast.LENGTH_LONG
+                ).show()
+                false
+            }
+        }
     }
 
     override fun onDestroy() {

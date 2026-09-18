@@ -64,7 +64,7 @@
         android:textColor="@color/text_inverse"
         android:textSize="@dimen/text_size_caption" />
 
-    <!-- 5. Bottom Controls Container: Torch Toggle -->
+    <!-- 5. Bottom Controls Container: Torch Toggle & Fast Test QR Trigger -->
     <LinearLayout
         android:id="@+id/layoutScannerControls"
         android:layout_width="match_parent"
@@ -72,6 +72,7 @@
         android:layout_gravity="bottom"
         android:gravity="center"
         android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_lg"
         android:paddingBottom="@dimen/spacing_xl">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -83,6 +84,22 @@
             app:backgroundTint="@color/color_primary"
             app:elevation="@dimen/elevation_card"
             app:tint="@color/color_secondary_variant" />
+
+        <Space
+            android:layout_width="@dimen/spacing_lg"
+            android:layout_height="wrap_content" />
+
+        <!-- Viva Simulation Fast Test QR Trigger (Rule 6.3) -->
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/btnFastTestQr"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/scanner_fast_test_button"
+            android:textColor="@color/text_inverse"
+            app:backgroundTint="@color/color_secondary"
+            app:elevation="@dimen/elevation_card"
+            app:icon="@android:drawable/ic_menu_agenda"
+            app:iconTint="@color/text_inverse" />
     </LinearLayout>
 
     <!-- 6. Non-Crashing Permission Denial Banner (Section 4 Mandate) -->
@@ -130,6 +147,16 @@
                 android:layout_height="@dimen/button_height"
                 android:layout_marginTop="@dimen/spacing_lg"
                 android:text="@string/btn_grant_permission" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermissionUseFastTest"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="@string/btn_use_fast_test"
+                android:textColor="@color/color_secondary"
+                app:strokeColor="@color/color_secondary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
