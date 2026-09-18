@@ -4,6 +4,7 @@
  */
 package com.sliit.ssmts.operator_dashboard.ui.dashboard
 
+import androidx.lifecycle.ViewModel
 import com.sliit.ssmts.operator_dashboard.domain.model.ActiveSpotlightReservation
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
 import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
@@ -27,8 +28,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -133,7 +136,32 @@ class DashboardViewModelTest {
     }
 
     /**
-     * Verifies that refresh invokes forced synchronization on repository.
+     * Verifies that error recovery succeeds when reloading metrics after an initial error.
+     */
+    @Test
+    fun errorRecovery_afterFailure_reloadsToSuccess() = runTest(testDispatcher) {
+        fakeRepository.metricsResult = NetworkResult.Error(code = "ERR_NET", message = "Network down")
+
+        viewModel = DashboardViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isError)
+
+        // Update repository with successful metrics and trigger reload
+        val recoveredMetrics = DashboardMetrics(pendingReservationsCount = 7, completedTodayCount = 3)
+        fakeRepository.metricsResult = NetworkResult.Success(recoveredMetrics)
+
+        viewModel.loadMetrics(forceRefresh = true)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isSuccess)
+        val successData = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(7, successData.pendingReservationsCount)
+        assertEquals(3, successData.completedTodayCount)
+    }
+
+    /**
+     * Verifies that refresh invokes forced synchronization on repository and updates isRefreshing indicator.
      */
     @Test
     fun refresh_triggersForcedRefreshOnRepository() = runTest(testDispatcher) {
@@ -142,10 +170,50 @@ class DashboardViewModelTest {
         viewModel = DashboardViewModel(fakeRepository)
         advanceUntilIdle()
 
+        assertFalse("isRefreshing must initially be false", viewModel.isRefreshing.value)
+
         viewModel.refresh()
         advanceUntilIdle()
 
+        assertFalse("isRefreshing must return to false after completion", viewModel.isRefreshing.value)
+        assertTrue("syncRemoteReservations must be invoked", fakeRepository.syncRemoteCalled)
         assertTrue("Forced refresh must be dispatched to repository", fakeRepository.lastForceRefreshRequested)
+    }
+
+    /**
+     * Verifies that switching operational feed tabs toggles between today's active slots and the pending queue.
+     */
+    @Test
+    fun feedTabs_switchingTogglesBetweenActiveAndPendingFeeds() = runTest(testDispatcher) {
+        val res1 = Reservation(id = "RES-ACTIVE-1", prosumerNic = "200012345678", stationName = "Hub 1", scheduledTimeMillis = 1000L, allocatedBay = "BAY-01", estimatedKwh = 20.0, status = ReservationStatus.APPROVED)
+        val res2 = Reservation(id = "RES-ACTIVE-2", prosumerNic = "200012345679", stationName = "Hub 2", scheduledTimeMillis = 2000L, allocatedBay = "BAY-02", estimatedKwh = 25.0, status = ReservationStatus.APPROVED)
+        val res3 = Reservation(id = "RES-PENDING-1", prosumerNic = "200012345680", stationName = "Hub 3", scheduledTimeMillis = 3000L, allocatedBay = "BAY-03", estimatedKwh = 30.0, status = ReservationStatus.PENDING)
+
+        fakeRepository.todayActiveList = listOf(res1, res2)
+        fakeRepository.pendingQueueList = listOf(res3)
+
+        viewModel = DashboardViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Default tab is TODAY_ACTIVE
+        assertEquals(DashboardFeedTab.TODAY_ACTIVE, viewModel.selectedFeedTab.value)
+        assertEquals(2, viewModel.feedReservations.value.size)
+        assertEquals("RES-ACTIVE-1", viewModel.feedReservations.value[0].id)
+
+        // Switch to PENDING_QUEUE
+        viewModel.selectFeedTab(DashboardFeedTab.PENDING_QUEUE)
+        advanceUntilIdle()
+
+        assertEquals(DashboardFeedTab.PENDING_QUEUE, viewModel.selectedFeedTab.value)
+        assertEquals(1, viewModel.feedReservations.value.size)
+        assertEquals("RES-PENDING-1", viewModel.feedReservations.value[0].id)
+
+        // Switch back to TODAY_ACTIVE
+        viewModel.selectFeedTab(DashboardFeedTab.TODAY_ACTIVE)
+        advanceUntilIdle()
+
+        assertEquals(DashboardFeedTab.TODAY_ACTIVE, viewModel.selectedFeedTab.value)
+        assertEquals(2, viewModel.feedReservations.value.size)
     }
 
     /**
@@ -185,11 +253,34 @@ class DashboardViewModelTest {
     }
 
     /**
+     * Asserts that ViewModel Factory constructs DashboardViewModel cleanly and rejects foreign classes.
+     */
+    @Test
+    fun factory_constructsViewModelAndRejectsForeignClasses() {
+        val factory = DashboardViewModel.Factory(fakeRepository)
+        val created = factory.create(DashboardViewModel::class.java)
+
+        assertNotNull(created)
+
+        try {
+            factory.create(ForeignTestViewModel::class.java)
+            fail("Expected IllegalArgumentException for foreign ViewModel class")
+        } catch (e: IllegalArgumentException) {
+            assertTrue(e.message?.contains("Unknown ViewModel class") == true)
+        }
+    }
+
+    private class ForeignTestViewModel : ViewModel()
+
+    /**
      * Test double implementation of IDashboardRepository for ViewModel verification.
      */
     private class FakeDashboardRepository : IDashboardRepository {
         var metricsResult: NetworkResult<DashboardMetrics> = NetworkResult.Success(DashboardMetrics())
         var lastForceRefreshRequested: Boolean = false
+        var syncRemoteCalled: Boolean = false
+        var todayActiveList: List<Reservation> = emptyList()
+        var pendingQueueList: List<Reservation> = emptyList()
 
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             lastForceRefreshRequested = forceRefresh
@@ -201,14 +292,15 @@ class DashboardViewModelTest {
         }
 
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
-            emit(emptyList())
+            emit(todayActiveList)
         }
 
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
-            emit(emptyList())
+            emit(pendingQueueList)
         }
 
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
+            syncRemoteCalled = true
             return NetworkResult.Success(Unit)
         }
     }
