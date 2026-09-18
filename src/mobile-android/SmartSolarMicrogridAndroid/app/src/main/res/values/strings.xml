@@ -118,9 +118,12 @@
     <!-- Transfer Completed Receipt (FR-M4-07.4) -->
     <string name="receipt_title">Transfer Finalized</string>
     <string name="receipt_subtitle">Energy transfer completed and committed successfully.</string>
+    <string name="receipt_delivered_label">Actual Delivered Energy</string>
     <string name="receipt_metered_kwh_format">Delivered: %1$.2f kWh</string>
+    <string name="receipt_ref_format">Reservation Ref: #%1$s</string>
     <string name="receipt_operator_format">Operator: %1$s</string>
     <string name="receipt_timestamp_format">Time: %1$s</string>
+    <string name="receipt_cache_synced">Local SQLite cache synchronized &amp; audited</string>
     <string name="btn_done">Done</string>
 
     <!-- Status Badge Values -->

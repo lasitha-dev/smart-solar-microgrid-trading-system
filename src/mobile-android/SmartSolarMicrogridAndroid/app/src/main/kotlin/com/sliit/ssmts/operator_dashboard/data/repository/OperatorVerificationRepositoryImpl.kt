@@ -15,6 +15,7 @@ import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 import com.sliit.ssmts.operator_dashboard.domain.repository.IOperatorVerificationRepository
 import com.sliit.ssmts.operator_dashboard.util.NetworkResult
+import com.sliit.ssmts.operator_dashboard.util.TransferSyncNotifier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -125,6 +126,11 @@ class OperatorVerificationRepositoryImpl(
                     syncStatus = OperatorAuditEntity.STATUS_SYNCED
                 )
                 auditDao.insertAudit(audit)
+
+                TransferSyncNotifier.notifyTransferCompleted(
+                    reservationId = reservationId.trim(),
+                    meteredKwh = meteredKwh
+                )
 
                 val result = FinalizeTransferResult(
                     isSuccess = body.success,

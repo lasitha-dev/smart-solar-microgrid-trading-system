@@ -10,6 +10,8 @@ import androidx.camera.view.PreviewView
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.button.MaterialButton
 import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.operator_dashboard.domain.model.FinalizeTransferResult
+import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -129,5 +131,29 @@ class OperatorScannerActivityTest {
 
         assertEquals(1080, overlayView.width)
         assertEquals(1920, overlayView.height)
+    }
+
+    /**
+     * Asserts that when a transfer is finalized, the TransferReceiptModal is presented to the operator (FR-M4-07.4).
+     */
+    @Test
+    fun finalizedState_displaysTransferReceiptModal() {
+        val mockReceipt = FinalizeTransferResult(
+            isSuccess = true,
+            reservationId = "664fa10b9c3e2e1a4f001201",
+            status = ReservationStatus.COMPLETED,
+            meteredEnergyKwh = 24.65,
+            finalizedAtIso = "2026-09-18T11:45:00Z",
+            finalizedByOperator = "OP-PERADENIYA-01"
+        )
+
+        val modal = TransferReceiptModal.newInstance(mockReceipt)
+        modal.show(activity.supportFragmentManager, TransferReceiptModal.TAG)
+        activity.supportFragmentManager.executePendingTransactions()
+
+        val foundModal = activity.supportFragmentManager.findFragmentByTag(TransferReceiptModal.TAG) as? TransferReceiptModal
+        assertNotNull(foundModal)
+        assertTrue(foundModal?.dialog?.isShowing == true)
+        assertTrue(foundModal?.binding?.tvReceiptDeliveredKwh?.text?.contains("24.65") == true)
     }
 }

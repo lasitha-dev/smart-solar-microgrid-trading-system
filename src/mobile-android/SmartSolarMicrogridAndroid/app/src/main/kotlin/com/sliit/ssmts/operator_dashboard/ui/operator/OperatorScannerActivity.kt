@@ -27,6 +27,7 @@ import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
 import com.sliit.ssmts.operator_dashboard.data.repository.OperatorVerificationRepositoryImpl
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorScannerBinding
+import com.sliit.ssmts.operator_dashboard.domain.model.FinalizeTransferResult
 import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 import com.sliit.ssmts.operator_dashboard.util.QrParseResult
 import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
@@ -257,14 +258,18 @@ class OperatorScannerActivity : AppCompatActivity() {
             }
             is ScannerUiState.Finalized -> {
                 binding.layoutVerificationLoading.isVisible = false
-                Toast.makeText(
-                    this,
-                    "Transfer Finalized: ${state.receipt.meteredEnergyKwh} kWh",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showReceiptModal(state.receipt)
+            }
+        }
+    }
+
+    private fun showReceiptModal(receipt: FinalizeTransferResult) {
+        val modal = TransferReceiptModal.newInstance(receipt).apply {
+            onDoneClicked = {
                 viewModel.resetScannerState()
             }
         }
+        modal.show(supportFragmentManager, TransferReceiptModal.TAG)
     }
 
     private fun showHandshakeModal(reservation: QrVerificationResult) {

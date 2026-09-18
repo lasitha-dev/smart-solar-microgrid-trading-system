@@ -14,6 +14,7 @@ import com.sliit.ssmts.operator_dashboard.ui.common.isError
 import com.sliit.ssmts.operator_dashboard.ui.common.isLoading
 import com.sliit.ssmts.operator_dashboard.ui.common.isSuccess
 import com.sliit.ssmts.operator_dashboard.util.NetworkResult
+import com.sliit.ssmts.operator_dashboard.util.TransferSyncNotifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -165,6 +166,22 @@ class DashboardViewModelTest {
 
         val successData = (viewModel.uiState.value as UiState.Success).data
         assertTrue("isOfflineCached flag must be true", successData.isOfflineCached)
+    }
+
+    /**
+     * Asserts that receiving a TransferSyncNotifier event triggers a forced dashboard metrics refresh (FR-M4-07.4).
+     */
+    @Test
+    fun transferCompletedNotification_triggersForcedMetricsReload() = runTest(testDispatcher) {
+        viewModel = DashboardViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        fakeRepository.lastForceRefreshRequested = false
+
+        TransferSyncNotifier.notifyTransferCompleted("RES-FINAL-01", 24.65)
+        advanceUntilIdle()
+
+        assertTrue("Transfer completion must trigger forced reload", fakeRepository.lastForceRefreshRequested)
     }
 
     /**

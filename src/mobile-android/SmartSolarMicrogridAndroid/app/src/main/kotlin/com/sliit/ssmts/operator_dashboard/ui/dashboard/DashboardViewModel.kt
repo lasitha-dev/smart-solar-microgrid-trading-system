@@ -12,6 +12,7 @@ import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import com.sliit.ssmts.operator_dashboard.domain.repository.IDashboardRepository
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
 import com.sliit.ssmts.operator_dashboard.util.NetworkResult
+import com.sliit.ssmts.operator_dashboard.util.TransferSyncNotifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -62,6 +63,19 @@ class DashboardViewModel(
     init {
         loadMetrics(forceRefresh = false)
         observeFeeds()
+        observeTransferSyncEvents()
+    }
+
+    /**
+     * Observes reactive transfer finalization events across the application to trigger
+     * cache recalculation and metric refresh (FR-M4-07.4).
+     */
+    private fun observeTransferSyncEvents() {
+        viewModelScope.launch {
+            TransferSyncNotifier.events.collect {
+                loadMetrics(forceRefresh = true)
+            }
+        }
     }
 
     /**
