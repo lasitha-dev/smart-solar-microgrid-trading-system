@@ -252,6 +252,18 @@ class OperatorScannerActivity : AppCompatActivity() {
                     viewModel.resetScannerState()
                 }
             }
+            is ScannerUiState.Finalizing -> {
+                binding.layoutVerificationLoading.isVisible = true
+            }
+            is ScannerUiState.Finalized -> {
+                binding.layoutVerificationLoading.isVisible = false
+                Toast.makeText(
+                    this,
+                    "Transfer Finalized: ${state.receipt.meteredEnergyKwh} kWh",
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.resetScannerState()
+            }
         }
     }
 
@@ -261,10 +273,22 @@ class OperatorScannerActivity : AppCompatActivity() {
                 viewModel.resetScannerState()
             }
             onProceedClicked = {
-                // Prepared for Sub-phase 7.4: TransferFinalizeDialog
+                showFinalizeDialog(reservation.reservationId ?: "")
             }
         }
         modal.show(supportFragmentManager, TransferHandshakeModal.TAG)
+    }
+
+    private fun showFinalizeDialog(reservationId: String) {
+        val dialog = TransferFinalizeDialog.newInstance(reservationId).apply {
+            onCancelClicked = {
+                viewModel.resetScannerState()
+            }
+            onFinalizeConfirmed = { resId, kwh, notes ->
+                viewModel.finalizeEnergyTransfer(resId, kwh, notes)
+            }
+        }
+        dialog.show(supportFragmentManager, TransferFinalizeDialog.TAG)
     }
 
     override fun onDestroy() {

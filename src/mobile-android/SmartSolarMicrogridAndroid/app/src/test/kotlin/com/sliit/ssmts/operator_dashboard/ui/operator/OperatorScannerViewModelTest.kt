@@ -171,12 +171,76 @@ class OperatorScannerViewModelTest {
     }
 
     /**
+     * Asserts that finalizeEnergyTransfer commits power reading and transitions to ScannerUiState.Finalized.
+     */
+    @Test
+    fun finalizeEnergyTransfer_success_transitionsToFinalized() = runTest(testDispatcher) {
+        viewModel.finalizeEnergyTransfer("res-fin-1", 24.65, "Nominal transfer")
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ScannerUiState.Finalized)
+        val finalized = state as ScannerUiState.Finalized
+        assertEquals("res-fin-1", finalized.receipt.reservationId)
+        assertEquals(24.65, finalized.receipt.meteredEnergyKwh, 0.001)
+        assertTrue(finalized.receipt.isSuccess)
+    }
+
+    /**
+     * Asserts that invalid metered kWh (< 0.01 or > 999.99) triggers Rejection without calling repository.
+     */
+    @Test
+    fun finalizeEnergyTransfer_invalidKwh_transitionsToRejection() = runTest(testDispatcher) {
+        viewModel.finalizeEnergyTransfer("res-fin-1", 0.0)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ScannerUiState.Rejection)
+        val rejection = state as ScannerUiState.Rejection
+        assertEquals("ERR_INVALID_METERED_KWH", rejection.errorCode)
+        assertEquals(0, fakeRepository.finalizeCallCount)
+    }
+
+    /**
+     * Asserts that network errors during finalization dispatch a structured Rejection state.
+     */
+    @Test
+    fun finalizeEnergyTransfer_networkError_transitionsToRejection() = runTest(testDispatcher) {
+        fakeRepository.finalizeResponse = NetworkResult.Error("500", "Central database failure")
+
+        viewModel.finalizeEnergyTransfer("res-fin-1", 15.0)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ScannerUiState.Rejection)
+        val rejection = state as ScannerUiState.Rejection
+        assertEquals("500", rejection.errorCode)
+        assertEquals("Central database failure", rejection.message)
+    }
+
+    /**
+     * Asserts that duplicate finalization requests while in-flight are ignored.
+     */
+    @Test
+    fun finalizeEnergyTransfer_whileFinalizing_ignoresDuplicateCalls() = runTest(testDispatcher) {
+        viewModel.finalizeEnergyTransfer("res-fin-1", 25.0)
+        // Second call while in progress
+        viewModel.finalizeEnergyTransfer("res-fin-1", 25.0)
+
+        advanceUntilIdle()
+        assertEquals(1, fakeRepository.finalizeCallCount)
+    }
+
+    /**
      * Test double repository implementation for unit testing OperatorScannerViewModel.
      */
     private class FakeOperatorVerificationRepository : IOperatorVerificationRepository {
         var verificationResponse: NetworkResult<QrVerificationResult> =
             NetworkResult.Success(QrVerificationResult(isValid = true))
         var verifyCallCount = 0
+
+        var finalizeResponse: NetworkResult<FinalizeTransferResult>? = null
+        var finalizeCallCount = 0
 
         override suspend fun verifyScannedQr(qrPayload: String): NetworkResult<QrVerificationResult> {
             verifyCallCount++
@@ -188,7 +252,8 @@ class OperatorScannerViewModelTest {
             meteredKwh: Double,
             notes: String?
         ): NetworkResult<FinalizeTransferResult> {
-            return NetworkResult.Success(
+            finalizeCallCount++
+            return finalizeResponse ?: NetworkResult.Success(
                 FinalizeTransferResult(
                     isSuccess = true,
                     reservationId = reservationId,

@@ -4,6 +4,7 @@
  */
 package com.sliit.ssmts.operator_dashboard.ui.operator
 
+import com.sliit.ssmts.operator_dashboard.domain.model.FinalizeTransferResult
 import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 
 /**
@@ -35,4 +36,16 @@ sealed interface ScannerUiState {
      * @property message Human-readable rejection reason.
      */
     data class Rejection(val errorCode: String?, val message: String) : ScannerUiState
+
+    /**
+     * In-flight energy transfer finalization request to PATCH /api/reservations/{id}/finalize.
+     */
+    data object Finalizing : ScannerUiState
+
+    /**
+     * Energy transfer finalized successfully on backend and committed to local cache.
+     *
+     * @property receipt Completed energy transfer metrics and audit confirmation.
+     */
+    data class Finalized(val receipt: FinalizeTransferResult) : ScannerUiState
 }

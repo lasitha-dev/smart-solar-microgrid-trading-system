@@ -68,6 +68,53 @@ class OperatorScannerViewModel(
     }
 
     /**
+     * Finalizes the energy transfer by committing metered power metrics to the central system.
+     *
+     * @param reservationId The verified reservation ID.
+     * @param meteredKwh Actual delivered energy in kWh (0.01 - 999.99 kWh).
+     * @param notes Optional operator observations.
+     */
+    fun finalizeEnergyTransfer(
+        reservationId: String,
+        meteredKwh: Double,
+        notes: String? = null
+    ) {
+        if (_uiState.value is ScannerUiState.Finalizing) {
+            return
+        }
+
+        if (meteredKwh.isNaN() || meteredKwh < 0.01 || meteredKwh > 999.99) {
+            _uiState.value = ScannerUiState.Rejection(
+                errorCode = "ERR_INVALID_METERED_KWH",
+                message = "Metered energy reading must be a positive decimal between 0.01 and 999.99 kWh."
+            )
+            return
+        }
+
+        _uiState.value = ScannerUiState.Finalizing
+
+        viewModelScope.launch {
+            when (val result = repository.finalizeTransfer(reservationId, meteredKwh, notes)) {
+                is NetworkResult.Success -> {
+                    _uiState.value = ScannerUiState.Finalized(result.data)
+                }
+                is NetworkResult.Error -> {
+                    _uiState.value = ScannerUiState.Rejection(
+                        errorCode = result.code,
+                        message = result.message
+                    )
+                }
+                is NetworkResult.Exception -> {
+                    _uiState.value = ScannerUiState.Rejection(
+                        errorCode = "ERR_FINALIZE_EXCEPTION",
+                        message = result.throwable.localizedMessage ?: "Failed to finalize transfer."
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Resets scanner UI state to Idle, dismissing dialogs and reactivating camera viewfinder.
      */
     fun resetScannerState() {
