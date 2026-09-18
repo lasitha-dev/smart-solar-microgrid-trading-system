@@ -35,6 +35,12 @@
             android:exported="false"
             android:label="@string/title_booking_history" />
 
+        <!-- Operator Scanner & Verification Activity (FR-M4-05.2) -->
+        <activity
+            android:name=".ui.operator.OperatorScannerActivity"
+            android:exported="false"
+            android:label="@string/title_operator_scanner" />
+
     </application>
 
 </manifest>
