@@ -4,6 +4,7 @@
  */
 package com.sliit.ssmts.operator_dashboard.util
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -18,7 +19,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class QrCodeGeneratorTest {
+open class QrCodeGeneratorTest {
 
     /**
      * Verifies that buildCanonicalPayload formats an exact 6-part string prefixed with SSMTS-QR.
@@ -52,10 +53,26 @@ class QrCodeGeneratorTest {
     }
 
     /**
-     * Verifies delimiter injection is rejected if any field contains the payload delimiter.
+     * Verifies that buildCanonicalPayload trims surrounding whitespace from fields.
+     */
+    @Test
+    fun buildCanonicalPayload_trimsWhitespace() {
+        val payload = QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "  RES-999  ",
+            prosumerNic = "  200012345678  ",
+            stationId = "  ST-01  ",
+            scheduledDateTimeIso = "  2026-09-18T10:00:00Z  ",
+            signature = "  SIG_ABC  "
+        )
+
+        assertEquals("SSMTS-QR|RES-999|200012345678|ST-01|2026-09-18T10:00:00Z|SIG_ABC", payload)
+    }
+
+    /**
+     * Verifies delimiter injection is rejected if reservation ID contains the payload delimiter.
      */
     @Test(expected = IllegalArgumentException::class)
-    fun buildCanonicalPayload_fieldWithDelimiter_throwsException() {
+    fun buildCanonicalPayload_reservationIdWithDelimiter_throwsException() {
         QrCodeGenerator.buildCanonicalPayload(
             reservationId = "RES|INJECTION",
             prosumerNic = "199512345678",
@@ -66,16 +83,114 @@ class QrCodeGeneratorTest {
     }
 
     /**
-     * Verifies that blank input arguments throw an IllegalArgumentException.
+     * Verifies delimiter injection is rejected if prosumer NIC contains delimiter.
      */
     @Test(expected = IllegalArgumentException::class)
-    fun buildCanonicalPayload_blankField_throwsException() {
+    fun buildCanonicalPayload_nicWithDelimiter_throwsException() {
         QrCodeGenerator.buildCanonicalPayload(
-            reservationId = "",
+            reservationId = "RES-01",
+            prosumerNic = "1995|12345678",
+            stationId = "STATION-01",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies delimiter injection is rejected if station ID contains delimiter.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_stationIdWithDelimiter_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "199512345678",
+            stationId = "STATION|01",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies delimiter injection is rejected if signature contains delimiter.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_signatureWithDelimiter_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "199512345678",
+            stationId = "STATION-01",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = "sig|123"
+        )
+    }
+
+    /**
+     * Verifies that blank reservation ID throws an IllegalArgumentException.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_blankReservationId_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "   ",
             prosumerNic = "199512345678",
             stationId = "STATION-01",
             scheduledDateTimeIso = "2026-09-16T14:30:00Z",
             signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies that blank prosumer NIC throws an IllegalArgumentException.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_blankNic_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "",
+            stationId = "STATION-01",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies that blank station ID throws an IllegalArgumentException.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_blankStationId_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "199512345678",
+            stationId = "",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies that blank scheduled ISO date throws an IllegalArgumentException.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_blankScheduledIso_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "199512345678",
+            stationId = "STATION-01",
+            scheduledDateTimeIso = "",
+            signature = "sig123"
+        )
+    }
+
+    /**
+     * Verifies that blank signature throws an IllegalArgumentException.
+     */
+    @Test(expected = IllegalArgumentException::class)
+    fun buildCanonicalPayload_blankSignature_throwsException() {
+        QrCodeGenerator.buildCanonicalPayload(
+            reservationId = "RES-01",
+            prosumerNic = "199512345678",
+            stationId = "STATION-01",
+            scheduledDateTimeIso = "2026-09-16T14:30:00Z",
+            signature = ""
         )
     }
 
@@ -86,6 +201,22 @@ class QrCodeGeneratorTest {
     fun generateQrBitmap_validPayload_producesNonNullBitmapWithExactDimensions() {
         val payload = "SSMTS-QR|RES-001|199012345678|STATION-01|2026-09-16T10:00:00Z|MOCKSIG"
         val dimension = 256
+
+        val bitmap = QrCodeGenerator.generateQrBitmap(payload = payload, dimensionPx = dimension)
+
+        assertNotNull(bitmap)
+        assertEquals(dimension, bitmap.width)
+        assertEquals(dimension, bitmap.height)
+        assertEquals(Bitmap.Config.ARGB_8888, bitmap.config)
+    }
+
+    /**
+     * Asserts generation succeeds at the minimum allowable dimension boundary (64px).
+     */
+    @Test
+    fun generateQrBitmap_minimumDimensionBoundary_succeeds() {
+        val payload = "SSMTS-QR|RES-MIN|199012345678|STATION-01|2026-09-16T10:00:00Z|MOCKSIG"
+        val dimension = 64
 
         val bitmap = QrCodeGenerator.generateQrBitmap(payload = payload, dimensionPx = dimension)
 
@@ -124,6 +255,39 @@ class QrCodeGeneratorTest {
 
         assertTrue("Generated QR bitmap must contain foreground dark pixels", hasDarkPixel)
         assertTrue("Generated QR bitmap must contain background light pixels", hasLightPixel)
+    }
+
+    /**
+     * Verifies that custom foreground and background colors are accurately applied to the QR bitmap.
+     */
+    @Test
+    fun generateQrBitmap_customColors_appliesSpecifiedColors() {
+        val payload = "SSMTS-QR|RES-COLOR|199012345678|STATION-01|2026-09-16T10:00:00Z|MOCKSIG"
+        val dimension = 128
+        val customFg = Color.BLUE
+        val customBg = Color.YELLOW
+
+        val bitmap = QrCodeGenerator.generateQrBitmap(
+            payload = payload,
+            dimensionPx = dimension,
+            foregroundColor = customFg,
+            backgroundColor = customBg
+        )
+
+        var hasFgPixel = false
+        var hasBgPixel = false
+
+        for (x in 0 until dimension) {
+            for (y in 0 until dimension) {
+                val pixel = bitmap.getPixel(x, y)
+                if (pixel == customFg) hasFgPixel = true
+                if (pixel == customBg) hasBgPixel = true
+                if (hasFgPixel && hasBgPixel) break
+            }
+        }
+
+        assertTrue("Generated QR bitmap must contain custom foreground pixels", hasFgPixel)
+        assertTrue("Generated QR bitmap must contain custom background pixels", hasBgPixel)
     }
 
     /**
