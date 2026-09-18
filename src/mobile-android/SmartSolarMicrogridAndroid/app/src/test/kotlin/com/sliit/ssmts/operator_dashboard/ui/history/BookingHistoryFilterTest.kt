@@ -163,6 +163,189 @@ class BookingHistoryFilterTest {
     }
 
     /**
+     * Asserts that text queries are case-insensitive ("colombo", "COLOMBO", "CoLoMbO" return identical 23 items).
+     */
+    @Test
+    fun filterByStationKeyword_caseInsensitive_returnsExactSameCount() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        for (query in listOf("colombo", "COLOMBO", "CoLoMbO")) {
+            viewModel.onSearchQueryChanged(query)
+            advanceTimeBy(350L)
+            advanceUntilIdle()
+
+            val list = (viewModel.historyUiState.value as UiState.Success).data
+            assertEquals("Query '$query' must yield 23 items", 23, list.size)
+        }
+    }
+
+    /**
+     * Asserts that searching by Prosumer NIC returns exact match records.
+     */
+    @Test
+    fun filterByProsumerNicKeyword_returnsExactCount() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Search specific individual NIC
+        viewModel.onSearchQueryChanged("199010000001")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        val singleList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(1, singleList.size)
+        assertEquals("RES-001", singleList[0].id)
+
+        // Search prefix shared by items 10 through 19
+        viewModel.onSearchQueryChanged("19901000001")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        val subsetList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(10, subsetList.size)
+    }
+
+    /**
+     * Asserts that searching by Reservation ID returns exact matching records.
+     */
+    @Test
+    fun filterByReservationIdKeyword_returnsExactCount() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        viewModel.onSearchQueryChanged("RES-005")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        val list = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(1, list.size)
+        assertEquals("RES-005", list[0].id)
+    }
+
+    /**
+     * Asserts compound filtering matrix: active "Colombo" search query (23 items) across all 5 chips sequentially.
+     */
+    @Test
+    fun filterCompound_searchColombo_andSwitchAll5Chips() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Set active search query
+        viewModel.onSearchQueryChanged("Colombo")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        // All -> 23
+        viewModel.onStatusFilterSelected(BookingFilterState.ALL.filterValue)
+        advanceUntilIdle()
+        assertEquals(23, (viewModel.historyUiState.value as UiState.Success).data.size)
+
+        // Pending -> 8
+        viewModel.onStatusFilterSelected(BookingFilterState.PENDING.filterValue)
+        advanceUntilIdle()
+        val pendingList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(8, pendingList.size)
+        assertTrue(pendingList.all { it.status == ReservationStatus.PENDING })
+
+        // Approved -> 5
+        viewModel.onStatusFilterSelected(BookingFilterState.APPROVED.filterValue)
+        advanceUntilIdle()
+        val approvedList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(5, approvedList.size)
+        assertTrue(approvedList.all { it.status == ReservationStatus.APPROVED })
+
+        // Completed -> 6
+        viewModel.onStatusFilterSelected(BookingFilterState.COMPLETED.filterValue)
+        advanceUntilIdle()
+        val completedList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(6, completedList.size)
+        assertTrue(completedList.all { it.status == ReservationStatus.COMPLETED })
+
+        // Cancelled -> 4
+        viewModel.onStatusFilterSelected(BookingFilterState.CANCELLED.filterValue)
+        advanceUntilIdle()
+        val cancelledList = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(4, cancelledList.size)
+        assertTrue(cancelledList.all { it.status == ReservationStatus.CANCELLED })
+
+        // Return to All -> 23
+        viewModel.onStatusFilterSelected(BookingFilterState.ALL.filterValue)
+        advanceUntilIdle()
+        assertEquals(23, (viewModel.historyUiState.value as UiState.Success).data.size)
+
+        // Clear search query -> 50
+        viewModel.onSearchQueryChanged("")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+        assertEquals(50, (viewModel.historyUiState.value as UiState.Success).data.size)
+    }
+
+    /**
+     * Asserts that searching for a non-existent keyword returns an empty list without error.
+     */
+    @Test
+    fun filterByNonExistentKeyword_returnsEmptyList() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        viewModel.onSearchQueryChanged("NonExistentStationXYZ")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        val list = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(0, list.size)
+    }
+
+    /**
+     * Asserts that filtering by a status with a non-matching keyword returns an empty list.
+     */
+    @Test
+    fun filterByStatusWithNonMatchingKeyword_returnsEmptyList() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Filter by Cancelled, but search for Kandy (no Cancelled reservations in Kandy)
+        viewModel.onStatusFilterSelected(BookingFilterState.CANCELLED.filterValue)
+        viewModel.onSearchQueryChanged("Kandy")
+        advanceTimeBy(350L)
+        advanceUntilIdle()
+
+        val list = (viewModel.historyUiState.value as UiState.Success).data
+        assertEquals(0, list.size)
+    }
+
+    /**
+     * Asserts that rapid keystrokes within 300ms do not filter prematurely until 300ms debounce completes.
+     */
+    @Test
+    fun searchDebounce_rapidInput_doesNotFilterUntil300msElapsed() = runTest(testDispatcher) {
+        viewModel = BookingHistoryViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Initial 50 items
+        assertEquals(50, (viewModel.historyUiState.value as UiState.Success).data.size)
+
+        // Type 'Col' at t=0
+        viewModel.onSearchQueryChanged("Col")
+        advanceTimeBy(150L)
+        // Still 50 items (debounce not expired)
+        assertEquals(50, (viewModel.historyUiState.value as UiState.Success).data.size)
+
+        // Type 'Colombo' at t=150 (resets debounce timer)
+        viewModel.onSearchQueryChanged("Colombo")
+        advanceTimeBy(200L)
+        // 200ms after second keystroke, still not 300ms
+        assertEquals(50, (viewModel.historyUiState.value as UiState.Success).data.size)
+
+        // Advance remaining 150ms (total 350ms since second keystroke)
+        advanceTimeBy(150L)
+        advanceUntilIdle()
+        // Now debounced query triggers and produces 23 items
+        assertEquals(23, (viewModel.historyUiState.value as UiState.Success).data.size)
+    }
+
+    /**
      * Asserts that BookingFilterState.fromChipId accurately resolves all 5 chip states.
      */
     @Test
