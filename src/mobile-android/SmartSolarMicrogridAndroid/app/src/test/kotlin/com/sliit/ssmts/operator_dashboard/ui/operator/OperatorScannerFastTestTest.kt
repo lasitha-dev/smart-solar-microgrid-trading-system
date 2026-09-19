@@ -30,6 +30,9 @@ class OperatorScannerFastTestTest {
     private lateinit var controller: ActivityController<OperatorScannerActivity>
     private lateinit var activity: OperatorScannerActivity
 
+    /**
+     * Prepares themed application context and builds the scanner activity before fast-test assertions.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

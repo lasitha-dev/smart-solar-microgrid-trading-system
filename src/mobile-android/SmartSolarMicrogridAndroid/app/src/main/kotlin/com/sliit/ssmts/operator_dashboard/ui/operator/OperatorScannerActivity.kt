@@ -67,6 +67,11 @@ class OperatorScannerActivity : AppCompatActivity() {
         handleCameraPermissionResult(isGranted)
     }
 
+    /**
+     * Initializes activity layout, permission checks, camera bindings, and UI state collectors.
+     *
+     * @param savedInstanceState Saved bundle state if restoring.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOperatorScannerBinding.inflate(layoutInflater)
@@ -296,6 +301,9 @@ class OperatorScannerActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, TransferFinalizeDialog.TAG)
     }
 
+    /**
+     * Unbinds active camera use-cases to ensure camera hardware resources are safely released.
+     */
     override fun onDestroy() {
         super.onDestroy()
         try {

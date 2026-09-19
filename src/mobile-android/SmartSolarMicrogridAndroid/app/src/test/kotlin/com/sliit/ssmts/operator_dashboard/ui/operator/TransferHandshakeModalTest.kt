@@ -27,6 +27,9 @@ class TransferHandshakeModalTest {
 
     private lateinit var activity: AppCompatActivity
 
+    /**
+     * Initializes themed application context and activity container before handshake modal tests.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

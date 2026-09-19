@@ -38,12 +38,18 @@ class BookingHistoryViewModelTest {
     private lateinit var fakeRepository: FakeHistoryDashboardRepository
     private lateinit var viewModel: BookingHistoryViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and initializes mock repository before each test.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeHistoryDashboardRepository()
     }
 
+    /**
+     * Resets Main dispatcher after each test.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -191,6 +197,9 @@ class BookingHistoryViewModelTest {
         var syncCalled: Boolean = false
         var mockReservations: List<Reservation> = emptyList()
 
+        /**
+         * Emits filtered cached reservations stream.
+         */
         override fun getCachedReservationsStream(status: String?, search: String?): Flow<List<Reservation>> = flow {
             lastQueriedStatus = status
             lastQueriedSearch = search
@@ -208,18 +217,30 @@ class BookingHistoryViewModelTest {
             emit(filtered)
         }
 
+        /**
+         * Emits mock dashboard metrics stream.
+         */
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             emit(NetworkResult.Success(DashboardMetrics()))
         }
 
+        /**
+         * Emits empty today active reservations stream.
+         */
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Emits empty pending queue flow.
+         */
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Records remote sync invocation.
+         */
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             syncCalled = true
             return NetworkResult.Success(Unit)

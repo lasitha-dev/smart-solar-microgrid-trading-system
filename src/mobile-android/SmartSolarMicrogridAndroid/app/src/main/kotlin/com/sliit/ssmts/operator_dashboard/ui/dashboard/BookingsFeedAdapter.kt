@@ -25,6 +25,13 @@ class BookingsFeedAdapter(
     private val onItemClick: ((Reservation) -> Unit)? = null
 ) : ListAdapter<Reservation, BookingsFeedAdapter.BookingViewHolder>(ReservationDiffCallback) {
 
+    /**
+     * Inflates the booking item layout binding and instantiates a new BookingViewHolder.
+     *
+     * @param parent The parent ViewGroup into which the new view will be added.
+     * @param viewType The view type integer of the new view.
+     * @return Initialized BookingViewHolder instance.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookingViewHolder {
         val binding = ItemDashboardBookingBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -34,6 +41,12 @@ class BookingsFeedAdapter(
         return BookingViewHolder(binding, onItemClick)
     }
 
+    /**
+     * Binds reservation entity data to the ViewHolder at the specified position.
+     *
+     * @param holder The target BookingViewHolder.
+     * @param position The list position of the item.
+     */
     override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -76,10 +89,24 @@ class BookingsFeedAdapter(
      * DiffUtil callback computing item differences efficiently for RecyclerView updates.
      */
     object ReservationDiffCallback : DiffUtil.ItemCallback<Reservation>() {
+        /**
+         * Checks whether two items represent the exact same reservation identifier.
+         *
+         * @param oldItem Previous reservation entity.
+         * @param newItem New reservation entity.
+         * @return True if identifiers match.
+         */
         override fun areItemsTheSame(oldItem: Reservation, newItem: Reservation): Boolean {
             return oldItem.id == newItem.id
         }
 
+        /**
+         * Checks whether the contents of two reservation entities are identical.
+         *
+         * @param oldItem Previous reservation entity.
+         * @param newItem New reservation entity.
+         * @return True if all fields match.
+         */
         override fun areContentsTheSame(oldItem: Reservation, newItem: Reservation): Boolean {
             return oldItem == newItem
         }

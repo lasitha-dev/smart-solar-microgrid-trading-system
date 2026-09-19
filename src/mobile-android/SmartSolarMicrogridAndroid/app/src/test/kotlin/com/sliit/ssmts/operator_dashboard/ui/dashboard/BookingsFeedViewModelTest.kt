@@ -36,12 +36,18 @@ class BookingsFeedViewModelTest {
     private lateinit var fakeRepository: FakeFeedDashboardRepository
     private lateinit var viewModel: DashboardViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and initializes fake repository before each test.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeFeedDashboardRepository()
     }
 
+    /**
+     * Resets Main dispatcher after each test execution.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -150,22 +156,37 @@ class BookingsFeedViewModelTest {
         val todayActiveFlow = MutableStateFlow<List<Reservation>>(emptyList())
         val pendingQueueFlow = MutableStateFlow<List<Reservation>>(emptyList())
 
+        /**
+         * Emits mock dashboard metrics.
+         */
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             emit(NetworkResult.Success(DashboardMetrics()))
         }
 
+        /**
+         * Emits cached reservations.
+         */
         override fun getCachedReservationsStream(status: String?, search: String?): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Returns active slots scheduled for today.
+         */
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> {
             return todayActiveFlow
         }
 
+        /**
+         * Returns pending slots queue.
+         */
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> {
             return pendingQueueFlow
         }
 
+        /**
+         * Simulates syncing remote reservations.
+         */
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             return NetworkResult.Success(Unit)
         }

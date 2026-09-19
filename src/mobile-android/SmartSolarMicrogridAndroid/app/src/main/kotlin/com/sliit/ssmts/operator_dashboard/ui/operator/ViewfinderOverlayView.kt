@@ -50,6 +50,14 @@ class ViewfinderOverlayView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
+    /**
+     * Computes the centered framing square coordinates when the view dimensions change.
+     *
+     * @param w Current view width.
+     * @param h Current view height.
+     * @param oldw Old view width.
+     * @param oldh Old view height.
+     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val left = (w - framingSize) / 2f
@@ -57,6 +65,11 @@ class ViewfinderOverlayView @JvmOverloads constructor(
         framingRect.set(left, top, left + framingSize, top + framingSize)
     }
 
+    /**
+     * Renders the darkened scrim, transparent scanning aperture cutout, and illuminated corner brackets.
+     *
+     * @param canvas The Canvas on which the viewfinder guide is drawn.
+     */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 

@@ -26,6 +26,9 @@ class BookingHistoryAdapterTest {
 
     private lateinit var context: Context
 
+    /**
+     * Initializes themed application context before adapter tests.
+     */
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext<Context>()

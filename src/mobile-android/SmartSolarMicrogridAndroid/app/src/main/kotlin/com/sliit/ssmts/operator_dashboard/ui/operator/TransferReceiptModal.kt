@@ -27,6 +27,14 @@ class TransferReceiptModal : BottomSheetDialogFragment() {
 
     private var isActionHandled = false
 
+    /**
+     * Inflates the transfer receipt modal layout ViewBinding hierarchy.
+     *
+     * @param inflater The LayoutInflater object to inflate views.
+     * @param container Optional parent container view.
+     * @param savedInstanceState Previous saved state bundle if restoring.
+     * @return The root View of the inflated layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,6 +44,12 @@ class TransferReceiptModal : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    /**
+     * Populates transfer completion receipt metrics, triggers entrance micro-animations, and sets click listeners.
+     *
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState Previous saved state bundle if restoring.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -80,6 +94,11 @@ class TransferReceiptModal : BottomSheetDialogFragment() {
             .start()
     }
 
+    /**
+     * Handles modal dismissal and invokes completion callback if unhandled.
+     *
+     * @param dialog The dismissed dialog interface.
+     */
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!isActionHandled) {
@@ -87,6 +106,9 @@ class TransferReceiptModal : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Cleans up ViewBinding reference on view destruction to prevent memory leaks.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Nullify view binding to prevent view-hierarchy memory leaks (Rule 3)

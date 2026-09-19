@@ -27,6 +27,14 @@ class TransferHandshakeModal : BottomSheetDialogFragment() {
 
     private var isActionHandled = false
 
+    /**
+     * Inflates the bottom sheet layout ViewBinding hierarchy.
+     *
+     * @param inflater The LayoutInflater used to inflate the modal.
+     * @param container Optional parent container view.
+     * @param savedInstanceState Saved bundle state if restoring.
+     * @return The root View of the inflated layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,6 +44,12 @@ class TransferHandshakeModal : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    /**
+     * Binds reservation arguments to modal UI controls and establishes button action handlers.
+     *
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState Saved bundle state if restoring.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,6 +80,11 @@ class TransferHandshakeModal : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Handles modal dismissal and triggers cancel callback if unhandled.
+     *
+     * @param dialog The dismissed dialog interface.
+     */
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!isActionHandled) {
@@ -73,6 +92,9 @@ class TransferHandshakeModal : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Nullifies ViewBinding reference to prevent view-hierarchy memory leaks.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Nullify view binding to prevent view-hierarchy memory leaks (Rule 3)

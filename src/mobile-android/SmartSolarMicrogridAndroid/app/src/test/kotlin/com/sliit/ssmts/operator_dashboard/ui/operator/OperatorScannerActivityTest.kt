@@ -32,6 +32,9 @@ class OperatorScannerActivityTest {
     private lateinit var controller: ActivityController<OperatorScannerActivity>
     private lateinit var activity: OperatorScannerActivity
 
+    /**
+     * Initializes theme context and instantiates the Robolectric activity controller before each test.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

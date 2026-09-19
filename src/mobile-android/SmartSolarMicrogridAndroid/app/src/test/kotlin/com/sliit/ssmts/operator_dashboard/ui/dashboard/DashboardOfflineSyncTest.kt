@@ -37,12 +37,18 @@ class DashboardOfflineSyncTest {
     private lateinit var fakeRepository: MockSyncDashboardRepository
     private lateinit var viewModel: DashboardViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and mock sync repository before each test.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = MockSyncDashboardRepository()
     }
 
+    /**
+     * Resets Main dispatcher after each test.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -142,23 +148,38 @@ class DashboardOfflineSyncTest {
         var lastForceRefreshParam = false
         var throwExceptionOnSync = false
 
+        /**
+         * Emits configured metrics result stream.
+         */
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             lastForceRefreshParam = forceRefresh
             emit(metricsResult)
         }
 
+        /**
+         * Emits empty cached reservations flow.
+         */
         override fun getCachedReservationsStream(status: String?, search: String?): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Emits empty today active reservations flow.
+         */
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Emits empty pending queue flow.
+         */
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Simulates syncing remote reservations with error triggering capabilities.
+         */
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             syncReservationsCalled = true
             syncReservationsCallCount++

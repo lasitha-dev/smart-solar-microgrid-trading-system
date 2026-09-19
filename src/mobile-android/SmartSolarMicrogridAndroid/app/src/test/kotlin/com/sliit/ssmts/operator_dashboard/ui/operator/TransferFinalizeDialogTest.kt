@@ -27,6 +27,9 @@ class TransferFinalizeDialogTest {
 
     private lateinit var activity: AppCompatActivity
 
+    /**
+     * Prepares themed activity environment before testing finalize dialog.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

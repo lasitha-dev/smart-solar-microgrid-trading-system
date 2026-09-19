@@ -38,12 +38,18 @@ class BookingHistoryFilterTest {
     private lateinit var fakeRepository: DatasetHistoryRepository
     private lateinit var viewModel: BookingHistoryViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and seeds 50 mock reservations repository.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = DatasetHistoryRepository(generate50MockReservations())
     }
 
+    /**
+     * Resets Main dispatcher after each test execution.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -369,6 +375,9 @@ class BookingHistoryFilterTest {
         val list = mutableListOf<Reservation>()
         var idCounter = 1
 
+        /**
+         * Helper closure to append a batch of mock reservations with designated status and station name.
+         */
         fun addItems(count: Int, status: ReservationStatus, station: String) {
             repeat(count) {
                 val id = "RES-${idCounter.toString().padStart(3, '0')}"
@@ -409,6 +418,9 @@ class BookingHistoryFilterTest {
         private val dataset: List<Reservation>
     ) : IDashboardRepository {
 
+        /**
+         * Emits filtered dataset matching status and search query terms.
+         */
         override fun getCachedReservationsStream(status: String?, search: String?): Flow<List<Reservation>> = flow {
             val normalizedStatus = if (status.isNullOrBlank() || status.equals("All", ignoreCase = true)) null else status.trim()
             val normalizedSearch = if (search.isNullOrBlank()) null else search.trim()
@@ -424,18 +436,30 @@ class BookingHistoryFilterTest {
             emit(filtered)
         }
 
+        /**
+         * Emits mock dashboard metrics stream.
+         */
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             emit(NetworkResult.Success(DashboardMetrics()))
         }
 
+        /**
+         * Emits empty today active reservations stream.
+         */
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Emits empty pending queue flow.
+         */
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Simulates syncing remote reservations.
+         */
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             return NetworkResult.Success(Unit)
         }

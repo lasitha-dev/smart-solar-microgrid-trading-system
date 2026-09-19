@@ -28,6 +28,9 @@ class TransferReceiptModalTest {
 
     private lateinit var activity: AppCompatActivity
 
+    /**
+     * Initializes the Robolectric test activity with the application theme prior to modal instantiation.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

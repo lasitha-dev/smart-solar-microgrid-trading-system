@@ -43,6 +43,14 @@ class DashboardFragment : Fragment() {
         DashboardViewModel.Factory(repository)
     }
 
+    /**
+     * Inflates the fragment dashboard ViewBinding hierarchy.
+     *
+     * @param inflater The LayoutInflater object to inflate views.
+     * @param container Optional parent container view.
+     * @param savedInstanceState Previous saved state if available.
+     * @return The root View of the inflated layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,6 +60,12 @@ class DashboardFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Initializes UI interactions and observers once the view hierarchy is created.
+     *
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState Previous saved state if available.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupInteractions()

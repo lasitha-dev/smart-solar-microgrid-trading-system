@@ -46,12 +46,18 @@ class DashboardViewModelTest {
     private lateinit var fakeRepository: FakeDashboardRepository
     private lateinit var viewModel: DashboardViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and initializes fake repository before each test.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeRepository = FakeDashboardRepository()
     }
 
+    /**
+     * Resets Main dispatcher after each test.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -282,23 +288,38 @@ class DashboardViewModelTest {
         var todayActiveList: List<Reservation> = emptyList()
         var pendingQueueList: List<Reservation> = emptyList()
 
+        /**
+         * Emits configured metrics result stream.
+         */
         override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
             lastForceRefreshRequested = forceRefresh
             emit(metricsResult)
         }
 
+        /**
+         * Emits empty cached reservations flow.
+         */
         override fun getCachedReservationsStream(status: String?, search: String?): Flow<List<Reservation>> = flow {
             emit(emptyList())
         }
 
+        /**
+         * Returns active reservations flow for today.
+         */
         override fun getTodayActiveReservationsStream(): Flow<List<Reservation>> = flow {
             emit(todayActiveList)
         }
 
+        /**
+         * Returns pending reservations queue flow.
+         */
         override fun getPendingQueueReservationsStream(): Flow<List<Reservation>> = flow {
             emit(pendingQueueList)
         }
 
+        /**
+         * Records remote sync invocation.
+         */
         override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
             syncRemoteCalled = true
             return NetworkResult.Success(Unit)

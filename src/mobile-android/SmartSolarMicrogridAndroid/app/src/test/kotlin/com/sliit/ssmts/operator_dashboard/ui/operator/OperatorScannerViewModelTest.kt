@@ -34,6 +34,9 @@ class OperatorScannerViewModelTest {
     private lateinit var fakeRepository: FakeOperatorVerificationRepository
     private lateinit var viewModel: OperatorScannerViewModel
 
+    /**
+     * Sets up test coroutine dispatcher and initializes fake verification repository and ViewModel.
+     */
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -41,6 +44,9 @@ class OperatorScannerViewModelTest {
         viewModel = OperatorScannerViewModel(fakeRepository)
     }
 
+    /**
+     * Resets Main dispatcher after each test.
+     */
     @After
     fun tearDown() {
         Dispatchers.resetMain()

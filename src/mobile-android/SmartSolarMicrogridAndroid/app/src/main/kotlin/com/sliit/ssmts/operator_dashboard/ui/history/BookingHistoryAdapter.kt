@@ -26,6 +26,13 @@ class BookingHistoryAdapter(
     private val onItemClick: ((Reservation) -> Unit)? = null
 ) : ListAdapter<Reservation, BookingHistoryAdapter.HistoryViewHolder>(ReservationDiffCallback) {
 
+    /**
+     * Inflates the history item view layout and constructs a HistoryViewHolder.
+     *
+     * @param parent Parent ViewGroup container.
+     * @param viewType Integer view type.
+     * @return Initialized HistoryViewHolder instance.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         val binding = ItemBookingHistoryBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -35,6 +42,12 @@ class BookingHistoryAdapter(
         return HistoryViewHolder(binding, onItemClick)
     }
 
+    /**
+     * Binds reservation entity details to the ViewHolder at the specified position.
+     *
+     * @param holder The target HistoryViewHolder.
+     * @param position The adapter position.
+     */
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -87,10 +100,24 @@ class BookingHistoryAdapter(
      * DiffUtil callback computing distinct item identity and structural equality.
      */
     object ReservationDiffCallback : DiffUtil.ItemCallback<Reservation>() {
+        /**
+         * Checks whether two reservation items share the same primary identifier.
+         *
+         * @param oldItem Prior reservation entity.
+         * @param newItem Successor reservation entity.
+         * @return True if identifiers match.
+         */
         override fun areItemsTheSame(oldItem: Reservation, newItem: Reservation): Boolean {
             return oldItem.id == newItem.id
         }
 
+        /**
+         * Checks whether the contents of two reservation entities are identical.
+         *
+         * @param oldItem Prior reservation entity.
+         * @param newItem Successor reservation entity.
+         * @return True if all fields match.
+         */
         override fun areContentsTheSame(oldItem: Reservation, newItem: Reservation): Boolean {
             return oldItem == newItem
         }

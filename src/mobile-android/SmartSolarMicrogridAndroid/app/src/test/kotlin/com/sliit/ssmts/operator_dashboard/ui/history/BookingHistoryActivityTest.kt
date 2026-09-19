@@ -29,6 +29,9 @@ class BookingHistoryActivityTest {
     private lateinit var controller: ActivityController<BookingHistoryActivity>
     private lateinit var activity: BookingHistoryActivity
 
+    /**
+     * Configures theme and builds the Robolectric activity controller before each test.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

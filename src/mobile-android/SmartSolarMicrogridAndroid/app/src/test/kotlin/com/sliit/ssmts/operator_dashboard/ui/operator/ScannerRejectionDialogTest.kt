@@ -26,6 +26,9 @@ class ScannerRejectionDialogTest {
 
     private lateinit var activity: AppCompatActivity
 
+    /**
+     * Initializes themed application context and builds parent activity before dialog tests.
+     */
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()

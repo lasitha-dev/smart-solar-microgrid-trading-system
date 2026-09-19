@@ -27,6 +27,14 @@ class TransferFinalizeDialog : BottomSheetDialogFragment() {
 
     private var isConfirmed = false
 
+    /**
+     * Inflates the dialog layout ViewBinding hierarchy.
+     *
+     * @param inflater The LayoutInflater used to inflate the dialog view.
+     * @param container Optional parent container view.
+     * @param savedInstanceState Saved bundle state if restoring.
+     * @return The root View of the inflated layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,6 +44,12 @@ class TransferFinalizeDialog : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    /**
+     * Sets up input listeners, numeric validation, and submission triggers.
+     *
+     * @param view The View returned by onCreateView.
+     * @param savedInstanceState Saved bundle state if restoring.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -78,6 +92,11 @@ class TransferFinalizeDialog : BottomSheetDialogFragment() {
         dismiss()
     }
 
+    /**
+     * Handles dialog dismissal and invokes cancellation callback if not confirmed.
+     *
+     * @param dialog The dismissed dialog interface.
+     */
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!isConfirmed) {
@@ -85,6 +104,9 @@ class TransferFinalizeDialog : BottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Cleans up ViewBinding reference on view destruction to prevent memory leaks.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         // Nullify view binding to prevent view-hierarchy memory leaks (Rule 3)

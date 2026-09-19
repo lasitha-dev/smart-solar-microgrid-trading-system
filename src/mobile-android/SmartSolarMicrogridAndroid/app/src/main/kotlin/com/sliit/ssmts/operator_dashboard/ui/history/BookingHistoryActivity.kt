@@ -37,6 +37,11 @@ class BookingHistoryActivity : AppCompatActivity() {
         BookingHistoryViewModel.Factory(repository)
     }
 
+    /**
+     * Initializes activity layout, toolbar, RecyclerView, search inputs, and state collectors.
+     *
+     * @param savedInstanceState Saved bundle state if restoring.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookingHistoryBinding.inflate(layoutInflater)
