@@ -63,6 +63,8 @@
 
     <!-- Camera Viewfinder & Scanner Overlay -->
     <color name="scanner_scrim_overlay">#99000000</color>
+    <color name="scanner_scrim_header">#66000000</color>
+    <color name="scanner_scrim_footer">#AA000000</color>
     <color name="scanner_reticle_frame">#00E676</color>
     <color name="scanner_reticle_glow">#3300E676</color>
 

@@ -10,6 +10,8 @@
     <string name="nav_scanner">Scan QR</string>
 
     <!-- Operational Dashboard Metrics (FR-M4-01) -->
+    <string name="dashboard_subtitle">Real-time trading slot monitoring and grid verification</string>
+    <string name="title_operational_metrics">OPERATIONAL METRICS</string>
     <string name="metric_pending_title">Pending Bookings</string>
     <string name="metric_pending_desc">Slots awaiting operator validation</string>
     <string name="metric_approved_future_title">Approved Future</string>
@@ -58,10 +60,12 @@
     <string name="label_kwh_unit">kWh</string>
 
     <!-- Empty State View (FR-M4-03.6) -->
+    <string name="empty_graphic_symbol">Ø</string>
     <string name="history_empty_title">No Reservations Found</string>
     <string name="history_empty_desc">No reservations match the specified search query or selected filter chips.</string>
 
     <!-- Grid Operator Scanner & Camera (FR-M4-05) -->
+    <string name="desc_close_scanner">Close Scanner</string>
     <string name="scanner_instruction">Align prosumer QR code inside the viewfinder</string>
     <string name="scanner_torch_toggle">Toggle Flashlight</string>
     <string name="scanner_fast_test_button">Fast Test QR</string>

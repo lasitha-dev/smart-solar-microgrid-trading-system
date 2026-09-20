@@ -7,28 +7,21 @@ package com.sliit.ssmts.operator_dashboard.ui.operator
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraControl
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import android.widget.Toast
 import com.sliit.ssmts.operator_dashboard.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
 import com.sliit.ssmts.operator_dashboard.data.repository.OperatorVerificationRepositoryImpl
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorScannerBinding
-import com.sliit.ssmts.operator_dashboard.domain.model.FinalizeTransferResult
-import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 import com.sliit.ssmts.operator_dashboard.util.QrParseResult
 import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
 import kotlinx.coroutines.launch
@@ -55,11 +48,16 @@ class OperatorScannerActivity : AppCompatActivity() {
         }
     }
 
-    private var cameraProvider: ProcessCameraProvider? = null
-    private var camera: Camera? = null
-    private var cameraControl: CameraControl? = null
-    var isTorchEnabled: Boolean = false
-        private set
+    val cameraDelegate: ScannerCameraDelegate by lazy {
+        ScannerCameraDelegate(this)
+    }
+
+    val modalCoordinator: ScannerModalCoordinator by lazy {
+        ScannerModalCoordinator(this, supportFragmentManager)
+    }
+
+    val isTorchEnabled: Boolean
+        get() = cameraDelegate.isTorchEnabled
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -150,41 +148,15 @@ class OperatorScannerActivity : AppCompatActivity() {
      * Initializes CameraX lifecycle provider and binds preview use case to viewfinder surface.
      */
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener({
-            try {
-                cameraProvider = cameraProviderFuture.get()
-
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(binding.previewViewFinder.surfaceProvider)
-                }
-
-                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-                cameraProvider?.unbindAll()
-                camera = cameraProvider?.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview
-                )
-                cameraControl = camera?.cameraControl
-            } catch (_: Exception) {
-                // Defensive fallback prevents crashes on emulators or unsupported camera hardware
-            }
-        }, ContextCompat.getMainExecutor(this))
+        cameraDelegate.startCamera(this, binding.previewViewFinder.surfaceProvider)
     }
 
     /**
      * Toggles the device flashlight on and off.
      */
     fun toggleTorch() {
-        isTorchEnabled = !isTorchEnabled
-        try {
-            cameraControl?.enableTorch(isTorchEnabled)
-        } catch (_: Exception) {
-            // Devices without flash hardware fail gracefully
-        }
-        val tintColor = if (isTorchEnabled) {
+        val enabled = cameraDelegate.toggleTorch()
+        val tintColor = if (enabled) {
             ContextCompat.getColor(this, R.color.color_secondary)
         } else {
             ContextCompat.getColor(this, R.color.color_secondary_variant)
@@ -196,7 +168,7 @@ class OperatorScannerActivity : AppCompatActivity() {
      * Displays the Viva Fast Test QR selection dialog for single-device demonstration (Rule 6.3).
      */
     fun showFastTestDialog() {
-        FastTestQrDialog.show(this) { payload ->
+        modalCoordinator.showFastTestDialog { payload ->
             processScannedPayload(payload)
         }
     }
@@ -241,64 +213,12 @@ class OperatorScannerActivity : AppCompatActivity() {
     }
 
     private fun renderUiState(state: ScannerUiState) {
-        when (state) {
-            is ScannerUiState.Idle -> {
-                binding.layoutVerificationLoading.isVisible = false
-            }
-            is ScannerUiState.Verifying -> {
-                binding.layoutVerificationLoading.isVisible = true
-            }
-            is ScannerUiState.Handshake -> {
-                binding.layoutVerificationLoading.isVisible = false
-                showHandshakeModal(state.reservation)
-            }
-            is ScannerUiState.Rejection -> {
-                binding.layoutVerificationLoading.isVisible = false
-                ScannerRejectionDialog.show(this, state.errorCode, state.message) {
-                    viewModel.resetScannerState()
-                }
-            }
-            is ScannerUiState.Finalizing -> {
-                binding.layoutVerificationLoading.isVisible = true
-            }
-            is ScannerUiState.Finalized -> {
-                binding.layoutVerificationLoading.isVisible = false
-                showReceiptModal(state.receipt)
-            }
-        }
-    }
-
-    private fun showReceiptModal(receipt: FinalizeTransferResult) {
-        val modal = TransferReceiptModal.newInstance(receipt).apply {
-            onDoneClicked = {
-                viewModel.resetScannerState()
-            }
-        }
-        modal.show(supportFragmentManager, TransferReceiptModal.TAG)
-    }
-
-    private fun showHandshakeModal(reservation: QrVerificationResult) {
-        val modal = TransferHandshakeModal.newInstance(reservation).apply {
-            onCancelClicked = {
-                viewModel.resetScannerState()
-            }
-            onProceedClicked = {
-                showFinalizeDialog(reservation.reservationId ?: "")
-            }
-        }
-        modal.show(supportFragmentManager, TransferHandshakeModal.TAG)
-    }
-
-    private fun showFinalizeDialog(reservationId: String) {
-        val dialog = TransferFinalizeDialog.newInstance(reservationId).apply {
-            onCancelClicked = {
-                viewModel.resetScannerState()
-            }
-            onFinalizeConfirmed = { resId, kwh, notes ->
-                viewModel.finalizeEnergyTransfer(resId, kwh, notes)
-            }
-        }
-        dialog.show(supportFragmentManager, TransferFinalizeDialog.TAG)
+        binding.layoutVerificationLoading.isVisible = (state is ScannerUiState.Verifying || state is ScannerUiState.Finalizing)
+        modalCoordinator.dispatchState(
+            state = state,
+            onReset = { viewModel.resetScannerState() },
+            onFinalize = { id, kwh, notes -> viewModel.finalizeEnergyTransfer(id, kwh, notes) }
+        )
     }
 
     /**
@@ -306,10 +226,6 @@ class OperatorScannerActivity : AppCompatActivity() {
      */
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            cameraProvider?.unbindAll()
-        } catch (_: Exception) {
-            // Defensive teardown
-        }
+        cameraDelegate.unbindAll()
     }
 }

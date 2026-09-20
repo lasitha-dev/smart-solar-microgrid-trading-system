@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_xs"
-                android:text="Real-time trading slot monitoring and grid verification"
+                android:text="@string/dashboard_subtitle"
                 android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_body" />
 
@@ -197,7 +197,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_xl"
                 android:letterSpacing="0.08"
-                android:text="OPERATIONAL METRICS"
+                android:text="@string/title_operational_metrics"
                 android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold" />

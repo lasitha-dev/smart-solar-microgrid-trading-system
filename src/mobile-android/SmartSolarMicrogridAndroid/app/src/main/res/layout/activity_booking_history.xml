@@ -91,7 +91,7 @@
                 android:layout_height="80dp"
                 android:background="@drawable/bg_status_pending"
                 android:gravity="center"
-                android:text="Ø"
+                android:text="@string/empty_graphic_symbol"
                 android:textColor="@color/status_pending_text"
                 android:textSize="36sp"
                 android:textStyle="bold" />
