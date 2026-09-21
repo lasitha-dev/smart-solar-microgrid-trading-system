@@ -51,4 +51,21 @@ public class ProsumerRegisterDto
     [Phone(ErrorMessage = "Invalid phone number format.")]
     [StringLength(20, MinimumLength = 9, ErrorMessage = "Phone number must be between 9 and 20 digits.")]
     public string Phone { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the street address of the prosumer.
+    /// </summary>
+    [Required(ErrorMessage = "Address is required.")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "Address must be between 3 and 200 characters.")]
+    public string Address { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the latitude coordinate of the solar facility.
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the longitude coordinate of the solar facility.
+    /// </summary>
+    public double? Longitude { get; set; }
 }

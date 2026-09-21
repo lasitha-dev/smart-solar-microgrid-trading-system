@@ -57,6 +57,24 @@ public class User
     public string Phone { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the street/residential address of the prosumer or facility.
+    /// </summary>
+    [BsonElement("address")]
+    public string Address { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the latitude coordinate of the solar facility. Strictly immutable once confirmed during registration.
+    /// </summary>
+    [BsonElement("latitude")]
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the longitude coordinate of the solar facility. Strictly immutable once confirmed during registration.
+    /// </summary>
+    [BsonElement("longitude")]
+    public double? Longitude { get; set; }
+
+    /// <summary>
     /// Gets or sets the assigned user role for system access control.
     /// </summary>
     [BsonElement("role")]
@@ -81,4 +99,10 @@ public class User
     /// </summary>
     [BsonElement("updatedAt")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Captures any extra elements in MongoDB documents to ensure resilient deserialization.
+    /// </summary>
+    [BsonExtraElements]
+    public BsonDocument? ExtraElements { get; set; }
 }

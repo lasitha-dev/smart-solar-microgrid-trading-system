@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Student Name: SILVA M N U
+  Student ID: IT22169112
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Identity, Authentication & Account Lifecycle (Member 1)
+  Description: Centralized string resource dictionary ensuring zero hardcoded strings in mobile application UI.
+-->
+<resources>
+    <!-- App & General -->
+    <string name="app_name">Smart Solar Microgrid</string>
+    <string name="app_tagline">Decentralized Peer-to-Peer Solar Trading</string>
+    <string name="loading">Please wait…</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to access your prosumer dashboard</string>
+    <string name="label_identifier">Username or NIC</string>
+    <string name="hint_identifier">Enter your Username or NIC</string>
+    <string name="label_password">Password</string>
+    <string name="hint_password">Enter your secure password</string>
+    <string name="btn_login">Sign In</string>
+    <string name="prompt_no_account">Don\'t have an account?</string>
+    <string name="action_register">Register as Prosumer</string>
+
+    <!-- Registration Screen -->
+    <string name="register_title">Prosumer Registration</string>
+    <string name="register_subtitle">Join the Smart Solar Microgrid Network</string>
+    <string name="label_nic">National Identity Card (NIC)</string>
+    <string name="hint_nic">e.g. 199512345678 or 951234567V</string>
+    <string name="label_username">Username</string>
+    <string name="hint_username">Choose a unique username</string>
+    <string name="label_full_name">Full Legal Name</string>
+    <string name="hint_full_name">Enter your full legal name</string>
+    <string name="label_phone">Phone Number</string>
+    <string name="hint_phone">e.g. +94771234567 or 0771234567</string>
+    <string name="label_address">Street / Facility Address</string>
+    <string name="hint_address">e.g. No. 45, Solar Avenue, Colombo 03</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="hint_confirm_password">Re-enter your password</string>
+    <string name="btn_register">Submit Registration</string>
+    <string name="prompt_have_account">Already registered?</string>
+    <string name="action_sign_in">Sign In</string>
+
+    <!-- Location Selection Component -->
+    <string name="title_location_picker">Facility Location Picker</string>
+    <string name="subtitle_location_picker">Tap map or drag marker to your solar array</string>
+    <string name="section_facility_location">Solar Facility Location</string>
+    <string name="facility_location_subtitle">Pin your microgrid node coordinates</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="btn_select_facility_on_map">Select Facility Location on Map</string>
+    <string name="btn_reselect_location_on_map">Change Location on Map</string>
+    <string name="btn_pick_location">Pick on Map</string>
+    <string name="btn_find_me">Find Me (GPS)</string>
+    <string name="btn_clusters_quick_select">Clusters</string>
+    <string name="btn_confirm_location">Confirm Location</string>
+    <string name="location_not_selected">Location not confirmed yet</string>
+    <string name="location_confirmed_badge">COORDINATES CONFIRMED</string>
+    <string name="location_confirmed_format">Lat: %1$.5f°, Lon: %2$.5f°</string>
+    <string name="location_immutable_notice">Facility location is permanently locked once confirmed</string>
+    <string name="dialog_location_picker_title">Select Microgrid Cluster Zone</string>
+    <string name="dialog_location_picker_msg">Choose a regional microgrid cluster or use GPS:</string>
+    <string name="permission_location_rationale">Location permission is required to detect your solar microgrid facility coordinates.</string>
+    <string name="permission_location_denied">Location permission was denied. Please tap on map or select a cluster.</string>
+    <string name="msg_gps_searching">Detecting current GPS coordinates…</string>
+    <string name="msg_gps_success">GPS location locked in successfully!</string>
+    <string name="msg_gps_failed">Unable to acquire GPS fix. Please tap on map or pick cluster.</string>
+    <string name="msg_tap_to_place_hint">Tap anywhere to drop marker</string>
+    <string name="msg_location_confirmed_toast">Facility coordinates locked in successfully!</string>
+
+    <!-- Pending Activation Screen -->
+    <string name="pending_title">Account Pending Approval</string>
+    <string name="pending_subtitle">Your prosumer registration is under review</string>
+    <string name="pending_badge">STATUS: PENDING ACTIVATION</string>
+    <string name="pending_nic_label">Registered NIC:</string>
+    <string name="pending_explanation">Your application has been received and is currently awaiting verification by a Backoffice administrator. You will be able to log in and trade energy once your account is activated.</string>
+    <string name="btn_check_status">Check Activation Status</string>
+    <string name="btn_back_to_login">Return to Login</string>
+    <string name="msg_still_pending">Account is still pending Backoffice review. Please check back shortly.</string>
+    <string name="msg_account_active_now">Account activated! Please sign in.</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">Prosumer Profile</string>
+    <string name="profile_subtitle">Manage your account details and status</string>
+    <string name="profile_section_identity">Identity Details</string>
+    <string name="profile_section_editable">Editable Information</string>
+    <string name="profile_section_location">Facility Coordinates</string>
+    <string name="profile_location_locked_badge">STRICTLY LOCKED / READ-ONLY</string>
+    <string name="profile_user_id">Account ID</string>
+    <string name="profile_role">Role</string>
+    <string name="profile_role_prosumer">Solar Prosumer</string>
+    <string name="profile_status">Account Status</string>
+    <string name="profile_status_active">Active</string>
+    <string name="profile_status_deactivated">Deactivated</string>
+    <string name="profile_status_pending">Pending Activation</string>
+    <string name="btn_toggle_edit">Edit Profile</string>
+    <string name="btn_cancel_edit">Cancel</string>
+    <string name="btn_save_profile">Save Profile Changes</string>
+    <string name="btn_request_deactivation">Request Account Deactivation</string>
+    <string name="btn_logout">Log Out</string>
+    <string name="msg_edit_mode_enabled">Edit mode enabled. You can now modify your details.</string>
+    <string name="msg_edit_mode_cancelled">Edit cancelled. Changes reverted.</string>
+
+    <!-- Deactivation Dialog -->
+    <string name="dialog_deactivate_title">Deactivate Account?</string>
+    <string name="dialog_deactivate_message">Are you sure you want to deactivate your prosumer account? You will not be able to book energy slots or trade until reactivated by Backoffice.</string>
+    <string name="dialog_deactivate_reason_hint">Optional: Reason for deactivation</string>
+    <string name="btn_confirm_deactivation">Deactivate Account</string>
+
+    <!-- Validation Errors -->
+    <string name="error_identifier_required">Username or NIC is required.</string>
+    <string name="error_nic_required">NIC is required.</string>
+    <string name="error_nic_invalid">Invalid NIC syntax (must be 9-20 characters).</string>
+    <string name="error_username_required">Username is required.</string>
+    <string name="error_username_short">Username must be at least 3 characters.</string>
+    <string name="error_full_name_required">Full Name is required.</string>
+    <string name="error_phone_required">Phone number is required.</string>
+    <string name="error_phone_invalid">Invalid phone number format.</string>
+    <string name="error_address_required">Facility address is required.</string>
+    <string name="error_location_required">Please confirm your facility coordinates.</string>
+    <string name="error_password_required">Password is required.</string>
+    <string name="error_password_short">Password must be at least 6 characters.</string>
+    <string name="error_passwords_mismatch">Passwords do not match.</string>
+
+    <!-- Network & General Messages -->
+    <string name="error_network_connection">Unable to connect to microgrid server. Please check connection.</string>
+    <string name="error_unauthorized">Invalid credentials or session expired.</string>
+    <string name="error_forbidden_deactivated">Your account has been deactivated. Please contact support.</string>
+    <string name="msg_profile_updated">Profile updated successfully.</string>
+    <string name="msg_deactivation_success">Account successfully deactivated.</string>
+    <string name="msg_logged_out">Logged out successfully.</string>
+</resources>

@@ -47,6 +47,26 @@ public class LoginResponseDto
     public string FullName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the contact phone number of the authenticated user.
+    /// </summary>
+    public string Phone { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the address of the prosumer.
+    /// </summary>
+    public string Address { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the latitude coordinate of the solar microgrid facility.
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the longitude coordinate of the solar microgrid facility.
+    /// </summary>
+    public double? Longitude { get; set; }
+
+    /// <summary>
     /// Gets or sets the assigned user role (Backoffice, GridOperator, Prosumer).
     /// </summary>
     public UserRole Role { get; set; }

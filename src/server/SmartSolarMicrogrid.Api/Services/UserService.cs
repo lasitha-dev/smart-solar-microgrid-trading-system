@@ -98,6 +98,10 @@ public class UserService : IUserService
             Nic = user.Nic,
             Username = user.Username,
             FullName = user.FullName,
+            Phone = user.Phone,
+            Address = user.Address,
+            Latitude = user.Latitude,
+            Longitude = user.Longitude,
             Role = user.Role,
             Status = user.Status,
             ExpiresAt = expiresAt
@@ -147,6 +151,9 @@ public class UserService : IUserService
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             FullName = request.FullName.Trim(),
             Phone = request.Phone.Trim(),
+            Address = request.Address.Trim(),
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
             Role = UserRole.Prosumer,
             Status = AccountStatus.PendingActivation,
             CreatedAt = now,
@@ -345,7 +352,7 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// Updates permitted profile fields (FullName, Phone) for a solar prosumer identified by NIC.
+    /// Updates permitted profile fields (FullName, Phone, Address) for a solar prosumer identified by NIC.
     /// </summary>
     /// <param name="nic">The unique National Identity Card number.</param>
     /// <param name="request">The profile update payload.</param>
@@ -366,19 +373,45 @@ public class UserService : IUserService
         var now = DateTime.UtcNow;
         var trimmedFullName = request.FullName.Trim();
         var trimmedPhone = request.Phone.Trim();
+        var trimmedAddress = (request.Address ?? string.Empty).Trim();
 
+        var filter = Builders<User>.Filter.Regex(u => u.Nic, new BsonRegularExpression($"^{nic.Trim()}$", "i"));
         var update = Builders<User>.Update
             .Set(u => u.FullName, trimmedFullName)
             .Set(u => u.Phone, trimmedPhone)
+            .Set(u => u.Address, trimmedAddress)
+            .Set("Address", trimmedAddress)
             .Set(u => u.UpdatedAt, now);
 
-        await _dbContext.Users.UpdateOneAsync(u => u.Id == user.Id, update);
+        await _dbContext.Users.UpdateOneAsync(filter, update);
 
         user.FullName = trimmedFullName;
         user.Phone = trimmedPhone;
+        user.Address = trimmedAddress;
         user.UpdatedAt = now;
 
         return (true, "Profile updated successfully.", StatusCodes.Status200OK, MapToDto(user));
+    }
+
+    /// <summary>
+    /// Retrieves a prosumer profile by their National Identity Card (NIC) number.
+    /// </summary>
+    /// <param name="nic">The unique NIC number.</param>
+    /// <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> GetProsumerProfileAsync(string nic)
+    {
+        if (string.IsNullOrWhiteSpace(nic))
+        {
+            return (false, "NIC cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByNicAsync(nic);
+        if (user == null)
+        {
+            return (false, $"Prosumer with NIC '{nic}' was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        return (true, "Profile retrieved successfully.", StatusCodes.Status200OK, MapToDto(user));
     }
 
     /// <summary>
@@ -406,11 +439,12 @@ public class UserService : IUserService
         }
 
         var now = DateTime.UtcNow;
+        var filter = Builders<User>.Filter.Regex(u => u.Nic, new BsonRegularExpression($"^{nic.Trim()}$", "i"));
         var update = Builders<User>.Update
             .Set(u => u.Status, AccountStatus.Deactivated)
             .Set(u => u.UpdatedAt, now);
 
-        await _dbContext.Users.UpdateOneAsync(u => u.Id == user.Id, update);
+        await _dbContext.Users.UpdateOneAsync(filter, update);
 
         user.Status = AccountStatus.Deactivated;
         user.UpdatedAt = now;
@@ -454,16 +488,50 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="user">The user entity to map.</param>
     /// <returns>The sanitized UserResponseDto.</returns>
-    private static UserResponseDto MapToDto(User user) => new()
+    private static UserResponseDto MapToDto(User user)
     {
-        Id = user.Id ?? string.Empty,
-        Nic = user.Nic,
-        Username = user.Username,
-        FullName = user.FullName,
-        Phone = user.Phone,
-        Role = user.Role,
-        Status = user.Status,
-        CreatedAt = user.CreatedAt,
-        UpdatedAt = user.UpdatedAt
-    };
+        var address = user.Address;
+        if (string.IsNullOrWhiteSpace(address) && user.ExtraElements != null)
+        {
+            if (user.ExtraElements.Contains("Address") && !user.ExtraElements["Address"].IsBsonNull)
+                address = user.ExtraElements["Address"].AsString;
+            else if (user.ExtraElements.Contains("address") && !user.ExtraElements["address"].IsBsonNull)
+                address = user.ExtraElements["address"].AsString;
+            else if (user.ExtraElements.Contains("facilityAddress") && !user.ExtraElements["facilityAddress"].IsBsonNull)
+                address = user.ExtraElements["facilityAddress"].AsString;
+        }
+
+        var lat = user.Latitude;
+        var lon = user.Longitude;
+        if (!lat.HasValue && user.ExtraElements != null)
+        {
+            if (user.ExtraElements.Contains("Latitude") && !user.ExtraElements["Latitude"].IsBsonNull)
+                lat = user.ExtraElements["Latitude"].ToDouble();
+            else if (user.ExtraElements.Contains("latitude") && !user.ExtraElements["latitude"].IsBsonNull)
+                lat = user.ExtraElements["latitude"].ToDouble();
+        }
+        if (!lon.HasValue && user.ExtraElements != null)
+        {
+            if (user.ExtraElements.Contains("Longitude") && !user.ExtraElements["Longitude"].IsBsonNull)
+                lon = user.ExtraElements["Longitude"].ToDouble();
+            else if (user.ExtraElements.Contains("longitude") && !user.ExtraElements["longitude"].IsBsonNull)
+                lon = user.ExtraElements["longitude"].ToDouble();
+        }
+
+        return new UserResponseDto
+        {
+            Id = user.Id ?? string.Empty,
+            Nic = user.Nic,
+            Username = user.Username,
+            FullName = user.FullName,
+            Phone = user.Phone,
+            Address = address ?? string.Empty,
+            Latitude = lat,
+            Longitude = lon,
+            Role = user.Role,
+            Status = user.Status,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
+        };
+    }
 }

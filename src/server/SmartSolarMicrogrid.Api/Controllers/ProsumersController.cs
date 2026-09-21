@@ -97,27 +97,14 @@ public class ProsumersController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, ApiResponseDto<object>.Fail("You are not authorized to view another user's profile."));
         }
 
-        var user = await _userService.GetUserByNicAsync(nic);
+        var (success, message, statusCode, data) = await _userService.GetProsumerProfileAsync(nic);
 
-        if (user == null)
+        if (!success)
         {
-            return NotFound(ApiResponseDto<object>.Fail($"Prosumer with NIC '{nic}' was not found."));
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
         }
 
-        var dto = new UserResponseDto
-        {
-            Id = user.Id ?? string.Empty,
-            Nic = user.Nic,
-            Username = user.Username,
-            FullName = user.FullName,
-            Phone = user.Phone,
-            Role = user.Role,
-            Status = user.Status,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        };
-
-        return Ok(ApiResponseDto<UserResponseDto>.Ok(dto));
+        return Ok(ApiResponseDto<UserResponseDto>.Ok(data));
     }
 
     /// <summary>

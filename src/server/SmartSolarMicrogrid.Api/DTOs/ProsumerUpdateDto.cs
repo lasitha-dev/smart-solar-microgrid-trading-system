@@ -30,4 +30,10 @@ public class ProsumerUpdateDto
     [Phone(ErrorMessage = "Invalid phone number format.")]
     [StringLength(20, MinimumLength = 9, ErrorMessage = "Phone number must be between 9 and 20 digits.")]
     public string Phone { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the updated residential/street address.
+    /// </summary>
+    [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
+    public string Address { get; set; } = string.Empty;
 }

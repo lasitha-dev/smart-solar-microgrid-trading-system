@@ -366,6 +366,26 @@
             Gets or sets the full legal name of the authenticated user.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Phone">
+            <summary>
+            Gets or sets the contact phone number of the authenticated user.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Address">
+            <summary>
+            Gets or sets the address of the prosumer.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Latitude">
+            <summary>
+            Gets or sets the latitude coordinate of the solar microgrid facility.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Longitude">
+            <summary>
+            Gets or sets the longitude coordinate of the solar microgrid facility.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Role">
             <summary>
             Gets or sets the assigned user role (Backoffice, GridOperator, Prosumer).
@@ -412,6 +432,21 @@
             Gets or sets the contact mobile telephone number.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.Address">
+            <summary>
+            Gets or sets the street address of the prosumer.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.Latitude">
+            <summary>
+            Gets or sets the latitude coordinate of the solar facility.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.Longitude">
+            <summary>
+            Gets or sets the longitude coordinate of the solar facility.
+            </summary>
+        </member>
         <member name="T:SmartSolarMicrogrid.Api.DTOs.ProsumerUpdateDto">
             <summary>
             Represents the update payload submitted by a solar prosumer to modify permitted profile fields.
@@ -426,6 +461,11 @@
         <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerUpdateDto.Phone">
             <summary>
             Gets or sets the updated contact phone number.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerUpdateDto.Address">
+            <summary>
+            Gets or sets the updated residential/street address.
             </summary>
         </member>
         <member name="T:SmartSolarMicrogrid.Api.DTOs.UserCreateDto">
@@ -493,6 +533,21 @@
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Phone">
             <summary>
             Gets or sets the phone number.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Address">
+            <summary>
+            Gets or sets the address of the prosumer.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Latitude">
+            <summary>
+            Gets or sets the latitude coordinate of the solar microgrid facility.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Longitude">
+            <summary>
+            Gets or sets the longitude coordinate of the solar microgrid facility.
             </summary>
         </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Role">
@@ -613,6 +668,21 @@
             Gets or sets the contact telephone / mobile number.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.Models.User.Address">
+            <summary>
+            Gets or sets the street/residential address of the prosumer or facility.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Models.User.Latitude">
+            <summary>
+            Gets or sets the latitude coordinate of the solar facility. Strictly immutable once confirmed during registration.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Models.User.Longitude">
+            <summary>
+            Gets or sets the longitude coordinate of the solar facility. Strictly immutable once confirmed during registration.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.Models.User.Role">
             <summary>
             Gets or sets the assigned user role for system access control.
@@ -631,6 +701,11 @@
         <member name="P:SmartSolarMicrogrid.Api.Models.User.UpdatedAt">
             <summary>
             Gets or sets the UTC timestamp when the user account was last modified.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Models.User.ExtraElements">
+            <summary>
+            Captures any extra elements in MongoDB documents to ensure resilient deserialization.
             </summary>
         </member>
         <member name="T:SmartSolarMicrogrid.Api.Services.ITokenService">
@@ -716,6 +791,13 @@
             <param name="nic">The unique National Identity Card number of the requesting prosumer.</param>
             <param name="request">Optional deactivation reason and remarks payload.</param>
             <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetProsumerProfileAsync(System.String)">
+            <summary>
+            Retrieves a prosumer profile by their National Identity Card (NIC) number.
+            </summary>
+            <param name="nic">The unique NIC number.</param>
+            <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetUserByIdAsync(System.String)">
             <summary>
@@ -820,11 +902,18 @@
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.UserService.UpdateProsumerProfileAsync(System.String,SmartSolarMicrogrid.Api.DTOs.ProsumerUpdateDto)">
             <summary>
-            Updates permitted profile fields (FullName, Phone) for a solar prosumer identified by NIC.
+            Updates permitted profile fields (FullName, Phone, Address) for a solar prosumer identified by NIC.
             </summary>
             <param name="nic">The unique National Identity Card number.</param>
             <param name="request">The profile update payload.</param>
             <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.GetProsumerProfileAsync(System.String)">
+            <summary>
+            Retrieves a prosumer profile by their National Identity Card (NIC) number.
+            </summary>
+            <param name="nic">The unique NIC number.</param>
+            <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.UserService.RequestProsumerDeactivationAsync(System.String,SmartSolarMicrogrid.Api.DTOs.DeactivationRequestDto)">
             <summary>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Student Name: SILVA M N U
+  Student ID: IT22169112
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Identity, Authentication & Account Lifecycle (Member 1)
+  Description: Network security configuration permitting cleartext traffic to localhost and local subnet for backend testing.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">192.168.1.1</domain>
+    </domain-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

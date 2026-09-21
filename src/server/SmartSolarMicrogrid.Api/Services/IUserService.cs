@@ -85,6 +85,13 @@ public interface IUserService
     Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> RequestProsumerDeactivationAsync(string nic, DeactivationRequestDto? request);
 
     /// <summary>
+    /// Retrieves a prosumer profile by their National Identity Card (NIC) number.
+    /// </summary>
+    /// <param name="nic">The unique NIC number.</param>
+    /// <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
+    Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> GetProsumerProfileAsync(string nic);
+
+    /// <summary>
     /// Retrieves a user entity by their database document identifier.
     /// </summary>
     /// <param name="id">The unique MongoDB user document identifier.</param>
