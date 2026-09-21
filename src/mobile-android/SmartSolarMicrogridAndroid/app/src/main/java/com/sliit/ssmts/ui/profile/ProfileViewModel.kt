@@ -1,0 +1,179 @@
+/*
+ * Student Name: SILVA M N U
+ * Student ID: IT22169112
+ * Module: SE4040 Enterprise Application Development (2026)
+ * Component: Identity, Authentication & Account Lifecycle (Member 1)
+ * Description: ViewModel managing Prosumer profile viewing, editing, deactivation, and logout workflows.
+ */
+
+package com.sliit.ssmts.ui.profile
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.sliit.ssmts.domain.model.UserSession
+import com.sliit.ssmts.domain.repository.IAuthRepository
+import com.sliit.ssmts.util.NetworkResult
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+/**
+ * UI state for profile data loading.
+ */
+sealed class ProfileUiState {
+    object Loading : ProfileUiState()
+    data class Success(val session: UserSession) : ProfileUiState()
+    data class Error(val message: String) : ProfileUiState()
+}
+
+/**
+ * UI state for profile update operations.
+ */
+sealed class ProfileUpdateState {
+    object Idle : ProfileUpdateState()
+    object Loading : ProfileUpdateState()
+    data class Success(val message: String) : ProfileUpdateState()
+    data class Error(val message: String) : ProfileUpdateState()
+}
+
+/**
+ * UI state for account deactivation requests.
+ */
+sealed class DeactivationState {
+    object Idle : DeactivationState()
+    object Loading : DeactivationState()
+    data class Success(val message: String) : DeactivationState()
+    data class Error(val message: String) : DeactivationState()
+}
+
+/**
+ * ViewModel orchestrating profile management and self-deactivation.
+ */
+class ProfileViewModel(
+    private val repository: IAuthRepository
+) : ViewModel() {
+
+    private val _profileState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
+    val profileState: StateFlow<ProfileUiState> = _profileState.asStateFlow()
+
+    private val _updateState = MutableStateFlow<ProfileUpdateState>(ProfileUpdateState.Idle)
+    val updateState: StateFlow<ProfileUpdateState> = _updateState.asStateFlow()
+
+    private val _deactivationState = MutableStateFlow<DeactivationState>(DeactivationState.Idle)
+    val deactivationState: StateFlow<DeactivationState> = _deactivationState.asStateFlow()
+
+    init {
+        loadProfile()
+    }
+
+    /**
+     * Loads the profile from SQLite local storage, then syncs with remote Web API.
+     */
+    fun loadProfile() {
+        viewModelScope.launch {
+            _profileState.value = ProfileUiState.Loading
+
+            // 1. Read cached session from SQLite
+            val cachedSession = repository.getActiveSession()
+            if (cachedSession != null) {
+                _profileState.value = ProfileUiState.Success(cachedSession)
+            }
+
+            // 2. Fetch fresh profile from API
+            if (cachedSession != null && cachedSession.nic.isNotBlank()) {
+                when (val result = repository.getProfile(cachedSession.nic)) {
+                    is NetworkResult.Success -> {
+                        _profileState.value = ProfileUiState.Success(result.data)
+                    }
+                    is NetworkResult.Error -> {
+                        // Keep displaying cached SQLite session if API returns an error
+                    }
+                    is NetworkResult.Exception -> {
+                        // Keep displaying cached SQLite session if connection fails
+                    }
+                }
+            } else if (cachedSession == null) {
+                _profileState.value = ProfileUiState.Error("No active session found. Please log in.")
+            }
+        }
+    }
+
+    /**
+     * Updates permitted profile fields (fullName, phone, address) on the backend server.
+     */
+    fun updateProfile(fullName: String, phone: String, address: String) {
+        viewModelScope.launch {
+            val session = (_profileState.value as? ProfileUiState.Success)?.session
+                ?: repository.getActiveSession()
+
+            if (session == null || session.nic.isBlank()) {
+                _updateState.value = ProfileUpdateState.Error("Session not loaded. Please log in again.")
+                return@launch
+            }
+
+            _updateState.value = ProfileUpdateState.Loading
+
+            when (val result = repository.updateProfile(session.nic, fullName, phone, address)) {
+                is NetworkResult.Success -> {
+                    _profileState.value = ProfileUiState.Success(result.data)
+                    _updateState.value = ProfileUpdateState.Success(result.message ?: "Profile updated successfully.")
+                }
+                is NetworkResult.Error -> {
+                    _updateState.value = ProfileUpdateState.Error(result.message)
+                }
+                is NetworkResult.Exception -> {
+                    _updateState.value = ProfileUpdateState.Error(
+                        result.throwable.localizedMessage ?: "Network error updating profile."
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends account self-deactivation request to the server and clears session on success.
+     */
+    fun requestDeactivation(reason: String?, remarks: String?) {
+        val currentSession = (_profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession == null) {
+            _deactivationState.value = DeactivationState.Error("Session not loaded.")
+            return
+        }
+
+        _deactivationState.value = DeactivationState.Loading
+
+        viewModelScope.launch {
+            when (val result = repository.requestDeactivation(currentSession.nic, reason, remarks)) {
+                is NetworkResult.Success -> {
+                    repository.clearSession()
+                    _deactivationState.value = DeactivationState.Success(
+                        result.message ?: "Account deactivated successfully."
+                    )
+                }
+                is NetworkResult.Error -> {
+                    _deactivationState.value = DeactivationState.Error(result.message)
+                }
+                is NetworkResult.Exception -> {
+                    _deactivationState.value = DeactivationState.Error(
+                        result.throwable.localizedMessage ?: "Error processing deactivation."
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Clears local SQLite session on logout.
+     */
+    fun logout(onLoggedOut: () -> Unit) {
+        viewModelScope.launch {
+            repository.clearSession()
+            onLoggedOut()
+        }
+    }
+
+    fun resetUpdateState() {
+        _updateState.value = ProfileUpdateState.Idle
+    }
+}
