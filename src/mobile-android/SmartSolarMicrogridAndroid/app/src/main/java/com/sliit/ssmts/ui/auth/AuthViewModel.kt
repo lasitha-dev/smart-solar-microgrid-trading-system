@@ -93,6 +93,7 @@ class AuthViewModel(
         password: String,
         fullName: String,
         phone: String,
+        email: String,
         address: String,
         latitude: Double? = null,
         longitude: Double? = null
@@ -106,6 +107,7 @@ class AuthViewModel(
                 password,
                 fullName,
                 phone,
+                email,
                 address,
                 latitude,
                 longitude

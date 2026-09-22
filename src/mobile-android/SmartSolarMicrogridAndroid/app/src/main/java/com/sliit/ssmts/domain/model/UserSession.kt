@@ -27,6 +27,7 @@ data class UserSession(
     val username: String,
     val fullName: String,
     val phone: String = "",
+    val email: String = "",
     val address: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,

@@ -6,6 +6,7 @@
  * Description: Core user service implementing authentication, prosumer registration, staff provisioning, and lifecycle transitions.
  */
 
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Data;
@@ -24,17 +25,20 @@ public class UserService : IUserService
 {
     private readonly MongoDbContext _dbContext;
     private readonly ITokenService _tokenService;
+    private readonly IEmailService _emailService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserService"/> class.
     /// </summary>
     /// <param name="dbContext">The MongoDB database context.</param>
     /// <param name="tokenService">The JWT token generation service.</param>
+    /// <param name="emailService">The automated email notification service.</param>
     /// <exception cref="ArgumentNullException">Thrown when required dependencies are null.</exception>
-    public UserService(MongoDbContext dbContext, ITokenService tokenService)
+    public UserService(MongoDbContext dbContext, ITokenService tokenService, IEmailService emailService)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
     }
 
     /// <summary>
@@ -99,6 +103,7 @@ public class UserService : IUserService
             Username = user.Username,
             FullName = user.FullName,
             Phone = user.Phone,
+            Email = user.Email ?? (user.ExtraElements != null && user.ExtraElements.Contains("email") && !user.ExtraElements["email"].IsBsonNull ? user.ExtraElements["email"].AsString : string.Empty),
             Address = user.Address,
             Latitude = user.Latitude,
             Longitude = user.Longitude,
@@ -125,6 +130,7 @@ public class UserService : IUserService
 
         var trimmedNic = request.Nic.Trim();
         var trimmedUsername = request.Username.Trim();
+        var trimmedEmail = request.Email.Trim().ToLowerInvariant();
 
         // Check for existing NIC (case-insensitive)
         var nicFilter = Builders<User>.Filter.Regex(u => u.Nic, new BsonRegularExpression($"^{trimmedNic}$", "i"));
@@ -142,12 +148,27 @@ public class UserService : IUserService
             return (false, $"A user with username '{trimmedUsername}' already exists.", StatusCodes.Status409Conflict, null);
         }
 
+        // Check password complexity (min 6 chars, uppercase, lowercase, number, symbol)
+        if (!IsComplexPassword(request.Password))
+        {
+            return (false, "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // Check for existing Email (case-insensitive)
+        var emailFilter = Builders<User>.Filter.Regex(u => u.Email, new BsonRegularExpression($"^{trimmedEmail}$", "i"));
+        var existingByEmail = await _dbContext.Users.Find(emailFilter).FirstOrDefaultAsync();
+        if (existingByEmail != null)
+        {
+            return (false, $"A user with email '{trimmedEmail}' is already registered in the system.", StatusCodes.Status409Conflict, null);
+        }
+
         // Create new User entity with PendingActivation status
         var now = DateTime.UtcNow;
         var newUser = new User
         {
             Nic = trimmedNic,
             Username = trimmedUsername,
+            Email = trimmedEmail,
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             FullName = request.FullName.Trim(),
             Phone = request.Phone.Trim(),
@@ -186,6 +207,7 @@ public class UserService : IUserService
 
         var trimmedNic = request.Nic.Trim();
         var trimmedUsername = request.Username.Trim();
+        var trimmedEmail = request.Email.Trim().ToLowerInvariant();
 
         // Check for existing NIC
         var nicFilter = Builders<User>.Filter.Regex(u => u.Nic, new BsonRegularExpression($"^{trimmedNic}$", "i"));
@@ -203,11 +225,26 @@ public class UserService : IUserService
             return (false, $"A user with username '{trimmedUsername}' already exists.", StatusCodes.Status409Conflict, null);
         }
 
+        // Check password complexity (min 6 chars, uppercase, lowercase, number, symbol)
+        if (!IsComplexPassword(request.Password))
+        {
+            return (false, "Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // Check for existing Email (case-insensitive)
+        var emailFilter = Builders<User>.Filter.Regex(u => u.Email, new BsonRegularExpression($"^{trimmedEmail}$", "i"));
+        var existingByEmail = await _dbContext.Users.Find(emailFilter).FirstOrDefaultAsync();
+        if (existingByEmail != null)
+        {
+            return (false, $"A user with email '{trimmedEmail}' already exists in the system.", StatusCodes.Status409Conflict, null);
+        }
+
         var now = DateTime.UtcNow;
         var newUser = new User
         {
             Nic = trimmedNic,
             Username = trimmedUsername,
+            Email = trimmedEmail,
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             FullName = request.FullName.Trim(),
             Phone = request.Phone.Trim(),
@@ -219,8 +256,22 @@ public class UserService : IUserService
 
         await _dbContext.Users.InsertOneAsync(newUser);
 
+        // Dispatch automated onboarding credentials email via SMTP
+        if (!string.IsNullOrWhiteSpace(newUser.Email))
+        {
+            _ = Task.Run(async () =>
+            {
+                await _emailService.SendStaffOnboardingEmailAsync(
+                    newUser.Email,
+                    newUser.FullName,
+                    newUser.Username,
+                    request.Password,
+                    newUser.Role);
+            });
+        }
+
         var responseDto = MapToDto(newUser);
-        return (true, $"{request.Role} user '{newUser.Username}' created successfully.", StatusCodes.Status201Created, responseDto);
+        return (true, $"{request.Role} user '{newUser.Username}' created successfully. Onboarding credentials email dispatched.", StatusCodes.Status201Created, responseDto);
     }
 
     /// <summary>
@@ -231,8 +282,35 @@ public class UserService : IUserService
     /// <returns>A list of sanitized user response DTOs.</returns>
     public async Task<List<UserResponseDto>> GetAllUsersAsync(UserRole? role = null, AccountStatus? status = null)
     {
+        return await GetUsersFilteredAsync(null, role, status, 1, 1000);
+    }
+
+    /// <summary>
+    /// Retrieves system users with search query, role, status filters, and pagination.
+    /// </summary>
+    /// <param name="search">Text query matching NIC, Username, or FullName.</param>
+    /// <param name="role">Optional filter by user role.</param>
+    /// <param name="status">Optional filter by account status.</param>
+    /// <param name="page">1-indexed page number.</param>
+    /// <param name="pageSize">Number of records per page (default 50).</param>
+    /// <returns>A list of sanitized user response DTOs.</returns>
+    public async Task<List<UserResponseDto>> GetUsersFilteredAsync(string? search = null, UserRole? role = null, AccountStatus? status = null, int page = 1, int pageSize = 50)
+    {
         var filterBuilder = Builders<User>.Filter;
         var filters = new List<FilterDefinition<User>>();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var trimmedSearch = search.Trim();
+            var regex = new BsonRegularExpression(trimmedSearch, "i");
+            var searchFilter = filterBuilder.Or(
+                filterBuilder.Regex(u => u.Nic, regex),
+                filterBuilder.Regex(u => u.Username, regex),
+                filterBuilder.Regex(u => u.FullName, regex),
+                filterBuilder.Regex(u => u.Email, regex)
+            );
+            filters.Add(searchFilter);
+        }
 
         if (role.HasValue)
         {
@@ -246,12 +324,69 @@ public class UserService : IUserService
 
         var filter = filters.Count > 0 ? filterBuilder.And(filters) : filterBuilder.Empty;
 
+        var skip = Math.Max(0, (page - 1) * pageSize);
+        var limit = Math.Clamp(pageSize, 1, 1000);
+
         var users = await _dbContext.Users
             .Find(filter)
             .SortByDescending(u => u.CreatedAt)
+            .Skip(skip)
+            .Limit(limit)
             .ToListAsync();
 
         return users.Select(MapToDto).ToList();
+    }
+
+    /// <summary>
+    /// Updates a user account's lifecycle status (Active, Deactivated, PendingActivation) with optional remarks.
+    /// </summary>
+    /// <param name="id">The unique MongoDB user document identifier.</param>
+    /// <param name="newStatus">The target lifecycle status.</param>
+    /// <param name="reason">Optional rejection or state change remark.</param>
+    /// <param name="currentUserId">The ID of the administrator invoking the transition.</param>
+    /// <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> UpdateUserStatusAsync(string id, AccountStatus newStatus, string? reason = null, string? currentUserId = null)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return (false, "User ID cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByIdAsync(id);
+        if (user == null)
+        {
+            return (false, $"User with ID '{id}' was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        if (newStatus == AccountStatus.Deactivated && !string.IsNullOrWhiteSpace(currentUserId) && string.Equals(id, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            return (false, "Administrators cannot deactivate their own active account.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var now = DateTime.UtcNow;
+        var updateBuilder = Builders<User>.Update
+            .Set(u => u.Status, newStatus)
+            .Set(u => u.UpdatedAt, now);
+
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            updateBuilder = updateBuilder.Set("StatusReason", reason.Trim());
+        }
+
+        await _dbContext.Users.UpdateOneAsync(u => u.Id == id, updateBuilder);
+
+        user.Status = newStatus;
+        user.UpdatedAt = now;
+
+        var actionText = newStatus switch
+        {
+            AccountStatus.Active => "activated/approved",
+            AccountStatus.Deactivated => "deactivated/rejected",
+            AccountStatus.PendingActivation => "moved to pending review",
+            _ => "updated"
+        };
+
+        return (true, $"User account '{user.Username}' was successfully {actionText}.", StatusCodes.Status200OK, MapToDto(user));
     }
 
     /// <summary>
@@ -453,6 +588,155 @@ public class UserService : IUserService
     }
 
     /// <summary>
+    /// Retrieves an authenticated user's profile details by their database identifier or NIC.
+    /// </summary>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> GetUserProfileAsync(string userId)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return (false, "User identifier cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByIdAsync(userId) ?? await GetUserByNicAsync(userId);
+        if (user == null)
+        {
+            return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        return (true, "User profile retrieved successfully.", StatusCodes.Status200OK, MapToDto(user));
+    }
+
+    /// <summary>
+    /// Updates permitted profile fields (FullName, Phone) for any authenticated user.
+    /// Enforces strict immutability on NIC, Username, Email, and Role.
+    /// </summary>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> UpdateUserProfileAsync(string userId, UserProfileUpdateDto request)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return (false, "User identifier cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByIdAsync(userId) ?? await GetUserByNicAsync(userId);
+        if (user == null)
+        {
+            return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        var now = DateTime.UtcNow;
+        var trimmedFullName = request.FullName.Trim();
+        var trimmedPhone = request.Phone.Trim();
+
+        var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+        var update = Builders<User>.Update
+            .Set(u => u.FullName, trimmedFullName)
+            .Set(u => u.Phone, trimmedPhone)
+            .Set(u => u.UpdatedAt, now);
+
+        await _dbContext.Users.UpdateOneAsync(filter, update);
+
+        user.FullName = trimmedFullName;
+        user.Phone = trimmedPhone;
+        user.UpdatedAt = now;
+
+        return (true, "Profile details updated successfully.", StatusCodes.Status200OK, MapToDto(user));
+    }
+
+    /// <summary>
+    /// Changes an authenticated user's password following verification of their current password and complexity rules.
+    /// </summary>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> ChangePasswordAsync(string userId, ChangePasswordDto request)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return (false, "User identifier cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByIdAsync(userId) ?? await GetUserByNicAsync(userId);
+        if (user == null)
+        {
+            return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        // 1. Verify Current Password
+        if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+        {
+            return (false, "The current password you entered is incorrect.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // 2. Validate New Password Confirmation
+        if (request.NewPassword != request.ConfirmNewPassword)
+        {
+            return (false, "New password and confirmation do not match.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // 3. Verify Complexity
+        if (!IsComplexPassword(request.NewPassword))
+        {
+            return (false, "New password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // 4. Update Password Hash
+        var newHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        var now = DateTime.UtcNow;
+
+        var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+        var update = Builders<User>.Update
+            .Set(u => u.PasswordHash, newHash)
+            .Set(u => u.UpdatedAt, now);
+
+        await _dbContext.Users.UpdateOneAsync(filter, update);
+
+        user.PasswordHash = newHash;
+        user.UpdatedAt = now;
+
+        return (true, "Password changed successfully. Please sign in with your new password.", StatusCodes.Status200OK, MapToDto(user));
+    }
+
+    /// <summary>
+    /// Permanently deletes an authenticated user's account from MongoDB after validating that
+    /// the provided confirmation email strictly matches the user's registered email address.
+    /// </summary>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> DeleteAccountAsync(string userId, DeleteAccountDto request)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return (false, "User identifier cannot be empty.", StatusCodes.Status400BadRequest, null);
+        }
+
+        if (request == null || string.IsNullOrWhiteSpace(request.ConfirmEmail))
+        {
+            return (false, "Confirmation email address is required.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await GetUserByIdAsync(userId) ?? await GetUserByNicAsync(userId);
+        if (user == null)
+        {
+            return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        var userEmail = user.Email ?? (user.ExtraElements != null && user.ExtraElements.Contains("email") && !user.ExtraElements["email"].IsBsonNull ? user.ExtraElements["email"].AsString : string.Empty);
+        var inputEmail = request.ConfirmEmail.Trim();
+
+        // Strictly verify that the typed email matches the registered account email
+        if (!string.Equals(inputEmail, userEmail.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return (false, "The confirmation email you entered does not match your registered email address.", StatusCodes.Status400BadRequest, null);
+        }
+
+        // Permanently delete user document from MongoDB
+        var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+        var deleteResult = await _dbContext.Users.DeleteOneAsync(filter);
+
+        if (deleteResult.DeletedCount == 0)
+        {
+            return (false, "Failed to delete user account. Please try again later.", StatusCodes.Status500InternalServerError, null);
+        }
+
+        return (true, "Your account has been deleted successfully.", StatusCodes.Status200OK, null);
+    }
+
+    /// <summary>
     /// Retrieves a user document by its MongoDB ObjectId.
     /// </summary>
     /// <param name="id">The unique document ID.</param>
@@ -518,6 +802,15 @@ public class UserService : IUserService
                 lon = user.ExtraElements["longitude"].ToDouble();
         }
 
+        var email = user.Email;
+        if (string.IsNullOrWhiteSpace(email) && user.ExtraElements != null)
+        {
+            if (user.ExtraElements.Contains("Email") && !user.ExtraElements["Email"].IsBsonNull)
+                email = user.ExtraElements["Email"].AsString;
+            else if (user.ExtraElements.Contains("email") && !user.ExtraElements["email"].IsBsonNull)
+                email = user.ExtraElements["email"].AsString;
+        }
+
         return new UserResponseDto
         {
             Id = user.Id ?? string.Empty,
@@ -525,6 +818,7 @@ public class UserService : IUserService
             Username = user.Username,
             FullName = user.FullName,
             Phone = user.Phone,
+            Email = email ?? string.Empty,
             Address = address ?? string.Empty,
             Latitude = lat,
             Longitude = lon,
@@ -533,5 +827,25 @@ public class UserService : IUserService
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt
         };
+    }
+
+    /// <summary>
+    /// Validates password complexity: minimum 6 characters, at least 1 uppercase letter,
+    /// at least 1 lowercase letter, at least 1 digit, and at least 1 special symbol.
+    /// </summary>
+    private static bool IsComplexPassword(string? password)
+    {
+        if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+        {
+            return false;
+        }
+
+        // Requires >= 1 uppercase, >= 1 lowercase, >= 1 digit, >= 1 special symbol
+        var hasUpper = Regex.IsMatch(password, @"[A-Z]");
+        var hasLower = Regex.IsMatch(password, @"[a-z]");
+        var hasDigit = Regex.IsMatch(password, @"\d");
+        var hasSymbol = Regex.IsMatch(password, @"[^a-zA-Z0-9]");
+
+        return hasUpper && hasLower && hasDigit && hasSymbol;
     }
 }

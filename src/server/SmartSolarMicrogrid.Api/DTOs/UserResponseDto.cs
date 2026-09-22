@@ -32,6 +32,11 @@ public class UserResponseDto
     public string Username { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the primary contact email address.
+    /// </summary>
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the full legal name.
     /// </summary>
     public string FullName { get; set; } = string.Empty;

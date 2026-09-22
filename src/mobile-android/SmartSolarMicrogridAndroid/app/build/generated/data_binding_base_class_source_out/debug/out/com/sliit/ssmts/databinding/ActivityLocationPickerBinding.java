@@ -57,6 +57,12 @@ public final class ActivityLocationPickerBinding implements ViewBinding {
   public final TextView tvGpsStatus;
 
   @NonNull
+  public final TextView tvLocationPickerSubtitle;
+
+  @NonNull
+  public final TextView tvLocationPickerTitle;
+
+  @NonNull
   public final WebView wvMapPicker;
 
   private ActivityLocationPickerBinding(@NonNull ConstraintLayout rootView,
@@ -65,6 +71,7 @@ public final class ActivityLocationPickerBinding implements ViewBinding {
       @NonNull ExtendedFloatingActionButton fabClusters, @NonNull FloatingActionButton fabFindMe,
       @NonNull LinearLayout llHeaderBar, @NonNull TextView tvCoordinatesLive,
       @NonNull TextView tvCoordinatesRegion, @NonNull TextView tvGpsStatus,
+      @NonNull TextView tvLocationPickerSubtitle, @NonNull TextView tvLocationPickerTitle,
       @NonNull WebView wvMapPicker) {
     this.rootView = rootView;
     this.btnBack = btnBack;
@@ -77,6 +84,8 @@ public final class ActivityLocationPickerBinding implements ViewBinding {
     this.tvCoordinatesLive = tvCoordinatesLive;
     this.tvCoordinatesRegion = tvCoordinatesRegion;
     this.tvGpsStatus = tvGpsStatus;
+    this.tvLocationPickerSubtitle = tvLocationPickerSubtitle;
+    this.tvLocationPickerTitle = tvLocationPickerTitle;
     this.wvMapPicker = wvMapPicker;
   }
 
@@ -167,6 +176,18 @@ public final class ActivityLocationPickerBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvLocationPickerSubtitle;
+      TextView tvLocationPickerSubtitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvLocationPickerSubtitle == null) {
+        break missingId;
+      }
+
+      id = R.id.tvLocationPickerTitle;
+      TextView tvLocationPickerTitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvLocationPickerTitle == null) {
+        break missingId;
+      }
+
       id = R.id.wvMapPicker;
       WebView wvMapPicker = ViewBindings.findChildViewById(rootView, id);
       if (wvMapPicker == null) {
@@ -175,7 +196,8 @@ public final class ActivityLocationPickerBinding implements ViewBinding {
 
       return new ActivityLocationPickerBinding((ConstraintLayout) rootView, btnBack,
           btnConfirmLocation, cardBottomActions, cardCoordinatesHud, fabClusters, fabFindMe,
-          llHeaderBar, tvCoordinatesLive, tvCoordinatesRegion, tvGpsStatus, wvMapPicker);
+          llHeaderBar, tvCoordinatesLive, tvCoordinatesRegion, tvGpsStatus,
+          tvLocationPickerSubtitle, tvLocationPickerTitle, wvMapPicker);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

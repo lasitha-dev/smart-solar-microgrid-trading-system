@@ -20,7 +20,7 @@ import com.sliit.ssmts.data.local.entity.SessionEntity
  */
 @Database(
     entities = [SessionEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class SsmtsDatabase : RoomDatabase() {

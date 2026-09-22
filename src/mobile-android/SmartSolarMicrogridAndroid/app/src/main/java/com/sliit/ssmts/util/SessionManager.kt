@@ -64,6 +64,7 @@ class SessionManager(context: Context) {
             username = session.username,
             fullName = session.fullName,
             phone = session.phone,
+            email = session.email,
             address = session.address,
             latitude = session.latitude,
             longitude = session.longitude,

@@ -52,6 +52,11 @@ public class LoginResponseDto
     public string Phone { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the primary email address of the authenticated user.
+    /// </summary>
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the address of the prosumer.
     /// </summary>
     public string Address { get; set; } = string.Empty;

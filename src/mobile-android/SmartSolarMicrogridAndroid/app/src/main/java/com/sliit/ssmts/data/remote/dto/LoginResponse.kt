@@ -45,6 +45,9 @@ data class LoginResponse(
     @SerializedName("phone")
     val phone: String? = null,
 
+    @SerializedName("email")
+    val email: String? = null,
+
     @SerializedName("address")
     val address: String? = null,
 

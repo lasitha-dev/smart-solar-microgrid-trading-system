@@ -20,6 +20,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.sliit.ssmts.R
 import com.sliit.ssmts.databinding.ActivityLoginBinding
 import com.sliit.ssmts.ui.ViewModelFactory
+import com.sliit.ssmts.ui.home.HomeActivity
 import com.sliit.ssmts.ui.profile.ProfileActivity
 import com.sliit.ssmts.util.Constants
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Auto-login if valid active session exists in SQLite
         viewModel.checkExistingSession {
-            navigateToProfile()
+            navigateToHome()
         }
     }
 
@@ -100,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
                                 state.message ?: getString(R.string.login_title),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            navigateToProfile()
+                            navigateToHome()
                         }
                         is AuthUiState.PendingActivation -> {
                             setLoading(false)
@@ -137,8 +138,8 @@ class LoginActivity : AppCompatActivity() {
         binding.tvErrorMessage.visibility = View.VISIBLE
     }
 
-    private fun navigateToProfile() {
-        val intent = Intent(this, ProfileActivity::class.java)
+    private fun navigateToHome() {
+        val intent = Intent(this, HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

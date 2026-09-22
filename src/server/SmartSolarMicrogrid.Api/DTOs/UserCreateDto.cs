@@ -32,10 +32,21 @@ public class UserCreateDto
     public string Username { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the contact email address of the staff member.
+    /// </summary>
+    [Required(ErrorMessage = "Email address is required.")]
+    [EmailAddress(ErrorMessage = "Invalid email address format.")]
+    [StringLength(100, MinimumLength = 5, ErrorMessage = "Email must be between 5 and 100 characters.")]
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the initial password for the staff account.
+    /// Requires at least 6 characters, one uppercase letter, one lowercase letter, one number, and one special symbol.
     /// </summary>
     [Required(ErrorMessage = "Password is required.")]
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$", 
+        ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.")]
     public string Password { get; set; } = string.Empty;
 
     /// <summary>

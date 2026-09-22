@@ -22,6 +22,11 @@ public enum UserRole
     Backoffice,
 
     /// <summary>
+    /// System Administrator with full administrative privileges across microgrid management.
+    /// </summary>
+    Administrator,
+
+    /// <summary>
     /// Field grid operator responsible for verifying bookings, QR validation, and energy transfers.
     /// </summary>
     GridOperator,

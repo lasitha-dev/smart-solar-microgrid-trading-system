@@ -32,6 +32,7 @@ data class SessionEntity(
     val longitude: Double? = null,
     val role: String,
     val status: String,
+    val email: String = "",
     val expiresAt: String? = null,
     val updatedAt: Long = System.currentTimeMillis()
 ) {
@@ -45,6 +46,7 @@ data class SessionEntity(
         username = username,
         fullName = fullName,
         phone = phone,
+        email = email,
         address = address,
         latitude = latitude,
         longitude = longitude,

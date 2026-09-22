@@ -47,7 +47,7 @@ public final class SessionDao_Impl implements SessionDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `user_session` (`id`,`token`,`userId`,`nic`,`username`,`fullName`,`phone`,`address`,`latitude`,`longitude`,`role`,`status`,`expiresAt`,`updatedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `user_session` (`id`,`token`,`userId`,`nic`,`username`,`fullName`,`phone`,`address`,`latitude`,`longitude`,`role`,`status`,`email`,`expiresAt`,`updatedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -73,12 +73,13 @@ public final class SessionDao_Impl implements SessionDao {
         }
         statement.bindString(11, entity.getRole());
         statement.bindString(12, entity.getStatus());
+        statement.bindString(13, entity.getEmail());
         if (entity.getExpiresAt() == null) {
-          statement.bindNull(13);
+          statement.bindNull(14);
         } else {
-          statement.bindString(13, entity.getExpiresAt());
+          statement.bindString(14, entity.getExpiresAt());
         }
-        statement.bindLong(14, entity.getUpdatedAt());
+        statement.bindLong(15, entity.getUpdatedAt());
       }
     };
     this.__preparedStmtOfUpdateProfileCache = new SharedSQLiteStatement(__db) {
@@ -232,6 +233,7 @@ public final class SessionDao_Impl implements SessionDao {
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfRole = CursorUtil.getColumnIndexOrThrow(_cursor, "role");
           final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
+          final int _cursorIndexOfEmail = CursorUtil.getColumnIndexOrThrow(_cursor, "email");
           final int _cursorIndexOfExpiresAt = CursorUtil.getColumnIndexOrThrow(_cursor, "expiresAt");
           final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
           final SessionEntity _result;
@@ -268,6 +270,8 @@ public final class SessionDao_Impl implements SessionDao {
             _tmpRole = _cursor.getString(_cursorIndexOfRole);
             final String _tmpStatus;
             _tmpStatus = _cursor.getString(_cursorIndexOfStatus);
+            final String _tmpEmail;
+            _tmpEmail = _cursor.getString(_cursorIndexOfEmail);
             final String _tmpExpiresAt;
             if (_cursor.isNull(_cursorIndexOfExpiresAt)) {
               _tmpExpiresAt = null;
@@ -276,7 +280,7 @@ public final class SessionDao_Impl implements SessionDao {
             }
             final long _tmpUpdatedAt;
             _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
-            _result = new SessionEntity(_tmpId,_tmpToken,_tmpUserId,_tmpNic,_tmpUsername,_tmpFullName,_tmpPhone,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpRole,_tmpStatus,_tmpExpiresAt,_tmpUpdatedAt);
+            _result = new SessionEntity(_tmpId,_tmpToken,_tmpUserId,_tmpNic,_tmpUsername,_tmpFullName,_tmpPhone,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpRole,_tmpStatus,_tmpEmail,_tmpExpiresAt,_tmpUpdatedAt);
           } else {
             _result = null;
           }
@@ -311,6 +315,7 @@ public final class SessionDao_Impl implements SessionDao {
           final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
           final int _cursorIndexOfRole = CursorUtil.getColumnIndexOrThrow(_cursor, "role");
           final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
+          final int _cursorIndexOfEmail = CursorUtil.getColumnIndexOrThrow(_cursor, "email");
           final int _cursorIndexOfExpiresAt = CursorUtil.getColumnIndexOrThrow(_cursor, "expiresAt");
           final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
           final SessionEntity _result;
@@ -347,6 +352,8 @@ public final class SessionDao_Impl implements SessionDao {
             _tmpRole = _cursor.getString(_cursorIndexOfRole);
             final String _tmpStatus;
             _tmpStatus = _cursor.getString(_cursorIndexOfStatus);
+            final String _tmpEmail;
+            _tmpEmail = _cursor.getString(_cursorIndexOfEmail);
             final String _tmpExpiresAt;
             if (_cursor.isNull(_cursorIndexOfExpiresAt)) {
               _tmpExpiresAt = null;
@@ -355,7 +362,7 @@ public final class SessionDao_Impl implements SessionDao {
             }
             final long _tmpUpdatedAt;
             _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
-            _result = new SessionEntity(_tmpId,_tmpToken,_tmpUserId,_tmpNic,_tmpUsername,_tmpFullName,_tmpPhone,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpRole,_tmpStatus,_tmpExpiresAt,_tmpUpdatedAt);
+            _result = new SessionEntity(_tmpId,_tmpToken,_tmpUserId,_tmpNic,_tmpUsername,_tmpFullName,_tmpPhone,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpRole,_tmpStatus,_tmpEmail,_tmpExpiresAt,_tmpUpdatedAt);
           } else {
             _result = null;
           }

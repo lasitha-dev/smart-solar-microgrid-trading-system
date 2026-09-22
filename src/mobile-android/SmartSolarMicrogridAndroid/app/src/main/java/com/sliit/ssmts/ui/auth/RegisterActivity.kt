@@ -11,6 +11,8 @@ package com.sliit.ssmts.ui.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -65,6 +67,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupListeners()
+        setupLiveValidationWatchers()
         observeViewModel()
         updateLocationUi()
     }
@@ -81,6 +84,62 @@ class RegisterActivity : AppCompatActivity() {
         binding.tvLoginLink.setOnClickListener {
             finish()
         }
+    }
+
+    /**
+     * Attaches real-time TextWatchers to enforce live validation on Password and Confirm Password fields.
+     */
+    private fun setupLiveValidationWatchers() {
+        val passwordWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val pass = s?.toString().orEmpty()
+                val confirm = binding.etConfirmPassword.text?.toString().orEmpty()
+
+                if (pass.isNotEmpty()) {
+                    if (pass.length < 6) {
+                        binding.tilPassword.error = getString(R.string.error_password_short)
+                    } else if (!InputValidator.isValidPassword(pass)) {
+                        binding.tilPassword.error = getString(R.string.error_password_complex)
+                    } else {
+                        binding.tilPassword.error = null
+                    }
+                } else {
+                    binding.tilPassword.error = null
+                }
+
+                if (confirm.isNotEmpty()) {
+                    if (pass != confirm) {
+                        binding.tilConfirmPassword.error = getString(R.string.error_passwords_mismatch)
+                    } else {
+                        binding.tilConfirmPassword.error = null
+                    }
+                }
+            }
+        }
+
+        val confirmPasswordWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val confirm = s?.toString().orEmpty()
+                val pass = binding.etPassword.text?.toString().orEmpty()
+
+                if (confirm.isNotEmpty()) {
+                    if (confirm != pass) {
+                        binding.tilConfirmPassword.error = getString(R.string.error_passwords_mismatch)
+                    } else {
+                        binding.tilConfirmPassword.error = null
+                    }
+                } else {
+                    binding.tilConfirmPassword.error = null
+                }
+            }
+        }
+
+        binding.etPassword.addTextChangedListener(passwordWatcher)
+        binding.etConfirmPassword.addTextChangedListener(confirmPasswordWatcher)
     }
 
     private fun openLocationPickerScreen() {
@@ -124,6 +183,7 @@ class RegisterActivity : AppCompatActivity() {
         val username = binding.etUsername.text?.toString()?.trim().orEmpty()
         val fullName = binding.etFullName.text?.toString()?.trim().orEmpty()
         val phone = binding.etPhone.text?.toString()?.trim().orEmpty()
+        val email = binding.etEmail.text?.toString()?.trim().orEmpty()
         val address = binding.etAddress.text?.toString()?.trim().orEmpty()
         val password = binding.etPassword.text?.toString().orEmpty()
         val confirmPassword = binding.etConfirmPassword.text?.toString().orEmpty()
@@ -150,6 +210,14 @@ class RegisterActivity : AppCompatActivity() {
             hasError = true
         }
 
+        if (email.isBlank()) {
+            binding.tilEmail.error = getString(R.string.error_email_required)
+            hasError = true
+        } else if (!InputValidator.isValidEmail(email)) {
+            binding.tilEmail.error = getString(R.string.error_email_invalid)
+            hasError = true
+        }
+
         if (address.isBlank() || address.length < 3) {
             binding.tilAddress.error = getString(R.string.error_address_required)
             hasError = true
@@ -161,12 +229,21 @@ class RegisterActivity : AppCompatActivity() {
             hasError = true
         }
 
-        if (!InputValidator.isValidPassword(password)) {
+        if (password.isBlank()) {
+            binding.tilPassword.error = getString(R.string.error_password_required)
+            hasError = true
+        } else if (password.length < 6) {
             binding.tilPassword.error = getString(R.string.error_password_short)
+            hasError = true
+        } else if (!InputValidator.isValidPassword(password)) {
+            binding.tilPassword.error = getString(R.string.error_password_complex)
             hasError = true
         }
 
-        if (password != confirmPassword) {
+        if (confirmPassword.isBlank()) {
+            binding.tilConfirmPassword.error = getString(R.string.error_password_required)
+            hasError = true
+        } else if (password != confirmPassword) {
             binding.tilConfirmPassword.error = getString(R.string.error_passwords_mismatch)
             hasError = true
         }
@@ -178,6 +255,7 @@ class RegisterActivity : AppCompatActivity() {
                 password = password,
                 fullName = fullName,
                 phone = phone,
+                email = email,
                 address = address,
                 latitude = selectedLatitude,
                 longitude = selectedLongitude
@@ -190,6 +268,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.tilUsername.error = null
         binding.tilFullName.error = null
         binding.tilPhone.error = null
+        binding.tilEmail.error = null
         binding.tilAddress.error = null
         binding.tilPassword.error = null
         binding.tilConfirmPassword.error = null
@@ -235,6 +314,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.etUsername.isEnabled = !isLoading
         binding.etFullName.isEnabled = !isLoading
         binding.etPhone.isEnabled = !isLoading
+        binding.etEmail.isEnabled = !isLoading
         binding.etAddress.isEnabled = !isLoading
         binding.etPassword.isEnabled = !isLoading
         binding.etConfirmPassword.isEnabled = !isLoading

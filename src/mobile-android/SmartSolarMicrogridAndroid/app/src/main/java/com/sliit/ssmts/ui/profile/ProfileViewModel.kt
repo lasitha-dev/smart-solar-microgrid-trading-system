@@ -48,7 +48,27 @@ sealed class DeactivationState {
 }
 
 /**
- * ViewModel orchestrating profile management and self-deactivation.
+ * UI state for change password operations.
+ */
+sealed class ChangePasswordState {
+    object Idle : ChangePasswordState()
+    object Loading : ChangePasswordState()
+    data class Success(val message: String) : ChangePasswordState()
+    data class Error(val message: String) : ChangePasswordState()
+}
+
+/**
+ * UI state for permanent account deletion.
+ */
+sealed class DeleteAccountState {
+    object Idle : DeleteAccountState()
+    object Loading : DeleteAccountState()
+    data class Success(val message: String) : DeleteAccountState()
+    data class Error(val message: String) : DeleteAccountState()
+}
+
+/**
+ * ViewModel orchestrating profile management, password changing, and self-account deletion.
  */
 class ProfileViewModel(
     private val repository: IAuthRepository
@@ -62,6 +82,12 @@ class ProfileViewModel(
 
     private val _deactivationState = MutableStateFlow<DeactivationState>(DeactivationState.Idle)
     val deactivationState: StateFlow<DeactivationState> = _deactivationState.asStateFlow()
+
+    private val _changePasswordState = MutableStateFlow<ChangePasswordState>(ChangePasswordState.Idle)
+    val changePasswordState: StateFlow<ChangePasswordState> = _changePasswordState.asStateFlow()
+
+    private val _deleteAccountState = MutableStateFlow<DeleteAccountState>(DeleteAccountState.Idle)
+    val deleteAccountState: StateFlow<DeleteAccountState> = _deleteAccountState.asStateFlow()
 
     init {
         loadProfile()
@@ -173,7 +199,63 @@ class ProfileViewModel(
         }
     }
 
+    /**
+     * Changes password via remote API and clears local session on success.
+     */
+     fun changePassword(current: String, newPass: String, confirmPass: String) {
+         viewModelScope.launch {
+             _changePasswordState.value = ChangePasswordState.Loading
+             when (val result = repository.changePassword(current, newPass, confirmPass)) {
+                 is NetworkResult.Success -> {
+                     _changePasswordState.value = ChangePasswordState.Success(
+                         result.message ?: "Password changed successfully."
+                     )
+                 }
+                 is NetworkResult.Error -> {
+                     _changePasswordState.value = ChangePasswordState.Error(result.message)
+                 }
+                 is NetworkResult.Exception -> {
+                     _changePasswordState.value = ChangePasswordState.Error(
+                         result.throwable.localizedMessage ?: "Network error changing password."
+                     )
+                 }
+             }
+         }
+     }
+
+    /**
+     * Sends account deletion request to the server and clears session on success.
+     */
+    fun deleteAccount(confirmEmail: String) {
+        viewModelScope.launch {
+            _deleteAccountState.value = DeleteAccountState.Loading
+            when (val result = repository.deleteAccount(confirmEmail)) {
+                is NetworkResult.Success -> {
+                    _deleteAccountState.value = DeleteAccountState.Success(
+                        result.message ?: "Your account has been permanently deleted."
+                    )
+                }
+                is NetworkResult.Error -> {
+                    _deleteAccountState.value = DeleteAccountState.Error(result.message)
+                }
+                is NetworkResult.Exception -> {
+                    _deleteAccountState.value = DeleteAccountState.Error(
+                        result.throwable.localizedMessage ?: "Network error deleting account."
+                    )
+                }
+            }
+        }
+    }
+
     fun resetUpdateState() {
         _updateState.value = ProfileUpdateState.Idle
+    }
+
+    fun resetChangePasswordState() {
+        _changePasswordState.value = ChangePasswordState.Idle
+    }
+
+    fun resetDeleteAccountState() {
+        _deleteAccountState.value = DeleteAccountState.Idle
     }
 }

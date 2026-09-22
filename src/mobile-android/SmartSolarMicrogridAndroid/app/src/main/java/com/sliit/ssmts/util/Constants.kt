@@ -43,6 +43,7 @@ object Constants {
      */
     const val EXTRA_LATITUDE = "extra_latitude"
     const val EXTRA_LONGITUDE = "extra_longitude"
+    const val EXTRA_READ_ONLY = "extra_read_only"
 
     /**
      * Roles

@@ -9,6 +9,7 @@
 package com.sliit.ssmts.data.remote
 
 import com.sliit.ssmts.data.remote.dto.ApiResponse
+import com.sliit.ssmts.data.remote.dto.ChangePasswordRequest
 import com.sliit.ssmts.data.remote.dto.DeactivationRequest
 import com.sliit.ssmts.data.remote.dto.LoginRequest
 import com.sliit.ssmts.data.remote.dto.LoginResponse
@@ -69,4 +70,20 @@ interface AuthApi {
         @Path("nic") nic: String,
         @Body request: DeactivationRequest? = null
     ): Response<ApiResponse<UserResponse>>
+
+    /**
+     * Changes authenticated user's account password.
+     */
+    @POST("api/auth/change-password")
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest
+    ): Response<ApiResponse<UserResponse>>
+
+    /**
+     * Permanently deletes authenticated user's account upon verifying registered email.
+     */
+    @POST("api/auth/delete-account")
+    suspend fun deleteAccount(
+        @Body request: com.sliit.ssmts.data.remote.dto.DeleteAccountRequest
+    ): Response<ApiResponse<Any?>>
 }

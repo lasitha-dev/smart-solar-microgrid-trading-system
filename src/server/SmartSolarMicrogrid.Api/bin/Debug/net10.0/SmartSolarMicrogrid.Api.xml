@@ -4,6 +4,56 @@
         <name>SmartSolarMicrogrid.Api</name>
     </assembly>
     <members>
+        <member name="T:SmartSolarMicrogrid.Api.Configuration.DotEnvLoader">
+            <summary>
+            Scans directory hierarchy and loads key-value pairs from .env files into process environment variables.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Configuration.DotEnvLoader.Load">
+            <summary>
+            Searches for .env file starting from current directory up to parent levels.
+            </summary>
+        </member>
+        <member name="T:SmartSolarMicrogrid.Api.Configuration.EmailSettings">
+            <summary>
+            Encapsulates SMTP email delivery configuration parameters.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.SmtpHost">
+            <summary>
+            Gets or sets the SMTP server hostname (e.g., smtp.gmail.com).
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.SmtpPort">
+            <summary>
+            Gets or sets the SMTP server port number (typically 587 for STARTTLS).
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.EnableSsl">
+            <summary>
+            Gets or sets a value indicating whether SSL/TLS encryption is enabled.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.SenderEmail">
+            <summary>
+            Gets or sets the sender email address used for outbound messages.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.SenderPassword">
+            <summary>
+            Gets or sets the sender application-specific password or authentication credential.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.SenderName">
+            <summary>
+            Gets or sets the display name for the sender.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Configuration.EmailSettings.PortalUrl">
+            <summary>
+            Gets or sets the URL of the Backoffice Administrative Web Portal.
+            </summary>
+        </member>
         <member name="T:SmartSolarMicrogrid.Api.Configuration.JwtSettings">
             <summary>
             Represents configuration settings for JWT token generation and validation.
@@ -59,6 +109,67 @@
             Gets or sets the name of the user detail collection.
             </summary>
         </member>
+        <member name="T:SmartSolarMicrogrid.Api.Controllers.AdminController">
+            <summary>
+            Provides administrative RESTful API endpoints for the Backoffice Web Portal.
+            Restricted strictly to authenticated users with Backoffice or Administrator roles.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.#ctor(SmartSolarMicrogrid.Api.Services.IUserService,Microsoft.Extensions.Logging.ILogger{SmartSolarMicrogrid.Api.Controllers.AdminController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SmartSolarMicrogrid.Api.Controllers.AdminController"/> class.
+            </summary>
+            <param name="userService">The user business service.</param>
+            <param name="logger">The system logger.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when dependencies are null.</exception>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.GetUsers(System.String,System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.UserRole},System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.AccountStatus},System.Int32,System.Int32)">
+            <summary>
+            Retrieves system users with instant text search, role filtering, status filtering, and pagination.
+            </summary>
+            <param name="search">Text query matching NIC, Username, or Full Name.</param>
+            <param name="role">Optional filter by user role (Backoffice, Administrator, GridOperator, Prosumer).</param>
+            <param name="status">Optional filter by account status (Active, Deactivated, PendingActivation).</param>
+            <param name="page">1-indexed page number (default 1).</param>
+            <param name="pageSize">Number of items per page (default 50, max 1000).</param>
+            <returns>HTTP 200 with list of matching user accounts.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.GetPendingProsumers">
+            <summary>
+            Retrieves all Prosumers currently in 'PendingActivation' status awaiting Backoffice review.
+            </summary>
+            <returns>HTTP 200 with list of pending prosumer registrations.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.UpdateUserStatus(System.String,SmartSolarMicrogrid.Api.DTOs.UserStatusUpdateDto)">
+            <summary>
+            Transitions a user account's lifecycle status (e.g. approve prosumer, reject/deactivate, or reactivate).
+            </summary>
+            <param name="id">The unique MongoDB user document identifier.</param>
+            <param name="request">The target status and optional remark/rejection reason.</param>
+            <returns>HTTP 200 with updated user details; HTTP 400 or HTTP 404 on failure.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.ActivateUser(System.String)">
+            <summary>
+            Activates a pending prosumer registration or reactivates a deactivated user account.
+            </summary>
+            <param name="id">The unique MongoDB user document identifier.</param>
+            <returns>HTTP 200 with activated user details; HTTP 400 on error.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.DeactivateUser(System.String)">
+            <summary>
+            Deactivates an active user account.
+            Protects against administrators deactivating their own currently logged-in account.
+            </summary>
+            <param name="id">The unique MongoDB user document identifier.</param>
+            <returns>HTTP 200 with deactivated user details; HTTP 400 on error.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AdminController.CreateStaffUser(SmartSolarMicrogrid.Api.DTOs.UserCreateDto)">
+            <summary>
+            Creates a new Backoffice administrator or Grid Operator account.
+            </summary>
+            <param name="request">The staff user creation payload.</param>
+            <returns>HTTP 201 with created user details; HTTP 400 on validation failure; HTTP 409 on conflict.</returns>
+        </member>
         <member name="T:SmartSolarMicrogrid.Api.Controllers.AuthController">
             <summary>
             Provides HTTP REST endpoints for user authentication, token issuance, and prosumer self-registration.
@@ -94,6 +205,27 @@
             <response code="201">Prosumer registration submitted; status is PendingActivation.</response>
             <response code="400">Validation failure in registration form.</response>
             <response code="409">Duplicate NIC or Username conflict.</response>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AuthController.GetCurrentProfile">
+            <summary>
+            Retrieves the profile details of the currently authenticated user.
+            </summary>
+            <returns>HTTP 200 with sanitized user profile.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AuthController.UpdateCurrentProfile(SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto)">
+            <summary>
+            Updates the editable profile fields (FullName, Phone) for the currently authenticated user.
+            </summary>
+            <param name="request">The profile update payload.</param>
+            <returns>HTTP 200 with updated user profile.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Controllers.AuthController.ChangePassword(SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto)">
+            <summary>
+            Changes the password of the currently authenticated user.
+            Validates current password and enforces new password complexity rules.
+            </summary>
+            <param name="request">The change password request payload.</param>
+            <returns>HTTP 200 on success; HTTP 400 on incorrect current password or validation failure.</returns>
         </member>
         <member name="T:SmartSolarMicrogrid.Api.Controllers.ProsumersController">
             <summary>
@@ -299,6 +431,27 @@
             <param name="message">The failure reason.</param>
             <returns>A new <see cref="T:SmartSolarMicrogrid.Api.DTOs.ApiResponseDto`1"/> marked as failed.</returns>
         </member>
+        <member name="T:SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto">
+            <summary>
+            Data Transfer Object for authenticated users changing their account password.
+            Enforces current password verification, complex new password syntax, and confirmation matching.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto.CurrentPassword">
+            <summary>
+            Gets or sets the user's existing active password.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto.NewPassword">
+            <summary>
+            Gets or sets the desired new password adhering to enterprise complexity rules.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto.ConfirmNewPassword">
+            <summary>
+            Gets or sets the confirmation of the new password.
+            </summary>
+        </member>
         <member name="T:SmartSolarMicrogrid.Api.DTOs.DeactivationRequestDto">
             <summary>
             Represents the payload submitted when a prosumer requests self-deactivation of their account.
@@ -371,6 +524,11 @@
             Gets or sets the contact phone number of the authenticated user.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Email">
+            <summary>
+            Gets or sets the primary email address of the authenticated user.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.LoginResponseDto.Address">
             <summary>
             Gets or sets the address of the prosumer.
@@ -417,9 +575,15 @@
             Gets or sets the requested unique username.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.Email">
+            <summary>
+            Gets or sets the primary contact email address.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.Password">
             <summary>
             Gets or sets the plaintext password, which will be securely hashed using BCrypt.
+            Requires at least 6 characters, one uppercase letter, one lowercase letter, one number, and one special symbol.
             </summary>
         </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.ProsumerRegisterDto.FullName">
@@ -484,9 +648,15 @@
             Gets or sets the unique username.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Email">
+            <summary>
+            Gets or sets the contact email address of the staff member.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Password">
             <summary>
             Gets or sets the initial password for the staff account.
+            Requires at least 6 characters, one uppercase letter, one lowercase letter, one number, and one special symbol.
             </summary>
         </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.FullName">
@@ -502,6 +672,22 @@
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Role">
             <summary>
             Gets or sets the administrative role to assign (must be Backoffice or GridOperator).
+            </summary>
+        </member>
+        <member name="T:SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto">
+            <summary>
+            Data Transfer Object for authenticated users updating their basic personal contact details.
+            Enforces read-only immutability on NIC, Username, Email, and Role.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto.FullName">
+            <summary>
+            Gets or sets the updated full legal name.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto.Phone">
+            <summary>
+            Gets or sets the updated contact telephone number.
             </summary>
         </member>
         <member name="T:SmartSolarMicrogrid.Api.DTOs.UserResponseDto">
@@ -523,6 +709,11 @@
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Username">
             <summary>
             Gets or sets the unique username.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.Email">
+            <summary>
+            Gets or sets the primary contact email address.
             </summary>
         </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.FullName">
@@ -568,6 +759,21 @@
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserResponseDto.UpdatedAt">
             <summary>
             Gets or sets the UTC timestamp when the user account was last updated.
+            </summary>
+        </member>
+        <member name="T:SmartSolarMicrogrid.Api.DTOs.UserStatusUpdateDto">
+            <summary>
+            Represents the payload for transitioning a user account lifecycle state (Active, Deactivated, PendingActivation).
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserStatusUpdateDto.Status">
+            <summary>
+            Gets or sets the target account lifecycle status.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserStatusUpdateDto.Reason">
+            <summary>
+            Gets or sets an optional reason or remark for the status transition (e.g., rejection remarks).
             </summary>
         </member>
         <member name="T:SmartSolarMicrogrid.Api.Helpers.PasswordHasher">
@@ -622,6 +828,11 @@
             Backoffice administrator responsible for user lifecycle, node setup, and system management.
             </summary>
         </member>
+        <member name="F:SmartSolarMicrogrid.Api.Models.Enums.UserRole.Administrator">
+            <summary>
+            System Administrator with full administrative privileges across microgrid management.
+            </summary>
+        </member>
         <member name="F:SmartSolarMicrogrid.Api.Models.Enums.UserRole.GridOperator">
             <summary>
             Field grid operator responsible for verifying bookings, QR validation, and energy transfers.
@@ -651,6 +862,11 @@
         <member name="P:SmartSolarMicrogrid.Api.Models.User.Username">
             <summary>
             Gets or sets the unique login username.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.Models.User.Email">
+            <summary>
+            Gets or sets the primary contact email address. Must be unique across all system users.
             </summary>
         </member>
         <member name="P:SmartSolarMicrogrid.Api.Models.User.PasswordHash">
@@ -708,6 +924,50 @@
             Captures any extra elements in MongoDB documents to ensure resilient deserialization.
             </summary>
         </member>
+        <member name="T:SmartSolarMicrogrid.Api.Services.EmailService">
+            <summary>
+            Implements SMTP email delivery using System.Net.Mail with Gmail SMTP STARTTLS protocol.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.EmailService.#ctor(Microsoft.Extensions.Options.IOptions{SmartSolarMicrogrid.Api.Configuration.EmailSettings},Microsoft.Extensions.Logging.ILogger{SmartSolarMicrogrid.Api.Services.EmailService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SmartSolarMicrogrid.Api.Services.EmailService"/> class.
+            </summary>
+            <param name="emailOptions">The strongly-typed email settings options.</param>
+            <param name="logger">The logging service instance.</param>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.EmailService.SendStaffOnboardingEmailAsync(System.String,System.String,System.String,System.String,SmartSolarMicrogrid.Api.Models.Enums.UserRole)">
+            <summary>
+            Sends an automated onboarding email containing login credentials to newly created staff accounts.
+            </summary>
+            <param name="recipientEmail">The destination email address.</param>
+            <param name="fullName">The full legal name of the staff member.</param>
+            <param name="username">The allocated system username.</param>
+            <param name="initialPassword">The temporary initial plaintext password.</param>
+            <param name="role">The assigned role (Backoffice or GridOperator).</param>
+            <returns>A task returning true if the email was dispatched successfully; otherwise false.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.EmailService.BuildStaffOnboardingHtml(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Builds a responsive, modern HTML email template for staff onboarding credentials.
+            </summary>
+        </member>
+        <member name="T:SmartSolarMicrogrid.Api.Services.IEmailService">
+            <summary>
+            Contract for sending automated transactional and onboarding emails.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IEmailService.SendStaffOnboardingEmailAsync(System.String,System.String,System.String,System.String,SmartSolarMicrogrid.Api.Models.Enums.UserRole)">
+            <summary>
+            Sends an automated onboarding email containing login credentials to newly created staff accounts.
+            </summary>
+            <param name="recipientEmail">The destination email address.</param>
+            <param name="fullName">The full legal name of the staff member.</param>
+            <param name="username">The allocated system username.</param>
+            <param name="initialPassword">The temporary initial plaintext password.</param>
+            <param name="role">The assigned role (Backoffice or GridOperator).</param>
+            <returns>A task returning true if the email was dispatched successfully; otherwise false.</returns>
+        </member>
         <member name="T:SmartSolarMicrogrid.Api.Services.ITokenService">
             <summary>
             Defines contracts for generating cryptographic JSON Web Tokens (JWT) for authenticated users.
@@ -755,11 +1015,32 @@
             <param name="status">Optional filter by account status.</param>
             <returns>A list of sanitized user response DTOs.</returns>
         </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetUsersFilteredAsync(System.String,System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.UserRole},System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.AccountStatus},System.Int32,System.Int32)">
+            <summary>
+            Retrieves system users with search, role, status filters, and optional pagination.
+            </summary>
+            <param name="search">Text query matching NIC, Username, or FullName.</param>
+            <param name="role">Optional filter by user role.</param>
+            <param name="status">Optional filter by account status.</param>
+            <param name="page">1-indexed page number.</param>
+            <param name="pageSize">Number of records per page (default 50).</param>
+            <returns>A list of sanitized user response DTOs.</returns>
+        </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetPendingProsumersAsync">
             <summary>
             Retrieves all prosumers whose status is currently PendingActivation.
             </summary>
             <returns>A list of pending prosumer DTOs.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.UpdateUserStatusAsync(System.String,SmartSolarMicrogrid.Api.Models.Enums.AccountStatus,System.String,System.String)">
+            <summary>
+            Updates a user account's lifecycle status (Active, Deactivated, PendingActivation) with optional remarks.
+            </summary>
+            <param name="id">The unique MongoDB user document identifier.</param>
+            <param name="newStatus">The target lifecycle status.</param>
+            <param name="reason">Optional rejection or state change remark.</param>
+            <param name="currentUserId">The ID of the administrator invoking the transition.</param>
+            <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.ActivateUserAsync(System.String)">
             <summary>
@@ -798,6 +1079,29 @@
             </summary>
             <param name="nic">The unique NIC number.</param>
             <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetUserProfileAsync(System.String)">
+            <summary>
+            Retrieves an authenticated user's profile details by their database identifier.
+            </summary>
+            <param name="userId">The unique MongoDB user document identifier.</param>
+            <returns>A tuple with success status, message, HTTP status code, and sanitized user DTO.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.UpdateUserProfileAsync(System.String,SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto)">
+            <summary>
+            Updates permitted profile fields (FullName, Phone) for any authenticated user.
+            </summary>
+            <param name="userId">The unique MongoDB user document identifier.</param>
+            <param name="request">The profile update payload.</param>
+            <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.ChangePasswordAsync(System.String,SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto)">
+            <summary>
+            Changes an authenticated user's password following verification of their current password and complexity rules.
+            </summary>
+            <param name="userId">The unique MongoDB user document identifier.</param>
+            <param name="request">The change password request payload.</param>
+            <returns>A tuple with success status, message, HTTP status code, and user response DTO.</returns>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.IUserService.GetUserByIdAsync(System.String)">
             <summary>
@@ -839,12 +1143,13 @@
             All authoritative business rules reside strictly in this service layer following the FAT Service invariant.
             </summary>
         </member>
-        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.#ctor(SmartSolarMicrogrid.Api.Data.MongoDbContext,SmartSolarMicrogrid.Api.Services.ITokenService)">
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.#ctor(SmartSolarMicrogrid.Api.Data.MongoDbContext,SmartSolarMicrogrid.Api.Services.ITokenService,SmartSolarMicrogrid.Api.Services.IEmailService)">
             <summary>
             Initializes a new instance of the <see cref="T:SmartSolarMicrogrid.Api.Services.UserService"/> class.
             </summary>
             <param name="dbContext">The MongoDB database context.</param>
             <param name="tokenService">The JWT token generation service.</param>
+            <param name="emailService">The automated email notification service.</param>
             <exception cref="T:System.ArgumentNullException">Thrown when required dependencies are null.</exception>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.UserService.AuthenticateAsync(SmartSolarMicrogrid.Api.DTOs.LoginRequestDto)">
@@ -878,6 +1183,27 @@
             <param name="role">Optional filter by user role.</param>
             <param name="status">Optional filter by account status.</param>
             <returns>A list of sanitized user response DTOs.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.GetUsersFilteredAsync(System.String,System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.UserRole},System.Nullable{SmartSolarMicrogrid.Api.Models.Enums.AccountStatus},System.Int32,System.Int32)">
+            <summary>
+            Retrieves system users with search query, role, status filters, and pagination.
+            </summary>
+            <param name="search">Text query matching NIC, Username, or FullName.</param>
+            <param name="role">Optional filter by user role.</param>
+            <param name="status">Optional filter by account status.</param>
+            <param name="page">1-indexed page number.</param>
+            <param name="pageSize">Number of records per page (default 50).</param>
+            <returns>A list of sanitized user response DTOs.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.UpdateUserStatusAsync(System.String,SmartSolarMicrogrid.Api.Models.Enums.AccountStatus,System.String,System.String)">
+            <summary>
+            Updates a user account's lifecycle status (Active, Deactivated, PendingActivation) with optional remarks.
+            </summary>
+            <param name="id">The unique MongoDB user document identifier.</param>
+            <param name="newStatus">The target lifecycle status.</param>
+            <param name="reason">Optional rejection or state change remark.</param>
+            <param name="currentUserId">The ID of the administrator invoking the transition.</param>
+            <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
         </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.UserService.GetPendingProsumersAsync">
             <summary>
@@ -923,6 +1249,22 @@
             <param name="request">Optional deactivation reason and remarks payload.</param>
             <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
         </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.GetUserProfileAsync(System.String)">
+            <summary>
+            Retrieves an authenticated user's profile details by their database identifier or NIC.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.UpdateUserProfileAsync(System.String,SmartSolarMicrogrid.Api.DTOs.UserProfileUpdateDto)">
+            <summary>
+            Updates permitted profile fields (FullName, Phone) for any authenticated user.
+            Enforces strict immutability on NIC, Username, Email, and Role.
+            </summary>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.ChangePasswordAsync(System.String,SmartSolarMicrogrid.Api.DTOs.ChangePasswordDto)">
+            <summary>
+            Changes an authenticated user's password following verification of their current password and complexity rules.
+            </summary>
+        </member>
         <member name="M:SmartSolarMicrogrid.Api.Services.UserService.GetUserByIdAsync(System.String)">
             <summary>
             Retrieves a user document by its MongoDB ObjectId.
@@ -943,6 +1285,12 @@
             </summary>
             <param name="user">The user entity to map.</param>
             <returns>The sanitized UserResponseDto.</returns>
+        </member>
+        <member name="M:SmartSolarMicrogrid.Api.Services.UserService.IsComplexPassword(System.String)">
+            <summary>
+            Validates password complexity: minimum 6 characters, at least 1 uppercase letter,
+            at least 1 lowercase letter, at least 1 digit, and at least 1 special symbol.
+            </summary>
         </member>
         <member name="T:Program">
             <summary>

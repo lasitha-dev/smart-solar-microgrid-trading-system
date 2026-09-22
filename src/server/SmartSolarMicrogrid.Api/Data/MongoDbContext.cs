@@ -72,7 +72,12 @@ public class MongoDbContext
             var usernameIndexOptions = new CreateIndexOptions { Unique = true, Name = "ux_users_username" };
             var usernameIndexModel = new CreateIndexModel<User>(usernameIndexKeys, usernameIndexOptions);
 
-            usersCollection.Indexes.CreateMany([nicIndexModel, usernameIndexModel]);
+            // Unique sparse index for Email
+            var emailIndexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
+            var emailIndexOptions = new CreateIndexOptions { Unique = true, Sparse = true, Name = "ux_users_email" };
+            var emailIndexModel = new CreateIndexModel<User>(emailIndexKeys, emailIndexOptions);
+
+            usersCollection.Indexes.CreateMany([nicIndexModel, usernameIndexModel, emailIndexModel]);
         }
         catch
         {
