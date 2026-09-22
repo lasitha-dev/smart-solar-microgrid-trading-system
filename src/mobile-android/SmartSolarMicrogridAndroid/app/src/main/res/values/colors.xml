@@ -64,9 +64,9 @@
     <color name="status_cancelled_text">#C62828</color>
     <color name="status_cancelled_stroke">#FFCDD2</color>
 
-    <!-- Spotlight Widget Gradient Colors -->
-    <color name="spotlight_gradient_start">#0D3B16</color>
-    <color name="spotlight_gradient_end">#1B5E20</color>
+    <!-- Spotlight Widget Gradient Colors (Emerald to Slate Dark Surface) -->
+    <color name="spotlight_gradient_start">#064E3B</color>
+    <color name="spotlight_gradient_end">#1E293B</color>
     <color name="spotlight_accent_pill">#33FFFFFF</color>
 
     <!-- Camera Viewfinder & Scanner Overlay -->

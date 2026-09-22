@@ -9,7 +9,7 @@
     android:id="@+id/layoutTransferFinalize"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/surface_card"
+    android:background="@color/slate_surface"
     android:orientation="vertical"
     android:padding="@dimen/spacing_lg">
 
@@ -19,7 +19,7 @@
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/spacing_md"
-        android:background="@color/text_hint" />
+        android:background="@color/slate_stroke" />
 
     <!-- Title & Subtitle -->
     <TextView
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/finalize_dialog_title"
-        android:textColor="@color/operator_text_primary"
+        android:textColor="@color/text_primary"
         android:textSize="@dimen/text_size_title"
         android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_xs"
         android:text="@string/finalize_dialog_subtitle"
-        android:textColor="@color/operator_text_secondary"
+        android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_size_caption" />
 
     <!-- Target Reservation ID Badge -->
@@ -46,26 +46,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_md"
-        android:background="@color/surface_divider"
+        android:background="@color/slate_input_bg"
         android:paddingHorizontal="@dimen/spacing_md"
         android:paddingVertical="@dimen/spacing_xs"
-        android:textColor="@color/operator_text_secondary"
+        android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_size_caption"
         tools:text="Reservation: 664fa10b9c3e2e1a4f001201" />
 
     <!-- Actual Metered Energy Input (Defensive: 0.01 to 999.99 kWh) -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilMeteredKwh"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.App.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
         android:hint="@string/label_metered_input"
-        app:boxStrokeColor="@color/color_secondary"
+        app:boxBackgroundColor="@color/slate_input_bg"
+        app:boxStrokeColor="@color/solar_amber_primary"
         app:errorEnabled="true"
         app:helperText="Allowed range: 0.01 - 999.99 kWh"
         app:helperTextEnabled="true"
-        app:hintTextColor="@color/color_secondary">
+        app:helperTextTextColor="@color/text_secondary"
+        app:hintTextColor="@color/solar_amber_primary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etMeteredKwh"
@@ -74,18 +76,21 @@
             android:hint="@string/hint_metered_kwh"
             android:inputType="numberDecimal"
             android:maxLines="1"
-            android:textColor="@color/operator_text_primary"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
             android:textSize="@dimen/text_size_subhead" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Operational Notes Input (Optional) -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilOperatorNotes"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.App.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_sm"
-        android:hint="@string/label_operator_notes">
+        android:hint="@string/label_operator_notes"
+        app:boxBackgroundColor="@color/slate_input_bg"
+        app:boxStrokeColor="@color/slate_stroke">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etOperatorNotes"
@@ -94,26 +99,29 @@
             android:hint="@string/hint_operator_notes"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="3"
-            android:textColor="@color/operator_text_primary"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
             android:textSize="@dimen/text_size_body" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Action Buttons -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirmFinalize"
+        style="@style/Widget.App.Button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="@dimen/spacing_lg"
         android:text="@string/btn_confirm_transfer"
-        app:backgroundTint="@color/status_completed_text" />
+        android:textColor="@color/text_on_primary"
+        app:backgroundTint="@color/solar_amber_primary" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCancelFinalize"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="@dimen/spacing_xs"
         android:text="@string/btn_cancel"
-        android:textColor="@color/operator_text_secondary" />
+        android:textColor="@color/text_secondary" />
 
 </LinearLayout>

@@ -9,7 +9,7 @@
     android:id="@+id/layoutTransferReceipt"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/surface_card"
+    android:background="@color/slate_surface"
     android:orientation="vertical"
     android:padding="@dimen/spacing_lg">
 
@@ -19,7 +19,7 @@
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/spacing_md"
-        android:background="@color/text_hint" />
+        android:background="@color/slate_stroke" />
 
     <!-- Animated Success Checkmark Container -->
     <FrameLayout
@@ -48,7 +48,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/spacing_md"
         android:text="@string/receipt_title"
-        android:textColor="@color/operator_text_primary"
+        android:textColor="@color/text_primary"
         android:textSize="@dimen/text_size_title"
         android:textStyle="bold" />
 
@@ -59,7 +59,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/spacing_xs"
         android:text="@string/receipt_subtitle"
-        android:textColor="@color/operator_text_secondary"
+        android:textColor="@color/text_secondary"
         android:textSize="@dimen/text_size_caption" />
 
     <!-- Receipt Details Card -->
@@ -68,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
-        android:background="@color/surface_background"
+        android:background="@color/slate_input_bg"
         android:orientation="vertical"
         android:padding="@dimen/spacing_md">
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/receipt_delivered_label"
-            android:textColor="@color/operator_text_secondary"
+            android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_caption" />
 
         <TextView
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/spacing_xs"
-            android:textColor="@color/color_secondary"
+            android:textColor="@color/solar_amber_primary"
             android:textSize="@dimen/text_size_display"
             android:textStyle="bold"
             tools:text="Delivered: 24.65 kWh" />
@@ -98,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="@dimen/spacing_md"
-            android:background="@color/surface_divider" />
+            android:background="@color/slate_stroke" />
 
         <!-- Reference & Status Row -->
         <LinearLayout
@@ -112,7 +112,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/operator_text_primary"
+                android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_size_body"
                 android:textStyle="bold"
                 tools:text="Ref: #664fa10b9c3e2e1a4f001201" />
@@ -130,7 +130,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_sm"
-            android:textColor="@color/operator_text_secondary"
+            android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_caption"
             tools:text="Operator: OP-PERADENIYA-01" />
 
@@ -140,7 +140,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"
-            android:textColor="@color/operator_text_secondary"
+            android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_caption"
             tools:text="Time: 2026-09-18T11:45:00Z" />
 
@@ -177,14 +177,15 @@
     <!-- Done Action Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDoneReceipt"
+        style="@style/Widget.App.Button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="@dimen/spacing_lg"
-        android:backgroundTint="@color/color_primary"
+        android:backgroundTint="@color/solar_amber_primary"
         android:text="@string/btn_done"
-        android:textColor="@color/color_on_primary"
+        android:textColor="@color/text_on_primary"
         android:textSize="@dimen/text_size_subhead"
         android:textStyle="bold"
-        app:cornerRadius="@dimen/radius_sm" />
+        app:cornerRadius="@dimen/radius_md" />
 
 </LinearLayout>

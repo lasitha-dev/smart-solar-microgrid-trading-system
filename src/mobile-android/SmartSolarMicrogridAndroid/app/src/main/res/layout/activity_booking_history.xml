@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_background"
+    android:background="@color/slate_bg_dark"
     android:orientation="vertical">
 
     <!-- Top Material Toolbar -->
@@ -12,27 +12,29 @@
         android:id="@+id/toolbarHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color_primary"
+        android:background="@color/slate_surface"
         app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:navigationIconTint="@color/text_inverse"
+        app:navigationIconTint="@color/solar_amber_primary"
         app:title="@string/title_booking_history"
-        app:titleTextColor="@color/text_inverse" />
+        app:titleTextColor="@color/text_primary" />
 
     <!-- Search Input Box (FR-M4-03.2) -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutSearchInput"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="@style/Widget.App.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_md"
         android:layout_marginTop="@dimen/spacing_sm"
         android:hint="@string/search_reservations_hint"
-        app:boxCornerRadiusBottomEnd="@dimen/radius_card"
-        app:boxCornerRadiusBottomStart="@dimen/radius_card"
-        app:boxCornerRadiusTopEnd="@dimen/radius_card"
-        app:boxCornerRadiusTopStart="@dimen/radius_card"
-        app:boxStrokeColor="@color/color_primary"
-        app:endIconMode="clear_text">
+        app:boxCornerRadiusBottomEnd="@dimen/radius_md"
+        app:boxCornerRadiusBottomStart="@dimen/radius_md"
+        app:boxCornerRadiusTopEnd="@dimen/radius_md"
+        app:boxCornerRadiusTopStart="@dimen/radius_md"
+        app:boxBackgroundColor="@color/slate_input_bg"
+        app:boxStrokeColor="@color/slate_stroke"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/text_secondary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearchQuery"
@@ -41,7 +43,8 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:textColor="@color/operator_text_primary"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
             android:textSize="@dimen/text_size_body" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/history_empty_title"
-                android:textColor="@color/operator_text_primary"
+                android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_size_title"
                 android:textStyle="bold" />
 
@@ -113,7 +116,7 @@
                 android:layout_marginTop="@dimen/spacing_xs"
                 android:gravity="center"
                 android:text="@string/history_empty_desc"
-                android:textColor="@color/operator_text_secondary"
+                android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_body" />
         </LinearLayout>
 
@@ -123,6 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:indeterminateTint="@color/solar_amber_primary"
             android:visibility="gone" />
 
         <!-- Error State View -->
@@ -146,10 +150,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnHistoryRetry"
+                style="@style/Widget.App.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_sm"
-                android:text="@string/action_retry_sync" />
+                android:text="@string/action_retry_sync"
+                android:textColor="@color/text_on_primary"
+                app:backgroundTint="@color/solar_amber_primary" />
         </LinearLayout>
 
     </FrameLayout>

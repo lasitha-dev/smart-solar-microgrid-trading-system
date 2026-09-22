@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/spacing_sm"
-    app:cardBackgroundColor="@color/surface_card"
-    app:cardCornerRadius="@dimen/radius_card"
-    app:cardElevation="@dimen/elevation_card"
-    app:strokeColor="@color/surface_card_stroke"
+    app:cardBackgroundColor="@color/slate_surface"
+    app:cardCornerRadius="@dimen/radius_lg"
+    app:cardElevation="4dp"
+    app:strokeColor="@color/slate_stroke"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@color/operator_text_primary"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_size_subhead"
                     android:textStyle="bold"
                     tools:text="Colombo Central Microgrid Hub" />
@@ -46,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xxs"
-                    android:textColor="@color/operator_text_secondary"
+                    android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_size_micro"
                     tools:text="Ref: #65f1a2b3c4d5e6f7a8b9c0d1" />
             </LinearLayout>
@@ -70,7 +70,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/operator_text_secondary"
+                android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 tools:text="Prosumer NIC: 199412345678" />
 
@@ -78,7 +78,7 @@
                 android:id="@+id/tvHistoryBay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color_secondary_variant"
+                android:textColor="@color/solar_amber_primary"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold"
                 tools:text="Bay: BAY-03" />
@@ -90,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"
-            android:textColor="@color/operator_text_secondary"
+            android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_size_caption"
             tools:text="Scheduled: Sep 17, 2026 10:30 AM" />
 
@@ -99,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="@dimen/spacing_sm"
-            android:background="@color/surface_card_stroke" />
+            android:background="@color/slate_stroke" />
 
         <!-- Energy Transfer Metrics Row (FR-M4-03.5) -->
         <LinearLayout
@@ -113,7 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/color_primary"
+                android:textColor="@color/emerald_accent"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold"
                 tools:text="Estimated: 35.00 kWh" />

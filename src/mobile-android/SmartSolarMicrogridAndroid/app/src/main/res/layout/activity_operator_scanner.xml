@@ -23,7 +23,7 @@
         android:id="@+id/layoutScannerHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/scanner_scrim_header"
+        android:background="@color/slate_surface"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/spacing_md"
@@ -36,7 +36,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_close_scanner"
             android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/text_inverse" />
+            app:tint="@color/solar_amber_primary" />
 
         <TextView
             android:id="@+id/tvScannerTitle"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_sm"
             android:text="@string/title_operator_scanner"
-            android:textColor="@color/text_inverse"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_size_title"
             android:textStyle="bold" />
     </LinearLayout>
@@ -57,11 +57,11 @@
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="140dp"
         android:background="@drawable/bg_status_approved"
-        android:backgroundTint="@color/scanner_scrim_footer"
+        android:backgroundTint="@color/slate_surface"
         android:paddingHorizontal="@dimen/spacing_md"
         android:paddingVertical="@dimen/spacing_xs"
         android:text="@string/scanner_instruction"
-        android:textColor="@color/text_inverse"
+        android:textColor="@color/text_primary"
         android:textSize="@dimen/text_size_caption" />
 
     <!-- 5. Bottom Controls Container: Torch Toggle & Fast Test QR Trigger -->
@@ -81,9 +81,9 @@
             android:layout_height="@dimen/scanner_torch_btn_size"
             android:contentDescription="@string/scanner_torch_toggle"
             android:src="@android:drawable/ic_menu_compass"
-            app:backgroundTint="@color/color_primary"
-            app:elevation="@dimen/elevation_card"
-            app:tint="@color/color_secondary_variant" />
+            app:backgroundTint="@color/slate_surface"
+            app:elevation="4dp"
+            app:tint="@color/solar_amber_primary" />
 
         <Space
             android:layout_width="@dimen/spacing_lg"
@@ -95,11 +95,12 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/button_height"
             android:text="@string/scanner_fast_test_button"
-            android:textColor="@color/text_inverse"
-            app:backgroundTint="@color/color_secondary"
-            app:elevation="@dimen/elevation_card"
+            android:textColor="@color/text_on_primary"
+            android:textStyle="bold"
+            app:backgroundTint="@color/solar_amber_primary"
+            app:elevation="4dp"
             app:icon="@android:drawable/ic_menu_agenda"
-            app:iconTint="@color/text_inverse" />
+            app:iconTint="@color/text_on_primary" />
     </LinearLayout>
 
     <!-- 6. Non-Crashing Permission Denial Banner (Section 4 Mandate) -->
@@ -110,9 +111,9 @@
         android:layout_gravity="center"
         android:layout_marginHorizontal="@dimen/spacing_lg"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/surface_card"
-        app:cardCornerRadius="@dimen/radius_card"
-        app:cardElevation="@dimen/elevation_dialog"
+        app:cardBackgroundColor="@color/slate_surface"
+        app:cardCornerRadius="@dimen/radius_lg"
+        app:cardElevation="8dp"
         app:strokeColor="@color/status_cancelled_stroke"
         app:strokeWidth="1dp"
         tools:visibility="visible">
@@ -143,20 +144,23 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGrantPermission"
+                style="@style/Widget.App.Button"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/button_height"
                 android:layout_marginTop="@dimen/spacing_lg"
-                android:text="@string/btn_grant_permission" />
+                android:text="@string/btn_grant_permission"
+                android:textColor="@color/text_on_primary"
+                app:backgroundTint="@color/solar_amber_primary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPermissionUseFastTest"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/button_height"
                 android:layout_marginTop="@dimen/spacing_sm"
                 android:text="@string/btn_use_fast_test"
-                android:textColor="@color/color_secondary"
-                app:strokeColor="@color/color_secondary" />
+                android:textColor="@color/solar_amber_primary"
+                app:strokeColor="@color/solar_amber_primary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -181,14 +185,15 @@
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminate="true" />
+                android:indeterminate="true"
+                android:indeterminateTint="@color/solar_amber_primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/verifying_qr_token"
-                android:textColor="@color/text_inverse"
+                android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_size_subhead" />
         </LinearLayout>
     </FrameLayout>
