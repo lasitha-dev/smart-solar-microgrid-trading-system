@@ -89,6 +89,14 @@ class HomeActivity : AppCompatActivity() {
         binding.tvHomeNic.text = "NIC: ${session.nic}"
         binding.tvHomeStatusBadge.text = session.status.uppercase()
 
+        // Dynamic Role Badge
+        binding.tvHomeRoleBadge.text = when (session.role) {
+            "GridOperator" -> "GRID OPERATOR NODE"
+            "Backoffice" -> "BACKOFFICE OFFICER"
+            "Administrator" -> "SYSTEM ADMINISTRATOR"
+            else -> getString(R.string.home_role_badge)
+        }
+
         if (session.status.equals(Constants.STATUS_ACTIVE, ignoreCase = true)) {
             binding.tvHomeStatusBadge.setBackgroundResource(R.drawable.bg_badge_active)
             binding.tvHomeStatusBadge.setTextColor(getColor(R.color.status_active_text))

@@ -72,6 +72,34 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun login_GridOperator_WithValidCredentials_EmitsSuccessState() = runTest(testDispatcher) {
+        // Arrange
+        val expectedSession = UserSession(
+            token = "jwt_grid_operator_token_mock",
+            userId = "usr_grid_01",
+            nic = "199211334455",
+            username = "grid_op_alex",
+            fullName = "Alex Grid Controller",
+            role = "GridOperator",
+            status = Constants.STATUS_ACTIVE
+        )
+        fakeRepository.loginResult = NetworkResult.Success(expectedSession, "Grid operator authenticated")
+
+        // Act
+        viewModel.login("grid_op_alex", "GridPassword123!")
+        advanceUntilIdle()
+
+        // Assert
+        val state = viewModel.loginState.value
+        assertTrue("Expected AuthUiState.Success but got $state", state is AuthUiState.Success)
+        val success = state as AuthUiState.Success
+        assertEquals("jwt_grid_operator_token_mock", success.session.token)
+        assertEquals("grid_op_alex", success.session.username)
+        assertEquals("GridOperator", success.session.role)
+        assertEquals(Constants.STATUS_ACTIVE, success.session.status)
+    }
+
+    @Test
     fun login_WithInvalidCredentials_EmitsErrorState() = runTest(testDispatcher) {
         // Arrange
         fakeRepository.loginResult = NetworkResult.Error(401, "Invalid username/NIC or password.")

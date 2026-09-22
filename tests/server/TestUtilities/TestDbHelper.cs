@@ -234,4 +234,30 @@ public static class TestDbHelper
             UpdatedAt = DateTime.UtcNow
         };
     }
+
+    /// <summary>
+    /// Creates a sample Grid Operator entity.
+    /// </summary>
+    public static User CreateSampleGridOperator(
+        string nic = "199211334455",
+        string username = "grid_operator_1",
+        string email = "operator@microgrid.lk",
+        string rawPassword = "GridPassword123!",
+        AccountStatus status = AccountStatus.Active)
+    {
+        return new User
+        {
+            Id = Guid.NewGuid().ToString("N")[..24],
+            Nic = nic,
+            Username = username,
+            Email = email,
+            FullName = "Grid Operator Silva",
+            Phone = "0715556677",
+            Role = UserRole.GridOperator,
+            Status = status,
+            PasswordHash = PasswordHasher.HashPassword(rawPassword),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+    }
 }

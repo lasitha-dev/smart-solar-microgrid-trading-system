@@ -189,7 +189,7 @@ public class AuthServiceTests
         };
 
         // Act
-        var result = await userService.ChangePasswordAsync(user.Id, changePasswordDto);
+        var result = await userService.ChangePasswordAsync(user.Id!, changePasswordDto);
 
         // Assert
         result.Success.Should().BeTrue();
@@ -217,11 +217,43 @@ public class AuthServiceTests
         };
 
         // Act
-        var result = await userService.ChangePasswordAsync(user.Id, changePasswordDto);
+        var result = await userService.ChangePasswordAsync(user.Id!, changePasswordDto);
 
         // Assert
         result.Success.Should().BeFalse();
         result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         result.Message.Should().Contain("incorrect");
+    }
+
+    [Fact]
+    public async Task Login_GridOperator_WithValidCredentials_ReturnsSuccessAndJwtTokenWithClaims()
+    {
+        // Arrange
+        var operatorUser = TestDbHelper.CreateSampleGridOperator(
+            nic: "199211334455",
+            username: "grid_operator_1",
+            rawPassword: "GridPassword123!");
+
+        var userList = new List<User> { operatorUser };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var loginDto = new LoginRequestDto
+        {
+            Identifier = "grid_operator_1",
+            Password = "GridPassword123!"
+        };
+
+        // Act
+        var result = await userService.AuthenticateAsync(loginDto);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Data.Should().NotBeNull();
+        result.Data!.Token.Should().Be("mock_jwt_access_token_12345");
+        result.Data.Nic.Should().Be("199211334455");
+        result.Data.Username.Should().Be("grid_operator_1");
+        result.Data.Role.Should().Be(UserRole.GridOperator);
     }
 }

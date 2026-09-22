@@ -117,7 +117,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun requestDeactivation_WithValidReason_EmitsSuccessAndClearsSession() = runTest(testDispatcher) {
+    fun requestDeactivation_WithValidReason_EmitsSuccessAndRetainsSession() = runTest(testDispatcher) {
         // Arrange
         val viewModel = ProfileViewModel(fakeRepository)
         advanceUntilIdle()
@@ -135,7 +135,83 @@ class ProfileViewModelTest {
         // Assert
         val deactivationState = viewModel.deactivationState.value
         assertTrue("Expected DeactivationState.Success but got $deactivationState", deactivationState is DeactivationState.Success)
-        assertTrue(fakeRepository.clearSessionCalled)
+        assertTrue("Session must NOT be cleared on deactivation", !fakeRepository.clearSessionCalled)
+
+        val profileState = viewModel.profileState.value
+        assertTrue(profileState is ProfileUiState.Success)
+        assertEquals(Constants.STATUS_DEACTIVATED, (profileState as ProfileUiState.Success).session.status)
+    }
+
+    @Test
+    fun requestDeactivation_WhenAlreadyDeactivated_EmitsError() = runTest(testDispatcher) {
+        // Arrange
+        val deactivatedSession = sampleSession.copy(status = Constants.STATUS_DEACTIVATED)
+        fakeRepository.currentActiveSession = deactivatedSession
+        val viewModel = ProfileViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Act
+        viewModel.requestDeactivation("Another reason", null)
+        advanceUntilIdle()
+
+        // Assert
+        val deactivationState = viewModel.deactivationState.value
+        assertTrue("Expected DeactivationState.Error but got $deactivationState", deactivationState is DeactivationState.Error)
+        assertEquals("Your account is already deactivated.", (deactivationState as DeactivationState.Error).message)
+    }
+
+    @Test
+    fun updateProfile_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository() = runTest(testDispatcher) {
+        // Arrange
+        val deactivatedSession = sampleSession.copy(status = Constants.STATUS_DEACTIVATED)
+        fakeRepository.currentActiveSession = deactivatedSession
+        val viewModel = ProfileViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Act
+        viewModel.updateProfile("Modified Name", "0771234567", "Colombo")
+        advanceUntilIdle()
+
+        // Assert
+        val updateState = viewModel.updateState.value
+        assertTrue("Expected ProfileUpdateState.Error but got $updateState", updateState is ProfileUpdateState.Error)
+        assertEquals("Deactivated accounts cannot modify profile information.", (updateState as ProfileUpdateState.Error).message)
+    }
+
+    @Test
+    fun changePassword_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository() = runTest(testDispatcher) {
+        // Arrange
+        val deactivatedSession = sampleSession.copy(status = Constants.STATUS_DEACTIVATED)
+        fakeRepository.currentActiveSession = deactivatedSession
+        val viewModel = ProfileViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Act
+        viewModel.changePassword("CurrentPass123!", "NewPass123!@#", "NewPass123!@#")
+        advanceUntilIdle()
+
+        // Assert
+        val changeState = viewModel.changePasswordState.value
+        assertTrue("Expected ChangePasswordState.Error but got $changeState", changeState is ChangePasswordState.Error)
+        assertEquals("Deactivated accounts cannot change password.", (changeState as ChangePasswordState.Error).message)
+    }
+
+    @Test
+    fun deleteAccount_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository() = runTest(testDispatcher) {
+        // Arrange
+        val deactivatedSession = sampleSession.copy(status = Constants.STATUS_DEACTIVATED)
+        fakeRepository.currentActiveSession = deactivatedSession
+        val viewModel = ProfileViewModel(fakeRepository)
+        advanceUntilIdle()
+
+        // Act
+        viewModel.deleteAccount("john@microgrid.lk")
+        advanceUntilIdle()
+
+        // Assert
+        val deleteState = viewModel.deleteAccountState.value
+        assertTrue("Expected DeleteAccountState.Error but got $deleteState", deleteState is DeleteAccountState.Error)
+        assertEquals("Deactivated accounts cannot delete account.", (deleteState as DeleteAccountState.Error).message)
     }
 
     @Test

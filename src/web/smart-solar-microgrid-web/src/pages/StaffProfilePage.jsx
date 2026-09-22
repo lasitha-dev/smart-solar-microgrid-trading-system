@@ -86,8 +86,11 @@ export const StaffProfilePage = () => {
     loadProfile();
   }, []);
 
+  // Deactivated status check
+  const isDeactivated = profile?.status === 'Deactivated';
+
   // Dirty checking for Profile Details
-  const isDirty = originalProfile !== null && (
+  const isDirty = !isDeactivated && originalProfile !== null && (
     fullName.trim() !== (originalProfile.fullName || '').trim() ||
     phoneNumber.trim() !== (originalProfile.phone || originalProfile.phoneNumber || '').trim()
   );
@@ -100,17 +103,17 @@ export const StaffProfilePage = () => {
   const hasSymbol = /[^a-zA-Z0-9]/.test(newPassword);
   const isPasswordValid = hasMinLength && hasUpper && hasLower && hasDigit && hasSymbol;
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
-  const canSubmitPassword = currentPassword.trim().length > 0 && isPasswordValid && passwordsMatch && !isChangingPassword;
+  const canSubmitPassword = !isDeactivated && currentPassword.trim().length > 0 && isPasswordValid && passwordsMatch && !isChangingPassword;
 
   // Account Deletion Email Matching Check
   const registeredEmail = (profile?.email || '').trim();
   const isDeleteEmailMatch = deleteConfirmEmail.trim().toLowerCase() === registeredEmail.toLowerCase() && registeredEmail.length > 0;
-  const canConfirmDelete = isDeleteEmailMatch && !isDeletingAccount;
+  const canConfirmDelete = !isDeactivated && isDeleteEmailMatch && !isDeletingAccount;
 
   // Handle Save Profile Changes
   const handleSaveProfile = async (e) => {
     e.preventDefault();
-    if (!isDirty) return;
+    if (isDeactivated || !isDirty) return;
 
     setIsSaving(true);
     setSaveErrorMsg('');
@@ -148,7 +151,7 @@ export const StaffProfilePage = () => {
   // Handle Change Password Submit
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (!canSubmitPassword) return;
+    if (isDeactivated || !canSubmitPassword) return;
 
     setIsChangingPassword(true);
     setPasswordErrorMsg('');
@@ -171,7 +174,7 @@ export const StaffProfilePage = () => {
   // Handle Account Deletion Submit
   const handleDeleteAccountSubmit = async (e) => {
     e.preventDefault();
-    if (!canConfirmDelete) return;
+    if (isDeactivated || !canConfirmDelete) return;
 
     setIsDeletingAccount(true);
     setDeleteErrorMsg('');
@@ -273,8 +276,8 @@ export const StaffProfilePage = () => {
           <span
             className="badge"
             style={{
-              background: profile?.role === 'GridOperator' ? 'var(--role-operator-bg)' : 'var(--role-backoffice-bg)',
-              color: profile?.role === 'GridOperator' ? 'var(--role-operator)' : 'var(--role-backoffice)',
+              background: profile?.role === 'GridOperator' ? 'var(--role-operator-bg, rgba(6, 182, 212, 0.15))' : 'var(--role-backoffice-bg, rgba(139, 92, 246, 0.15))',
+              color: profile?.role === 'GridOperator' ? 'var(--role-operator, #06b6d4)' : 'var(--role-backoffice, #a78bfa)',
               borderColor: profile?.role === 'GridOperator' ? 'rgba(6, 182, 212, 0.4)' : 'rgba(139, 92, 246, 0.4)',
               padding: '0.55rem 1.15rem',
               fontSize: '0.85rem',
@@ -283,11 +286,12 @@ export const StaffProfilePage = () => {
               alignItems: 'center',
               gap: '0.5rem',
               borderRadius: 'var(--radius-full)',
+              letterSpacing: '0.04em',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
             }}
           >
             {profile?.role === 'GridOperator' ? <Radio size={16} /> : <Shield size={16} />}
-            {profile?.role === 'GridOperator' ? 'Grid Operator' : 'Backoffice Officer'}
+            <span>{profile?.role === 'GridOperator' ? 'GRID OPERATOR' : (profile?.role === 'Backoffice' ? 'BACKOFFICE OFFICER' : (profile?.role || 'STAFF OFFICER'))}</span>
           </span>
         </div>
       </div>
@@ -296,6 +300,31 @@ export const StaffProfilePage = () => {
         <div className="alert alert-danger" style={{ marginBottom: '1.75rem' }}>
           <AlertCircle size={18} />
           <span>{fetchError}</span>
+        </div>
+      )}
+
+      {isDeactivated && (
+        <div
+          className="alert alert-danger"
+          style={{
+            marginBottom: '1.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.85rem',
+            background: 'rgba(239, 68, 68, 0.12)',
+            borderColor: 'rgba(239, 68, 68, 0.35)',
+            color: '#fca5a5',
+            padding: '1rem 1.25rem',
+            borderRadius: 'var(--radius-md)'
+          }}
+        >
+          <AlertCircle size={22} style={{ color: 'var(--status-danger, #ef4444)', flexShrink: 0 }} />
+          <div>
+            <strong style={{ display: 'block', color: '#fff', fontSize: '0.95rem', marginBottom: '0.15rem' }}>Account Deactivated</strong>
+            <span style={{ fontSize: '0.85rem', color: '#fca5a5' }}>
+              Your account is currently deactivated. Profile modifications, password updates, and account deletion are restricted.
+            </span>
+          </div>
         </div>
       )}
 
@@ -430,6 +459,7 @@ export const StaffProfilePage = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter full legal name"
                     style={{ paddingLeft: '2.6rem' }}
+                    disabled={isDeactivated || isSaving}
                     required
                   />
                   <User
@@ -459,6 +489,7 @@ export const StaffProfilePage = () => {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="e.g. 0771234567"
                     style={{ paddingLeft: '2.6rem' }}
+                    disabled={isDeactivated || isSaving}
                   />
                   <Phone
                     size={18}
@@ -481,7 +512,7 @@ export const StaffProfilePage = () => {
                     type="button"
                     className="btn btn-outline btn-sm"
                     onClick={handleResetProfile}
-                    disabled={isSaving}
+                    disabled={isDeactivated || isSaving}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 0.95rem' }}
                   >
                     <RotateCcw size={15} />
@@ -492,10 +523,10 @@ export const StaffProfilePage = () => {
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  disabled={!isDirty || isSaving}
+                  disabled={isDeactivated || !isDirty || isSaving}
                   style={{
-                    opacity: !isDirty ? 0.5 : 1,
-                    cursor: !isDirty ? 'not-allowed' : 'pointer',
+                    opacity: (isDeactivated || !isDirty) ? 0.5 : 1,
+                    cursor: (isDeactivated || !isDirty) ? 'not-allowed' : 'pointer',
                     padding: '0.6rem 1.25rem'
                   }}
                 >
@@ -551,6 +582,7 @@ export const StaffProfilePage = () => {
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
                     style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem' }}
+                    disabled={isDeactivated || isChangingPassword}
                     required
                   />
                   <Lock
@@ -567,6 +599,7 @@ export const StaffProfilePage = () => {
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    disabled={isDeactivated}
                     style={{
                       position: 'absolute',
                       right: '0.85rem',
@@ -575,7 +608,7 @@ export const StaffProfilePage = () => {
                       background: 'none',
                       border: 'none',
                       color: 'var(--text-dim)',
-                      cursor: 'pointer',
+                      cursor: isDeactivated ? 'not-allowed' : 'pointer',
                       padding: '0.2rem',
                       display: 'flex',
                       alignItems: 'center'
@@ -601,6 +634,7 @@ export const StaffProfilePage = () => {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new strong password"
                     style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem' }}
+                    disabled={isDeactivated || isChangingPassword}
                     required
                   />
                   <KeyRound
@@ -617,6 +651,7 @@ export const StaffProfilePage = () => {
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
+                    disabled={isDeactivated}
                     style={{
                       position: 'absolute',
                       right: '0.85rem',
@@ -625,7 +660,7 @@ export const StaffProfilePage = () => {
                       background: 'none',
                       border: 'none',
                       color: 'var(--text-dim)',
-                      cursor: 'pointer',
+                      cursor: isDeactivated ? 'not-allowed' : 'pointer',
                       padding: '0.2rem',
                       display: 'flex',
                       alignItems: 'center'
@@ -734,6 +769,7 @@ export const StaffProfilePage = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
                     style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem' }}
+                    disabled={isDeactivated || isChangingPassword}
                     required
                   />
                   <Lock
@@ -750,6 +786,7 @@ export const StaffProfilePage = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isDeactivated}
                     style={{
                       position: 'absolute',
                       right: '0.85rem',
@@ -758,7 +795,7 @@ export const StaffProfilePage = () => {
                       background: 'none',
                       border: 'none',
                       color: 'var(--text-dim)',
-                      cursor: 'pointer',
+                      cursor: isDeactivated ? 'not-allowed' : 'pointer',
                       padding: '0.2rem',
                       display: 'flex',
                       alignItems: 'center'
@@ -793,11 +830,11 @@ export const StaffProfilePage = () => {
                   style={{
                     width: '100%',
                     justifyContent: 'center',
-                    opacity: !canSubmitPassword ? 0.5 : 1,
-                    cursor: !canSubmitPassword ? 'not-allowed' : 'pointer',
+                    opacity: (!canSubmitPassword || isDeactivated) ? 0.5 : 1,
+                    cursor: (!canSubmitPassword || isDeactivated) ? 'not-allowed' : 'pointer',
                     padding: '0.65rem'
                   }}
-                  disabled={!canSubmitPassword}
+                  disabled={!canSubmitPassword || isDeactivated}
                 >
                   {isChangingPassword ? (
                     <>
@@ -841,8 +878,17 @@ export const StaffProfilePage = () => {
           <button
             type="button"
             className="btn btn-danger"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.6rem 1.25rem',
+              opacity: isDeactivated ? 0.5 : 1,
+              cursor: isDeactivated ? 'not-allowed' : 'pointer'
+            }}
+            disabled={isDeactivated}
             onClick={() => {
+              if (isDeactivated) return;
               setDeleteConfirmEmail('');
               setDeleteErrorMsg('');
               setIsDeleteModalOpen(true);

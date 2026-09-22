@@ -133,6 +133,12 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun toggleEditMode() {
+        val currentSession = (viewModel.profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession?.status.equals("Deactivated", ignoreCase = true)) {
+            Toast.makeText(this, "Deactivated accounts cannot modify profile information.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         isEditMode = !isEditMode
         applyEditModeUi(isEditMode)
 
@@ -223,6 +229,12 @@ class ProfileActivity : AppCompatActivity() {
     private fun attemptSaveProfile() {
         clearErrors()
 
+        val currentSession = (viewModel.profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession?.status.equals("Deactivated", ignoreCase = true)) {
+            Toast.makeText(this, "Deactivated accounts cannot modify profile information.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val fullName = binding.etProfileFullName.text?.toString()?.trim().orEmpty()
         val phone = binding.etProfilePhone.text?.toString()?.trim().orEmpty()
 
@@ -244,6 +256,12 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showDeleteAccountDialog() {
+        val currentSession = (viewModel.profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession?.status.equals("Deactivated", ignoreCase = true)) {
+            Toast.makeText(this, "Deactivated accounts cannot delete account.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val dialogBinding = com.sliit.ssmts.databinding.DialogDeleteAccountBinding.inflate(layoutInflater)
         val registeredEmail = binding.tvProfileEmail.text?.toString()?.trim().orEmpty()
 
@@ -294,6 +312,12 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showDeactivationDialog() {
+        val currentSession = (viewModel.profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession?.status.equals("Deactivated", ignoreCase = true)) {
+            Toast.makeText(this, "Your account is already deactivated.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val input = EditText(this).apply {
             hint = getString(R.string.dialog_deactivate_reason_hint)
             setPadding(48, 32, 48, 32)
@@ -301,9 +325,16 @@ class ProfileActivity : AppCompatActivity() {
             setHintTextColor(getColor(R.color.text_muted))
         }
 
+        val role = binding.tvProfileRole.text.toString()
+        val deactivationMessage = if (role.contains("Grid Operator", ignoreCase = true)) {
+            "Are you sure you want to deactivate your grid operator account? You will not be able to manage or operate the microgrid until reactivated by Backoffice."
+        } else {
+            getString(R.string.dialog_deactivate_message)
+        }
+
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.dialog_deactivate_title))
-            .setMessage(getString(R.string.dialog_deactivate_message))
+            .setMessage(deactivationMessage)
             .setView(input)
             .setPositiveButton(getString(R.string.btn_confirm_deactivation)) { _, _ ->
                 val reason = input.text?.toString()?.trim()
@@ -314,6 +345,12 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showChangePasswordDialog() {
+        val currentSession = (viewModel.profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession?.status.equals("Deactivated", ignoreCase = true)) {
+            Toast.makeText(this, "Deactivated accounts cannot change password.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val dialogBinding = com.sliit.ssmts.databinding.DialogChangePasswordBinding.inflate(layoutInflater)
 
         val dialog = MaterialAlertDialogBuilder(this)
@@ -489,7 +526,8 @@ class ProfileActivity : AppCompatActivity() {
                             is DeactivationState.Success -> {
                                 binding.progressBar.visibility = View.GONE
                                 Toast.makeText(this@ProfileActivity, state.message, Toast.LENGTH_LONG).show()
-                                navigateToLogin()
+                                // Retain active session without logging out; reload profile with Deactivated status
+                                viewModel.loadProfile()
                             }
                             is DeactivationState.Error -> {
                                 binding.progressBar.visibility = View.GONE
@@ -548,10 +586,30 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun populateProfileData(session: UserSession) {
+        val isDeactivated = session.status.equals("Deactivated", ignoreCase = true)
+
+        // Dynamic Header
+        binding.tvProfileHeader.text = if (session.role.equals("GridOperator", ignoreCase = true)) {
+            "Grid Operator Profile"
+        } else {
+            getString(R.string.profile_title)
+        }
+
+        binding.tvProfileSubheader.text = if (session.role.equals("GridOperator", ignoreCase = true)) {
+            "Manage your grid operator identity and credentials"
+        } else {
+            getString(R.string.profile_subtitle)
+        }
+
         // Account & Identity Information
         binding.tvProfileNic.text = session.nic
         binding.tvProfileUsername.text = session.username
-        binding.tvProfileRole.text = session.role
+        binding.tvProfileRole.text = when (session.role) {
+            "GridOperator" -> "Grid Operator"
+            "Backoffice" -> "Backoffice Officer"
+            "Administrator" -> "System Administrator"
+            else -> getString(R.string.profile_role_prosumer)
+        }
         binding.tvProfileEmail.text = if (session.email.isNotBlank()) session.email else "Not Specified"
         binding.tvProfileAddress.text = if (session.address.isNotBlank()) session.address else "Not Specified"
         binding.tvStatusBadge.text = session.status.uppercase()
@@ -559,9 +617,35 @@ class ProfileActivity : AppCompatActivity() {
         if (session.status.equals(Constants.STATUS_ACTIVE, ignoreCase = true)) {
             binding.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_active)
             binding.tvStatusBadge.setTextColor(getColor(R.color.status_active_text))
+        } else if (isDeactivated) {
+            binding.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_pending)
+            binding.tvStatusBadge.setTextColor(getColor(R.color.error_red))
         } else {
             binding.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_pending)
             binding.tvStatusBadge.setTextColor(getColor(R.color.status_pending_text))
+        }
+
+        // Disable or restrict mutation operations if deactivated
+        if (isDeactivated) {
+            isEditMode = false
+            applyEditModeUi(false)
+            binding.btnToggleEdit.visibility = View.GONE
+            binding.btnOpenChangePassword.isEnabled = false
+            binding.btnOpenChangePassword.alpha = 0.5f
+            binding.btnDeleteAccount.isEnabled = false
+            binding.btnDeleteAccount.alpha = 0.5f
+            binding.btnRequestDeactivation.isEnabled = false
+            binding.btnRequestDeactivation.alpha = 0.5f
+            binding.btnRequestDeactivation.text = "Account Deactivated"
+        } else {
+            binding.btnToggleEdit.visibility = View.VISIBLE
+            binding.btnOpenChangePassword.isEnabled = true
+            binding.btnOpenChangePassword.alpha = 1.0f
+            binding.btnDeleteAccount.isEnabled = true
+            binding.btnDeleteAccount.alpha = 1.0f
+            binding.btnRequestDeactivation.isEnabled = true
+            binding.btnRequestDeactivation.alpha = 1.0f
+            binding.btnRequestDeactivation.text = getString(R.string.btn_request_deactivation)
         }
 
         // Strictly Immutable Facility Location Coordinates for Map Viewer

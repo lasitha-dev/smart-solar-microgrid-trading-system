@@ -138,6 +138,11 @@ class ProfileViewModel(
                 return@launch
             }
 
+            if (session.status.equals("Deactivated", ignoreCase = true)) {
+                _updateState.value = ProfileUpdateState.Error("Deactivated accounts cannot modify profile information.")
+                return@launch
+            }
+
             _updateState.value = ProfileUpdateState.Loading
 
             when (val result = repository.updateProfile(session.nic, fullName, phone, address)) {
@@ -158,7 +163,7 @@ class ProfileViewModel(
     }
 
     /**
-     * Sends account self-deactivation request to the server and clears session on success.
+     * Sends account self-deactivation request to the server and retains session with Deactivated status.
      */
     fun requestDeactivation(reason: String?, remarks: String?) {
         val currentSession = (_profileState.value as? ProfileUiState.Success)?.session
@@ -167,12 +172,17 @@ class ProfileViewModel(
             return
         }
 
+        if (currentSession.status.equals("Deactivated", ignoreCase = true)) {
+            _deactivationState.value = DeactivationState.Error("Your account is already deactivated.")
+            return
+        }
+
         _deactivationState.value = DeactivationState.Loading
 
         viewModelScope.launch {
             when (val result = repository.requestDeactivation(currentSession.nic, reason, remarks)) {
                 is NetworkResult.Success -> {
-                    repository.clearSession()
+                    _profileState.value = ProfileUiState.Success(result.data)
                     _deactivationState.value = DeactivationState.Success(
                         result.message ?: "Account deactivated successfully."
                     )
@@ -203,6 +213,12 @@ class ProfileViewModel(
      * Changes password via remote API and clears local session on success.
      */
      fun changePassword(current: String, newPass: String, confirmPass: String) {
+         val currentSession = (_profileState.value as? ProfileUiState.Success)?.session
+         if (currentSession != null && currentSession.status.equals("Deactivated", ignoreCase = true)) {
+             _changePasswordState.value = ChangePasswordState.Error("Deactivated accounts cannot change password.")
+             return
+         }
+
          viewModelScope.launch {
              _changePasswordState.value = ChangePasswordState.Loading
              when (val result = repository.changePassword(current, newPass, confirmPass)) {
@@ -227,6 +243,12 @@ class ProfileViewModel(
      * Sends account deletion request to the server and clears session on success.
      */
     fun deleteAccount(confirmEmail: String) {
+        val currentSession = (_profileState.value as? ProfileUiState.Success)?.session
+        if (currentSession != null && currentSession.status.equals("Deactivated", ignoreCase = true)) {
+            _deleteAccountState.value = DeleteAccountState.Error("Deactivated accounts cannot delete account.")
+            return
+        }
+
         viewModelScope.launch {
             _deleteAccountState.value = DeleteAccountState.Loading
             when (val result = repository.deleteAccount(confirmEmail)) {

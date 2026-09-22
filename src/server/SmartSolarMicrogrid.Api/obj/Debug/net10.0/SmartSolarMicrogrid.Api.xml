@@ -692,6 +692,21 @@
             Gets or sets the contact telephone / mobile number.
             </summary>
         </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Address">
+            <summary>
+            Gets or sets the physical address or operational station of the staff member.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Latitude">
+            <summary>
+            Gets or sets the geographic latitude coordinate of the staff or operational station.
+            </summary>
+        </member>
+        <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Longitude">
+            <summary>
+            Gets or sets the geographic longitude coordinate of the staff or operational station.
+            </summary>
+        </member>
         <member name="P:SmartSolarMicrogrid.Api.DTOs.UserCreateDto.Role">
             <summary>
             Gets or sets the administrative role to assign (must be Backoffice or GridOperator).
