@@ -157,6 +157,7 @@ id tvDeleteTargetEmail
 id tvErrorMessage
 id tvGpsStatus
 id tvHomeNic
+id tvHomeRoleBadge
 id tvHomeStatusBadge
 id tvLocationPickerSubtitle
 id tvLocationPickerTitle

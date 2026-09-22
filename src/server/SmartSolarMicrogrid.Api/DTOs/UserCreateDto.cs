@@ -65,6 +65,24 @@ public class UserCreateDto
     public string Phone { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the physical address or operational station of the staff member.
+    /// </summary>
+    [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
+    public string? Address { get; set; }
+
+    /// <summary>
+    /// Gets or sets the geographic latitude coordinate of the staff or operational station.
+    /// </summary>
+    [Range(-90.0, 90.0, ErrorMessage = "Latitude must be between -90 and 90 degrees.")]
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the geographic longitude coordinate of the staff or operational station.
+    /// </summary>
+    [Range(-180.0, 180.0, ErrorMessage = "Longitude must be between -180 and 180 degrees.")]
+    public double? Longitude { get; set; }
+
+    /// <summary>
     /// Gets or sets the administrative role to assign (must be Backoffice or GridOperator).
     /// </summary>
     [Required(ErrorMessage = "Role is required.")]

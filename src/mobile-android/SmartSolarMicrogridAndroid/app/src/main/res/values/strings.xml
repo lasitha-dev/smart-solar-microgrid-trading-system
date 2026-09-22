@@ -131,7 +131,7 @@
     <string name="home_welcome">Welcome Back,</string>
     <string name="home_role_badge">PROSUMER NODE</string>
     <string name="home_quick_actions">Navigation &amp; Account</string>
-    <string name="btn_view_profile">My Prosumer Profile</string>
+    <string name="btn_view_profile">My Profile</string>
     <string name="btn_view_profile_desc">Manage account details, facility coordinates &amp; security</string>
     <string name="home_section_microgrid">Microgrid Node Overview</string>
     <string name="home_card_generation">Solar Generation</string>

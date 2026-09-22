@@ -40,8 +40,13 @@ export const LoginPage = () => {
 
     setLoading(true);
     try {
-      await login(identifier, password);
-      navigate(from, { replace: true });
+      const userData = await login(identifier, password);
+      // Route Grid Operator to Profile or requested page; Backoffice to Pending Approvals or requested page
+      if (userData.role === 'GridOperator') {
+        navigate(from && from !== '/pending-approvals' ? from : '/profile', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       setError(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
@@ -55,7 +60,7 @@ export const LoginPage = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 45%), radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.08), transparent 45%), #090d16',
+      background: 'radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 45%), radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.08), transparent 45%), #090d16',
       padding: '1.5rem',
     }}>
       <div style={{
@@ -89,26 +94,26 @@ export const LoginPage = () => {
             <Sun size={32} />
           </div>
 
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Backoffice Admin Portal</h1>
+          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Smart Solar Staff Portal</h1>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Smart Solar Microgrid Trading & User Lifecycle
+            Microgrid Operations, Trading & User Lifecycle
           </p>
 
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.35rem',
-            background: 'var(--role-backoffice-bg)',
-            color: 'var(--role-backoffice)',
-            padding: '0.2rem 0.65rem',
+            background: 'rgba(245, 158, 11, 0.12)',
+            color: 'var(--solar-amber)',
+            padding: '0.25rem 0.75rem',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.75rem',
             fontWeight: 700,
             marginTop: '0.75rem',
-            border: '1px solid rgba(139, 92, 246, 0.3)'
+            border: '1px solid rgba(245, 158, 11, 0.3)'
           }}>
-            <Shield size={12} />
-            <span>OFFICER ACCESS ONLY</span>
+            <Shield size={13} />
+            <span>AUTHORIZED STAFF ACCESS</span>
           </div>
         </div>
 
@@ -127,7 +132,7 @@ export const LoginPage = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="e.g. backoffice_admin"
+                placeholder="e.g. staff_officer or NIC"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 style={{ paddingLeft: '2.5rem' }}
@@ -190,7 +195,7 @@ export const LoginPage = () => {
             disabled={loading}
           >
             {loading ? <span className="spinner"></span> : <Shield size={18} />}
-            <span>{loading ? 'Authenticating...' : 'Sign In to Backoffice'}</span>
+            <span>{loading ? 'Authenticating...' : 'Sign In to Portal'}</span>
           </button>
         </form>
       </div>

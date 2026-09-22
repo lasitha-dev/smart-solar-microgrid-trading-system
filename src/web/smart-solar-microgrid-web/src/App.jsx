@@ -15,6 +15,20 @@ import { PendingApprovalsPage } from './pages/PendingApprovalsPage';
 import { UserManagementPage } from './pages/UserManagementPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { useAuth } from './context/AuthContext';
+
+const DashboardRedirect = () => {
+  const { isGridOperator } = useAuth();
+  return <Navigate to={isGridOperator ? "/profile" : "/pending-approvals"} replace />;
+};
+
+const BackofficeOnlyRoute = ({ children }) => {
+  const { isBackoffice } = useAuth();
+  if (!isBackoffice) {
+    return <Navigate to="/profile" replace />;
+  }
+  return children;
+};
 
 export const App = () => {
   return (
@@ -22,7 +36,7 @@ export const App = () => {
       {/* Public Authentication Route */}
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Protected Backoffice Administrative Routes */}
+      {/* Protected Staff Administrative & Operations Routes */}
       <Route
         path="/"
         element={
@@ -31,9 +45,23 @@ export const App = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/pending-approvals" replace />} />
-        <Route path="pending-approvals" element={<PendingApprovalsPage />} />
-        <Route path="users" element={<UserManagementPage />} />
+        <Route index element={<DashboardRedirect />} />
+        <Route
+          path="pending-approvals"
+          element={
+            <BackofficeOnlyRoute>
+              <PendingApprovalsPage />
+            </BackofficeOnlyRoute>
+          }
+        />
+        <Route
+          path="users"
+          element={
+            <BackofficeOnlyRoute>
+              <UserManagementPage />
+            </BackofficeOnlyRoute>
+          }
+        />
         <Route path="profile" element={<StaffProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

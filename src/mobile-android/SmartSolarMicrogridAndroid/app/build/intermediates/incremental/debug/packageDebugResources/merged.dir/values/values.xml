@@ -83,7 +83,7 @@
     <string name="btn_submit_change_password">Update Password &amp; Re-Login</string>
     <string name="btn_toggle_edit">Edit Profile</string>
     <string name="btn_view_facility_on_map">View on Map</string>
-    <string name="btn_view_profile">My Prosumer Profile</string>
+    <string name="btn_view_profile">My Profile</string>
     <string name="btn_view_profile_desc">Manage account details, facility coordinates &amp; security</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>

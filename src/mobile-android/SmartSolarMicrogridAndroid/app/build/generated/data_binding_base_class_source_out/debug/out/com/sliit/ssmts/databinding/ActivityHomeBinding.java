@@ -34,6 +34,9 @@ public final class ActivityHomeBinding implements ViewBinding {
   public final TextView tvHomeNic;
 
   @NonNull
+  public final TextView tvHomeRoleBadge;
+
+  @NonNull
   public final TextView tvHomeStatusBadge;
 
   @NonNull
@@ -45,13 +48,14 @@ public final class ActivityHomeBinding implements ViewBinding {
   private ActivityHomeBinding(@NonNull ScrollView rootView,
       @NonNull MaterialCardView cardNavigateProfile, @NonNull MaterialCardView cardWelcome,
       @NonNull LinearLayout llTopBar, @NonNull TextView tvHomeNic,
-      @NonNull TextView tvHomeStatusBadge, @NonNull TextView tvQuickActionsHeader,
-      @NonNull TextView tvWelcomeName) {
+      @NonNull TextView tvHomeRoleBadge, @NonNull TextView tvHomeStatusBadge,
+      @NonNull TextView tvQuickActionsHeader, @NonNull TextView tvWelcomeName) {
     this.rootView = rootView;
     this.cardNavigateProfile = cardNavigateProfile;
     this.cardWelcome = cardWelcome;
     this.llTopBar = llTopBar;
     this.tvHomeNic = tvHomeNic;
+    this.tvHomeRoleBadge = tvHomeRoleBadge;
     this.tvHomeStatusBadge = tvHomeStatusBadge;
     this.tvQuickActionsHeader = tvQuickActionsHeader;
     this.tvWelcomeName = tvWelcomeName;
@@ -108,6 +112,12 @@ public final class ActivityHomeBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvHomeRoleBadge;
+      TextView tvHomeRoleBadge = ViewBindings.findChildViewById(rootView, id);
+      if (tvHomeRoleBadge == null) {
+        break missingId;
+      }
+
       id = R.id.tvHomeStatusBadge;
       TextView tvHomeStatusBadge = ViewBindings.findChildViewById(rootView, id);
       if (tvHomeStatusBadge == null) {
@@ -127,7 +137,8 @@ public final class ActivityHomeBinding implements ViewBinding {
       }
 
       return new ActivityHomeBinding((ScrollView) rootView, cardNavigateProfile, cardWelcome,
-          llTopBar, tvHomeNic, tvHomeStatusBadge, tvQuickActionsHeader, tvWelcomeName);
+          llTopBar, tvHomeNic, tvHomeRoleBadge, tvHomeStatusBadge, tvQuickActionsHeader,
+          tvWelcomeName);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

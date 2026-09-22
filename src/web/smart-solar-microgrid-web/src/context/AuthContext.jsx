@@ -22,12 +22,12 @@ export const AuthProvider = ({ children }) => {
     const savedUser = authService.getCurrentUser();
 
     if (savedToken && savedUser) {
-      // Ensure user has administrative privileges
-      if (savedUser.role === 'Backoffice' || savedUser.role === 'Administrator') {
+      // Ensure user has administrative or operational staff privileges
+      if (savedUser.role === 'Backoffice' || savedUser.role === 'Administrator' || savedUser.role === 'GridOperator') {
         setToken(savedToken);
         setUser(savedUser);
       } else {
-        // Clear non-administrative session
+        // Clear non-staff session
         authService.logout();
       }
     }
@@ -37,10 +37,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (identifier, password) => {
     const authData = await authService.login(identifier, password);
     
-    // Strict role validation: Only Backoffice and Administrator allowed in web portal
-    if (authData.role !== 'Backoffice' && authData.role !== 'Administrator') {
+    // Strict role validation: Backoffice, Administrator, and Grid Operator allowed in staff web portal
+    if (authData.role !== 'Backoffice' && authData.role !== 'Administrator' && authData.role !== 'GridOperator') {
       authService.logout();
-      throw new Error('Access Denied: The Backoffice Web Portal is restricted to Backoffice Officers and System Administrators only.');
+      throw new Error('Access Denied: The Staff Web Portal is restricted to Backoffice Officers and Grid Operators.');
     }
 
     const userData = {
@@ -62,9 +62,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isBackoffice = user?.role === 'Backoffice' || user?.role === 'Administrator';
+  const isGridOperator = user?.role === 'GridOperator';
+  const isStaff = isBackoffice || isGridOperator;
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, isBackoffice }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, isBackoffice, isGridOperator, isStaff }}>
       {children}
     </AuthContext.Provider>
   );

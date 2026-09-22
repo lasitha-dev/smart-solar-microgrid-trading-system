@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.sliit.ssmts.ui.profile.ProfileViewModelTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-22T10:32:22.984Z" hostname="DESKTOP-F7HJGDP" time="0.022">
+<testsuite name="com.sliit.ssmts.ui.profile.ProfileViewModelTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-09-22T13:28:47.616Z" hostname="DESKTOP-F7HJGDP" time="0.033">
   <properties/>
-  <testcase name="logout_ClearsRepositorySessionAndInvokesCallback" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
-  <testcase name="updateProfile_WithValidDetails_UpdatesProfileStateAndEmitsSuccess" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
-  <testcase name="changePassword_WithInvalidCurrentPassword_EmitsErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
-  <testcase name="requestDeactivation_WithValidReason_EmitsSuccessAndClearsSession" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
-  <testcase name="updateProfile_WithNetworkError_EmitsUpdateErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
-  <testcase name="changePassword_WithValidCredentials_EmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
-  <testcase name="deleteAccount_WithMismatchedEmail_EmitsErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
-  <testcase name="deleteAccount_WithMatchingEmail_EmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
-  <testcase name="init_LoadsCachedSessionAndEmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.001"/>
+  <testcase name="requestDeactivation_WithValidReason_EmitsSuccessAndRetainsSession" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
+  <testcase name="requestDeactivation_WhenAlreadyDeactivated_EmitsError" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
+  <testcase name="logout_ClearsRepositorySessionAndInvokesCallback" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
+  <testcase name="updateProfile_WithValidDetails_UpdatesProfileStateAndEmitsSuccess" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.004"/>
+  <testcase name="changePassword_WithInvalidCurrentPassword_EmitsErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
+  <testcase name="updateProfile_WithNetworkError_EmitsUpdateErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
+  <testcase name="changePassword_WithValidCredentials_EmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.001"/>
+  <testcase name="deleteAccount_WithMismatchedEmail_EmitsErrorState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
+  <testcase name="changePassword_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
+  <testcase name="deleteAccount_WithMatchingEmail_EmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.003"/>
+  <testcase name="updateProfile_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.001"/>
+  <testcase name="deleteAccount_WhenAccountDeactivated_EmitsErrorWithoutCallingRepository" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
+  <testcase name="init_LoadsCachedSessionAndEmitsSuccessState" classname="com.sliit.ssmts.ui.profile.ProfileViewModelTest" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

@@ -20,7 +20,8 @@ import {
   Activity,
   Menu,
   X,
-  Zap
+  Zap,
+  Radio
 } from 'lucide-react';
 
 export const AdminLayout = () => {
@@ -29,21 +30,24 @@ export const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
 
-  // Fetch pending count periodically
+  // Fetch pending count periodically for backoffice users
   const fetchPendingCount = async () => {
+    if (user?.role !== 'Backoffice' && user?.role !== 'Administrator') return;
     try {
       const pending = await adminService.getPendingProsumers();
-      setPendingCount(pending.length);
+      setPendingCount(pending?.length || 0);
     } catch {
       // Ignored if offline or unauthorized
     }
   };
 
   useEffect(() => {
-    fetchPendingCount();
-    const interval = setInterval(fetchPendingCount, 15000); // refresh every 15s
-    return () => clearInterval(interval);
-  }, []);
+    if (user?.role === 'Backoffice' || user?.role === 'Administrator') {
+      fetchPendingCount();
+      const interval = setInterval(fetchPendingCount, 15000); // refresh every 15s
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -86,70 +90,74 @@ export const AdminLayout = () => {
           <div>
             <h2 style={{ fontSize: '1.1rem', color: 'var(--text-main)', lineHeight: 1.2 }}>Smart Solar</h2>
             <p style={{ fontSize: '0.75rem', color: 'var(--solar-amber)', fontWeight: 600, letterSpacing: '0.05em' }}>
-              BACKOFFICE PORTAL
+              {user?.role === 'GridOperator' ? 'OPERATIONS PORTAL' : 'BACKOFFICE PORTAL'}
             </p>
           </div>
         </div>
 
         {/* Navigation Menu Links */}
         <nav style={{ padding: '1.25rem 0.75rem', flex: 1 }}>
-          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '0 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
-            Account Administration
-          </div>
+          {(user?.role === 'Backoffice' || user?.role === 'Administrator') && (
+            <>
+              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '0 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
+                Account Administration
+              </div>
 
-          <NavLink
-            to="/pending-approvals"
-            onClick={() => setSidebarOpen(false)}
-            style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-              background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
-              borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
-              fontWeight: isActive ? 600 : 500,
-              fontSize: '0.9rem',
-              marginBottom: '0.4rem',
-              transition: 'all var(--transition-fast)'
-            })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <UserCheck size={18} style={{ color: 'var(--solar-amber)' }} />
-              <span>Pending Approvals</span>
-            </div>
-            {pendingCount > 0 && (
-              <span className="badge badge-pending" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>
-                {pendingCount}
-              </span>
-            )}
-          </NavLink>
+              <NavLink
+                to="/pending-approvals"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <UserCheck size={18} style={{ color: 'var(--solar-amber)' }} />
+                  <span>Pending Approvals</span>
+                </div>
+                {pendingCount > 0 && (
+                  <span className="badge badge-pending" style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>
+                    {pendingCount}
+                  </span>
+                )}
+              </NavLink>
 
-          <NavLink
-            to="/users"
-            onClick={() => setSidebarOpen(false)}
-            style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-              background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
-              borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
-              fontWeight: isActive ? 600 : 500,
-              fontSize: '0.9rem',
-              marginBottom: '0.4rem',
-              transition: 'all var(--transition-fast)'
-            })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Users size={18} style={{ color: 'var(--role-operator)' }} />
-              <span>User Directory</span>
-            </div>
-          </NavLink>
+              <NavLink
+                to="/users"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Users size={18} style={{ color: 'var(--role-operator)' }} />
+                  <span>User Directory</span>
+                </div>
+              </NavLink>
+            </>
+          )}
 
-          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '1rem 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
+          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: (user?.role === 'Backoffice' || user?.role === 'Administrator') ? '1rem 0.75rem 0.5rem' : '0 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
             Account Settings
           </div>
 
@@ -201,19 +209,22 @@ export const AdminLayout = () => {
             title="Click to view Staff Profile"
           >
             <div style={{
-              background: 'var(--role-backoffice-bg)',
-              color: 'var(--role-backoffice)',
+              background: user?.role === 'GridOperator' ? 'var(--role-operator-bg, rgba(6, 182, 212, 0.15))' : 'var(--role-backoffice-bg)',
+              color: user?.role === 'GridOperator' ? 'var(--role-operator, #06b6d4)' : 'var(--role-backoffice)',
               padding: '0.5rem',
-              borderRadius: 'var(--radius-full)'
+              borderRadius: 'var(--radius-full)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              <Shield size={18} />
+              {user?.role === 'GridOperator' ? <Radio size={18} /> : <Shield size={18} />}
             </div>
             <div style={{ overflow: 'hidden', flex: 1 }}>
               <p style={{ fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user?.username || 'Officer'}
+                {user?.username || 'Staff'}
               </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {user?.role || 'Backoffice'}
+              <p style={{ fontSize: '0.75rem', color: user?.role === 'GridOperator' ? 'var(--role-operator, #06b6d4)' : 'var(--text-muted)' }}>
+                {user?.role === 'GridOperator' ? 'Grid Operator' : (user?.role === 'Backoffice' ? 'Backoffice Officer' : (user?.role || 'Staff'))}
               </p>
             </div>
           </div>

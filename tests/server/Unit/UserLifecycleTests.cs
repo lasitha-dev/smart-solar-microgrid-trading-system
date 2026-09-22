@@ -123,6 +123,41 @@ public class UserLifecycleTests
     }
 
     [Fact]
+    public async Task CreateStaffUser_WithAddressAndCoordinates_SavesSuccessfullyAndReturnsData()
+    {
+        // Arrange
+        var userList = new List<User>();
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var createStaffDto = new UserCreateDto
+        {
+            Nic = "199411223344",
+            Username = "grid_substation_op",
+            Email = "operator.kandy@microgrid.lk",
+            Password = "GridPassword123!",
+            FullName = "Kandy Grid Dispatcher",
+            Phone = "0712345678",
+            Address = "Kandy Grid Substation, Peradeniya Road, Kandy",
+            Latitude = 7.2906,
+            Longitude = 80.6337,
+            Role = UserRole.GridOperator
+        };
+
+        // Act
+        var result = await userService.CreateStaffUserAsync(createStaffDto);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status201Created);
+        result.Data.Should().NotBeNull();
+        result.Data!.Address.Should().Be("Kandy Grid Substation, Peradeniya Road, Kandy");
+        result.Data.Latitude.Should().Be(7.2906);
+        result.Data.Longitude.Should().Be(80.6337);
+        result.Data.Role.Should().Be(UserRole.GridOperator);
+    }
+
+    [Fact]
     public async Task GetPendingProsumers_ReturnsOnlyPendingStatusUsers()
     {
         // Arrange
@@ -158,7 +193,7 @@ public class UserLifecycleTests
 
         // Act
         var result = await userService.UpdateUserStatusAsync(
-            pendingUser.Id,
+            pendingUser.Id!,
             AccountStatus.Active,
             "All facility coordinates verified.");
 
@@ -184,7 +219,7 @@ public class UserLifecycleTests
         };
 
         // Act
-        var result = await userService.DeleteAccountAsync(user.Id, deleteDto);
+        var result = await userService.DeleteAccountAsync(user.Id!, deleteDto);
 
         // Assert
         result.Success.Should().BeTrue();
@@ -207,7 +242,7 @@ public class UserLifecycleTests
         };
 
         // Act
-        var result = await userService.DeleteAccountAsync(user.Id, deleteDto);
+        var result = await userService.DeleteAccountAsync(user.Id!, deleteDto);
 
         // Assert
         result.Success.Should().BeFalse();
@@ -234,7 +269,7 @@ public class UserLifecycleTests
         };
 
         // Act
-        var result = await userService.UpdateUserProfileAsync(user.Id, updateDto);
+        var result = await userService.UpdateUserProfileAsync(user.Id!, updateDto);
 
         // Assert
         result.Success.Should().BeTrue();
@@ -242,5 +277,172 @@ public class UserLifecycleTests
         result.Data.Should().NotBeNull();
         result.Data!.FullName.Should().Be("Updated Senior Admin");
         result.Data.Phone.Should().Be("0778889999");
+    }
+
+    [Fact]
+    public async Task UpdateProfile_GridOperator_WithValidData_UpdatesFullNameAndPhone()
+    {
+        // Arrange
+        var gridOperator = TestDbHelper.CreateSampleGridOperator(
+            username: "grid_op_1",
+            email: "operator@microgrid.lk");
+
+        var userList = new List<User> { gridOperator };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var updateDto = new UserProfileUpdateDto
+        {
+            FullName = "Chief Grid Dispatcher",
+            Phone = "0719876543"
+        };
+
+        // Act
+        var result = await userService.UpdateUserProfileAsync(gridOperator.Id!, updateDto);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Data.Should().NotBeNull();
+        result.Data!.FullName.Should().Be("Chief Grid Dispatcher");
+        result.Data.Phone.Should().Be("0719876543");
+        result.Data.Role.Should().Be(UserRole.GridOperator);
+    }
+
+    [Fact]
+    public async Task DeleteAccount_GridOperator_WithMatchingEmail_PermanentlyDeletesUser()
+    {
+        // Arrange
+        var gridOperator = TestDbHelper.CreateSampleGridOperator(
+            username: "grid_op_retiring",
+            email: "retiring.operator@microgrid.lk");
+
+        var userList = new List<User> { gridOperator };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var deleteDto = new DeleteAccountDto
+        {
+            ConfirmEmail = "retiring.operator@microgrid.lk"
+        };
+
+        // Act
+        var result = await userService.DeleteAccountAsync(gridOperator.Id!, deleteDto);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Message.Should().Contain("deleted successfully");
+    }
+
+    [Fact]
+    public async Task UpdateProsumerProfile_DeactivatedProsumer_ReturnsForbidden403()
+    {
+        // Arrange
+        var prosumer = TestDbHelper.CreateSampleProsumer(
+            nic: "199512345678",
+            status: AccountStatus.Deactivated);
+
+        var userList = new List<User> { prosumer };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var updateDto = new ProsumerUpdateDto
+        {
+            FullName = "Deactivated Prosumer Modified",
+            Phone = "0771234567",
+            Address = "New Address"
+        };
+
+        // Act
+        var result = await userService.UpdateProsumerProfileAsync("199512345678", updateDto);
+
+        // Assert
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        result.Message.Should().Contain("Deactivated");
+    }
+
+    [Fact]
+    public async Task UpdateUserProfile_DeactivatedStaff_ReturnsForbidden403()
+    {
+        // Arrange
+        var staff = TestDbHelper.CreateSampleBackofficeOfficer(
+            nic: "199011223344",
+            status: AccountStatus.Deactivated);
+
+        var userList = new List<User> { staff };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var updateDto = new UserProfileUpdateDto
+        {
+            FullName = "Modified Name",
+            Phone = "0778889999"
+        };
+
+        // Act
+        var result = await userService.UpdateUserProfileAsync(staff.Id!, updateDto);
+
+        // Assert
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        result.Message.Should().Contain("Deactivated");
+    }
+
+    [Fact]
+    public async Task ChangePassword_DeactivatedUser_ReturnsForbidden403()
+    {
+        // Arrange
+        var user = TestDbHelper.CreateSampleBackofficeOfficer(
+            nic: "199011223344",
+            rawPassword: "OldPassword123!",
+            status: AccountStatus.Deactivated);
+
+        var userList = new List<User> { user };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var changeDto = new ChangePasswordDto
+        {
+            CurrentPassword = "OldPassword123!",
+            NewPassword = "NewPassword123!@#",
+            ConfirmNewPassword = "NewPassword123!@#"
+        };
+
+        // Act
+        var result = await userService.ChangePasswordAsync(user.Id!, changeDto);
+
+        // Assert
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        result.Message.Should().Contain("Deactivated");
+    }
+
+    [Fact]
+    public async Task DeleteAccount_DeactivatedUser_ReturnsForbidden403()
+    {
+        // Arrange
+        var user = TestDbHelper.CreateSampleProsumer(
+            nic: "199512345678",
+            email: "deactivated.prosumer@microgrid.lk",
+            status: AccountStatus.Deactivated);
+
+        var userList = new List<User> { user };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var deleteDto = new DeleteAccountDto
+        {
+            ConfirmEmail = "deactivated.prosumer@microgrid.lk"
+        };
+
+        // Act
+        var result = await userService.DeleteAccountAsync(user.Id!, deleteDto);
+
+        // Assert
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        result.Message.Should().Contain("Deactivated");
     }
 }

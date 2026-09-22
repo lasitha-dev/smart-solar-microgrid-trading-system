@@ -248,6 +248,9 @@ public class UserService : IUserService
             PasswordHash = PasswordHasher.HashPassword(request.Password),
             FullName = request.FullName.Trim(),
             Phone = request.Phone.Trim(),
+            Address = request.Address?.Trim() ?? string.Empty,
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
             Role = request.Role,
             Status = AccountStatus.Active,
             CreatedAt = now,
@@ -505,6 +508,11 @@ public class UserService : IUserService
             return (false, $"Prosumer with NIC '{nic}' was not found.", StatusCodes.Status404NotFound, null);
         }
 
+        if (user.Status == AccountStatus.Deactivated)
+        {
+            return (false, "Deactivated accounts cannot modify profile information.", StatusCodes.Status403Forbidden, null);
+        }
+
         var now = DateTime.UtcNow;
         var trimmedFullName = request.FullName.Trim();
         var trimmedPhone = request.Phone.Trim();
@@ -623,6 +631,11 @@ public class UserService : IUserService
             return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
         }
 
+        if (user.Status == AccountStatus.Deactivated)
+        {
+            return (false, "Deactivated accounts cannot modify profile information.", StatusCodes.Status403Forbidden, null);
+        }
+
         var now = DateTime.UtcNow;
         var trimmedFullName = request.FullName.Trim();
         var trimmedPhone = request.Phone.Trim();
@@ -656,6 +669,11 @@ public class UserService : IUserService
         if (user == null)
         {
             return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        if (user.Status == AccountStatus.Deactivated)
+        {
+            return (false, "Deactivated accounts cannot change password.", StatusCodes.Status403Forbidden, null);
         }
 
         // 1. Verify Current Password
@@ -713,6 +731,11 @@ public class UserService : IUserService
         if (user == null)
         {
             return (false, "User account was not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        if (user.Status == AccountStatus.Deactivated)
+        {
+            return (false, "Deactivated accounts cannot delete account.", StatusCodes.Status403Forbidden, null);
         }
 
         var userEmail = user.Email ?? (user.ExtraElements != null && user.ExtraElements.Contains("email") && !user.ExtraElements["email"].IsBsonNull ? user.ExtraElements["email"].AsString : string.Empty);
