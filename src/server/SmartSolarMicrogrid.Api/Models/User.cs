@@ -39,6 +39,12 @@ public class User
     public string Username { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the primary contact email address. Must be unique across all system users.
+    /// </summary>
+    [BsonElement("email")]
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the one-way BCrypt hashed password string. Plaintext passwords must never be stored.
     /// </summary>
     [BsonElement("passwordHash")]

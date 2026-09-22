@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sliit.ssmts.data.local.SessionDaoTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-22T10:32:22.827Z" hostname="DESKTOP-F7HJGDP" time="0.111">
+  <properties/>
+  <testcase name="saveSession_And_GetActiveSession_SuccessfullyPersistsData" classname="com.sliit.ssmts.data.local.SessionDaoTest" time="0.105"/>
+  <testcase name="clearSession_RemovesAllStoredSessionData" classname="com.sliit.ssmts.data.local.SessionDaoTest" time="0.001"/>
+  <testcase name="toDomain_MapsAllSessionEntityFieldsAccurately" classname="com.sliit.ssmts.data.local.SessionDaoTest" time="0.001"/>
+  <testcase name="updateProfileCache_ModifiesCachedNamePhoneAndAddress" classname="com.sliit.ssmts.data.local.SessionDaoTest" time="0.002"/>
+  <testcase name="updateStatusCache_ModifiesCachedAccountStatus" classname="com.sliit.ssmts.data.local.SessionDaoTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

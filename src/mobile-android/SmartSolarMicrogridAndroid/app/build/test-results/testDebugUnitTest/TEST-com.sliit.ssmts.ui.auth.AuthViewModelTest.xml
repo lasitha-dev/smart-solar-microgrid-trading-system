@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sliit.ssmts.ui.auth.AuthViewModelTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T10:32:22.941Z" hostname="DESKTOP-F7HJGDP" time="0.04">
+  <properties/>
+  <testcase name="registerProsumer_WithDuplicateNICorEmail_EmitsErrorState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.011"/>
+  <testcase name="login_WithInvalidCredentials_EmitsErrorState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.002"/>
+  <testcase name="checkExistingSession_WhenActiveSessionPresent_TriggersCallback" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.003"/>
+  <testcase name="login_WithValidCredentials_EmitsSuccessState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.015"/>
+  <testcase name="resetLoginState_And_resetRegisterState_ResetsToIdle" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.003"/>
+  <testcase name="login_WithPendingActivationStatus_EmitsPendingActivationState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.002"/>
+  <testcase name="registerProsumer_WithValidDetails_EmitsSuccessState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.001"/>
+  <testcase name="login_WithDeactivatedStatus_EmitsDeactivatedState" classname="com.sliit.ssmts.ui.auth.AuthViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

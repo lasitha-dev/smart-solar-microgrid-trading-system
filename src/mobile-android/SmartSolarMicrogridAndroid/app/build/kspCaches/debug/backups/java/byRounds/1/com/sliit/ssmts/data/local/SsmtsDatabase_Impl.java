@@ -33,12 +33,12 @@ public final class SsmtsDatabase_Impl extends SsmtsDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(3) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `user_session` (`id` INTEGER NOT NULL, `token` TEXT NOT NULL, `userId` TEXT NOT NULL, `nic` TEXT NOT NULL, `username` TEXT NOT NULL, `fullName` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `role` TEXT NOT NULL, `status` TEXT NOT NULL, `expiresAt` TEXT, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `user_session` (`id` INTEGER NOT NULL, `token` TEXT NOT NULL, `userId` TEXT NOT NULL, `nic` TEXT NOT NULL, `username` TEXT NOT NULL, `fullName` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `role` TEXT NOT NULL, `status` TEXT NOT NULL, `email` TEXT NOT NULL, `expiresAt` TEXT, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c67e5ac28a0c4c17a28c100f6cb3511')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd08e6a40ccf5ea66fd8779a9fef836a3')");
       }
 
       @Override
@@ -87,7 +87,7 @@ public final class SsmtsDatabase_Impl extends SsmtsDatabase {
       @NonNull
       public RoomOpenHelper.ValidationResult onValidateSchema(
           @NonNull final SupportSQLiteDatabase db) {
-        final HashMap<String, TableInfo.Column> _columnsUserSession = new HashMap<String, TableInfo.Column>(14);
+        final HashMap<String, TableInfo.Column> _columnsUserSession = new HashMap<String, TableInfo.Column>(15);
         _columnsUserSession.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("token", new TableInfo.Column("token", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("userId", new TableInfo.Column("userId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -100,6 +100,7 @@ public final class SsmtsDatabase_Impl extends SsmtsDatabase {
         _columnsUserSession.put("longitude", new TableInfo.Column("longitude", "REAL", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("role", new TableInfo.Column("role", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("status", new TableInfo.Column("status", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsUserSession.put("email", new TableInfo.Column("email", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("expiresAt", new TableInfo.Column("expiresAt", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsUserSession.put("updatedAt", new TableInfo.Column("updatedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysUserSession = new HashSet<TableInfo.ForeignKey>(0);
@@ -113,7 +114,7 @@ public final class SsmtsDatabase_Impl extends SsmtsDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "8c67e5ac28a0c4c17a28c100f6cb3511", "c45233aa3b486b3c38674f5096132e13");
+    }, "d08e6a40ccf5ea66fd8779a9fef836a3", "3eaad1b921fd085121511de73285aadd");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

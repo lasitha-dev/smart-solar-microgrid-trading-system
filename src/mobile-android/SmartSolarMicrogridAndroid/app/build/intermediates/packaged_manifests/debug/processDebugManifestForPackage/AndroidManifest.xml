@@ -36,7 +36,6 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Theme.SmartSolarMicrogridAndroid" >
 
         <!-- Login Activity (Launcher) -->
@@ -61,6 +60,12 @@
         <activity
             android:name="com.sliit.ssmts.ui.auth.PendingActivationActivity"
             android:exported="false" />
+
+        <!-- Prosumer Home Dashboard Activity -->
+        <activity
+            android:name="com.sliit.ssmts.ui.home.HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Prosumer Profile Activity -->
         <activity

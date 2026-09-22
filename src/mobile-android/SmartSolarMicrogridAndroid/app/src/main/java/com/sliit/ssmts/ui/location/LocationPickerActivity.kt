@@ -17,6 +17,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -43,6 +44,7 @@ class LocationPickerActivity : AppCompatActivity() {
     private var currentLatitude: Double = DEFAULT_LAT
     private var currentLongitude: Double = DEFAULT_LON
     private var isMapLoaded: Boolean = false
+    private var isReadOnly: Boolean = false
 
     // Sri Lankan Microgrid Regional Clusters for rapid zone selection
     private val microgridClusters = listOf(
@@ -76,9 +78,10 @@ class LocationPickerActivity : AppCompatActivity() {
         binding = ActivityLocationPickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Read initial coordinates from Intent if provided
+        // Read initial coordinates and mode from Intent if provided
         val initialLat = intent.getDoubleExtra(Constants.EXTRA_LATITUDE, Double.NaN)
         val initialLon = intent.getDoubleExtra(Constants.EXTRA_LONGITUDE, Double.NaN)
+        isReadOnly = intent.getBooleanExtra(Constants.EXTRA_READ_ONLY, false)
 
         if (!initialLat.isNaN() && !initialLon.isNaN() && initialLat in -90.0..90.0 && initialLon in -180.0..180.0) {
             currentLatitude = initialLat
@@ -88,6 +91,7 @@ class LocationPickerActivity : AppCompatActivity() {
         updateCoordinatesDisplay(currentLatitude, currentLongitude)
         setupWebView()
         setupListeners()
+        applyModeUi()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -141,6 +145,17 @@ class LocationPickerActivity : AppCompatActivity() {
 
         binding.btnConfirmLocation.setOnClickListener {
             confirmLocationAndReturn()
+        }
+    }
+
+    private fun applyModeUi() {
+        if (isReadOnly) {
+            binding.tvLocationPickerTitle.text = "Solar Facility Location"
+            binding.tvLocationPickerSubtitle.text = "Registered microgrid node coordinates on map"
+            binding.cardBottomActions.visibility = View.GONE
+            binding.fabClusters.visibility = View.GONE
+            binding.fabFindMe.visibility = View.GONE
+            binding.tvCoordinatesRegion.text = "Registered Solar Facility Node (Locked)"
         }
     }
 

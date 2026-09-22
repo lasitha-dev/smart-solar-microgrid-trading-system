@@ -54,6 +54,7 @@ class AuthRepositoryImpl(
                             username = data.username,
                             fullName = data.fullName,
                             phone = data.phone.orEmpty(),
+                            email = data.email.orEmpty(),
                             address = data.address.orEmpty(),
                             latitude = data.latitude,
                             longitude = data.longitude,
@@ -87,6 +88,7 @@ class AuthRepositoryImpl(
         password: String,
         fullName: String,
         phone: String,
+        email: String,
         address: String,
         latitude: Double?,
         longitude: Double?
@@ -98,6 +100,7 @@ class AuthRepositoryImpl(
                 password = password,
                 fullName = fullName.trim(),
                 phone = phone.trim(),
+                email = email.trim(),
                 address = address.trim(),
                 latitude = latitude,
                 longitude = longitude
@@ -117,6 +120,7 @@ class AuthRepositoryImpl(
                         username = data.username,
                         fullName = data.fullName,
                         phone = data.phone,
+                        email = data.email.orEmpty(),
                         address = data.address.orEmpty(),
                         latitude = data.latitude,
                         longitude = data.longitude,
@@ -157,6 +161,7 @@ class AuthRepositoryImpl(
                             username = data.username,
                             fullName = data.fullName,
                             phone = data.phone,
+                            email = data.email ?: activeSession?.email.orEmpty(),
                             address = data.address ?: activeSession?.address.orEmpty(),
                             latitude = data.latitude ?: activeSession?.latitude,
                             longitude = data.longitude ?: activeSession?.longitude,
@@ -215,6 +220,7 @@ class AuthRepositoryImpl(
                         username = data.username,
                         fullName = data.fullName,
                         phone = data.phone,
+                        email = data.email ?: activeSession?.email.orEmpty(),
                         address = data.address ?: address.trim(),
                         latitude = data.latitude ?: activeSession?.latitude,
                         longitude = data.longitude ?: activeSession?.longitude,
@@ -266,6 +272,7 @@ class AuthRepositoryImpl(
                         nic = data.nic,
                         username = data.username,
                         fullName = data.fullName,
+                        email = activeSession?.email.orEmpty(),
                         role = data.role,
                         status = data.status
                     )
@@ -278,6 +285,87 @@ class AuthRepositoryImpl(
                     NetworkResult.Error(
                         response.code(),
                         apiResponse.message ?: "Deactivation request failed."
+                    )
+                }
+            } else {
+                val errorMessage = parseErrorMessage(response.errorBody()?.string(), response.code())
+                NetworkResult.Error(response.code(), errorMessage)
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
+        }
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmNewPassword: String
+    ): NetworkResult<UserSession> = withContext(Dispatchers.IO) {
+        try {
+            val request = com.sliit.ssmts.data.remote.dto.ChangePasswordRequest(
+                currentPassword = currentPassword,
+                newPassword = newPassword,
+                confirmNewPassword = confirmNewPassword
+            )
+            val response = authApi.changePassword(request)
+
+            if (response.isSuccessful && response.body() != null) {
+                val apiResponse = response.body()!!
+                val data = apiResponse.data
+
+                if (apiResponse.success && data != null) {
+                    val activeSession = sessionManager.getActiveSession()
+                    val updatedSession = UserSession(
+                        token = activeSession?.token ?: "",
+                        userId = data.id ?: activeSession?.userId ?: "",
+                        nic = data.nic,
+                        username = data.username,
+                        fullName = data.fullName,
+                        phone = data.phone,
+                        email = data.email ?: activeSession?.email.orEmpty(),
+                        address = data.address ?: activeSession?.address.orEmpty(),
+                        latitude = data.latitude ?: activeSession?.latitude,
+                        longitude = data.longitude ?: activeSession?.longitude,
+                        role = data.role,
+                        status = data.status
+                    )
+
+                    // Clear local session cache so user is prompted to sign in with new password
+                    sessionManager.clearSession()
+
+                    NetworkResult.Success(updatedSession, apiResponse.message ?: "Password changed successfully.")
+                } else {
+                    NetworkResult.Error(
+                        response.code(),
+                        apiResponse.message ?: "Password change failed."
+                    )
+                }
+            } else {
+                val errorMessage = parseErrorMessage(response.errorBody()?.string(), response.code())
+                NetworkResult.Error(response.code(), errorMessage)
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
+        }
+    }
+
+    override suspend fun deleteAccount(confirmEmail: String): NetworkResult<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val request = com.sliit.ssmts.data.remote.dto.DeleteAccountRequest(
+                confirmEmail = confirmEmail.trim()
+            )
+            val response = authApi.deleteAccount(request)
+
+            if (response.isSuccessful && response.body() != null) {
+                val apiResponse = response.body()!!
+                if (apiResponse.success) {
+                    // Clear local session cache upon account deletion
+                    sessionManager.clearSession()
+                    NetworkResult.Success(Unit, apiResponse.message ?: "Account deleted successfully.")
+                } else {
+                    NetworkResult.Error(
+                        response.code(),
+                        apiResponse.message ?: "Account deletion failed."
                     )
                 }
             } else {

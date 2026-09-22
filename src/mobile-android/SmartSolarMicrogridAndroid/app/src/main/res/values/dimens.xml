@@ -26,6 +26,7 @@
     <dimen name="card_elevation">4dp</dimen>
     <dimen name="stroke_thin">1dp</dimen>
     <dimen name="stroke_focus">2dp</dimen>
+    <dimen name="stroke_medium">2dp</dimen>
 
     <!-- Button Heights & Element Sizes -->
     <dimen name="button_height">52dp</dimen>
@@ -37,6 +38,7 @@
     <!-- Text Sizes -->
     <dimen name="text_xs">12sp</dimen>
     <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
     <dimen name="text_base">16sp</dimen>
     <dimen name="text_lg">18sp</dimen>
     <dimen name="text_xl">22sp</dimen>

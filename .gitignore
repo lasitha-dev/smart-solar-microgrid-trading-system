@@ -1,0 +1,14 @@
+
+# ==========================================
+# Smart Solar Microgrid Trading System - .gitignore
+# Student Name: SILVA M N U (IT22169112)
+# ==========================================
+
+# Node.js / Web Frontend Dependencies
+node_modules/
+*/node_modules/
+src/web/smart-solar-microgrid-web/node_modules/
+
+# Member 1 Personal Planning & Rule Files
+roadmap_member_1.md
+rules_member_1.md

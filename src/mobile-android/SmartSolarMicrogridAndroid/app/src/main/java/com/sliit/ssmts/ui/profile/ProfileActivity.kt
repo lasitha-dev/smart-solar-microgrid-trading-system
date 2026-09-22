@@ -53,6 +53,10 @@ class ProfileActivity : AppCompatActivity() {
     private var originalPhone: String = ""
     private var currentAddress: String = ""
 
+    // Facility Location Coordinates for Map View
+    private var currentLatitude: Double = 6.9271
+    private var currentLongitude: Double = 79.8612
+
     private val dirtyCheckTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -73,6 +77,11 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        // Back to Home Dashboard
+        binding.btnProfileBack.setOnClickListener {
+            finish()
+        }
+
         binding.btnToggleEdit.setOnClickListener {
             toggleEditMode()
         }
@@ -85,8 +94,29 @@ class ProfileActivity : AppCompatActivity() {
             attemptSaveProfile()
         }
 
+        // Open Change Password Dialog
+        binding.btnOpenChangePassword.setOnClickListener {
+            showChangePasswordDialog()
+        }
+
+        // View Facility Location on Interactive Map
+        binding.btnViewLocationOnMap.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.ui.location.LocationPickerActivity::class.java).apply {
+                putExtra(Constants.EXTRA_LATITUDE, currentLatitude)
+                putExtra(Constants.EXTRA_LONGITUDE, currentLongitude)
+                putExtra(Constants.EXTRA_READ_ONLY, true)
+            }
+            startActivity(intent)
+        }
+
+        // Request Deactivation Dialog
         binding.btnRequestDeactivation.setOnClickListener {
             showDeactivationDialog()
+        }
+
+        // Delete Account Dialog
+        binding.btnDeleteAccount.setOnClickListener {
+            showDeleteAccountDialog()
         }
 
         binding.btnLogout.setOnClickListener {
@@ -213,6 +243,56 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun showDeleteAccountDialog() {
+        val dialogBinding = com.sliit.ssmts.databinding.DialogDeleteAccountBinding.inflate(layoutInflater)
+        val registeredEmail = binding.tvProfileEmail.text?.toString()?.trim().orEmpty()
+
+        dialogBinding.tvDeleteTargetEmail.text = if (registeredEmail.isNotBlank()) registeredEmail else "user@smartgrid.lk"
+        dialogBinding.tvDeleteMatchStatus.text = getString(R.string.error_email_mismatch)
+        dialogBinding.tvDeleteMatchStatus.setTextColor(getColor(R.color.error_red))
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .setPositiveButton(getString(R.string.btn_confirm_delete_account), null)
+            .setNegativeButton(getString(R.string.cancel), null)
+            .create()
+
+        dialog.setOnShowListener {
+            val deleteBtn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            deleteBtn.isEnabled = false
+            deleteBtn.setTextColor(getColor(R.color.error_red))
+
+            dialogBinding.etDeleteConfirmEmail.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    val typed = s?.toString()?.trim().orEmpty()
+                    val isMatched = typed.equals(registeredEmail, ignoreCase = true)
+
+                    if (isMatched && typed.isNotBlank()) {
+                        dialogBinding.tvDeleteMatchStatus.text = getString(R.string.msg_email_matched)
+                        dialogBinding.tvDeleteMatchStatus.setTextColor(getColor(R.color.solar_amber_primary))
+                        deleteBtn.isEnabled = true
+                    } else {
+                        dialogBinding.tvDeleteMatchStatus.text = getString(R.string.error_email_mismatch)
+                        dialogBinding.tvDeleteMatchStatus.setTextColor(getColor(R.color.error_red))
+                        deleteBtn.isEnabled = false
+                    }
+                }
+            })
+
+            deleteBtn.setOnClickListener {
+                val typed = dialogBinding.etDeleteConfirmEmail.text?.toString()?.trim().orEmpty()
+                if (typed.equals(registeredEmail, ignoreCase = true) && typed.isNotBlank()) {
+                    dialog.dismiss()
+                    viewModel.deleteAccount(typed)
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
     private fun showDeactivationDialog() {
         val input = EditText(this).apply {
             hint = getString(R.string.dialog_deactivate_reason_hint)
@@ -231,6 +311,113 @@ class ProfileActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .show()
+    }
+
+    private fun showChangePasswordDialog() {
+        val dialogBinding = com.sliit.ssmts.databinding.DialogChangePasswordBinding.inflate(layoutInflater)
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .setPositiveButton(getString(R.string.btn_submit_change_password), null)
+            .setNegativeButton(getString(R.string.cancel), null)
+            .create()
+
+        // TextWatchers for live complexity & mismatch validation inside dialog
+        dialogBinding.etNewPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val newPass = s?.toString().orEmpty()
+                val confirm = dialogBinding.etConfirmNewPassword.text?.toString().orEmpty()
+
+                if (newPass.isNotEmpty()) {
+                    if (newPass.length < 6) {
+                        dialogBinding.tilNewPassword.error = getString(R.string.error_password_short)
+                    } else if (!InputValidator.isValidPassword(newPass)) {
+                        dialogBinding.tilNewPassword.error = getString(R.string.error_password_complex)
+                    } else {
+                        dialogBinding.tilNewPassword.error = null
+                    }
+                } else {
+                    dialogBinding.tilNewPassword.error = null
+                }
+
+                if (confirm.isNotEmpty()) {
+                    if (confirm != newPass) {
+                        dialogBinding.tilConfirmNewPassword.error = getString(R.string.error_passwords_mismatch)
+                    } else {
+                        dialogBinding.tilConfirmNewPassword.error = null
+                    }
+                }
+            }
+        })
+
+        dialogBinding.etConfirmNewPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val confirm = s?.toString().orEmpty()
+                val newPass = dialogBinding.etNewPassword.text?.toString().orEmpty()
+
+                if (confirm.isNotEmpty()) {
+                    if (confirm != newPass) {
+                        dialogBinding.tilConfirmNewPassword.error = getString(R.string.error_passwords_mismatch)
+                    } else {
+                        dialogBinding.tilConfirmNewPassword.error = null
+                    }
+                } else {
+                    dialogBinding.tilConfirmNewPassword.error = null
+                }
+            }
+        })
+
+        dialog.setOnShowListener {
+            val submitBtn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            submitBtn.setOnClickListener {
+                val current = dialogBinding.etCurrentPassword.text?.toString().orEmpty()
+                val newPass = dialogBinding.etNewPassword.text?.toString().orEmpty()
+                val confirm = dialogBinding.etConfirmNewPassword.text?.toString().orEmpty()
+
+                var hasError = false
+
+                if (current.isBlank()) {
+                    dialogBinding.tilCurrentPassword.error = getString(R.string.error_current_password_required)
+                    hasError = true
+                } else {
+                    dialogBinding.tilCurrentPassword.error = null
+                }
+
+                if (newPass.isBlank()) {
+                    dialogBinding.tilNewPassword.error = getString(R.string.error_new_password_required)
+                    hasError = true
+                } else if (newPass.length < 6) {
+                    dialogBinding.tilNewPassword.error = getString(R.string.error_password_short)
+                    hasError = true
+                } else if (!InputValidator.isValidPassword(newPass)) {
+                    dialogBinding.tilNewPassword.error = getString(R.string.error_password_complex)
+                    hasError = true
+                } else {
+                    dialogBinding.tilNewPassword.error = null
+                }
+
+                if (confirm.isBlank()) {
+                    dialogBinding.tilConfirmNewPassword.error = getString(R.string.error_password_required)
+                    hasError = true
+                } else if (newPass != confirm) {
+                    dialogBinding.tilConfirmNewPassword.error = getString(R.string.error_passwords_mismatch)
+                    hasError = true
+                } else {
+                    dialogBinding.tilConfirmNewPassword.error = null
+                }
+
+                if (!hasError) {
+                    dialog.dismiss()
+                    viewModel.changePassword(current, newPass, confirm)
+                }
+            }
+        }
+
+        dialog.show()
     }
 
     private fun observeViewModel() {
@@ -311,6 +498,51 @@ class ProfileActivity : AppCompatActivity() {
                         }
                     }
                 }
+
+                launch {
+                    viewModel.changePasswordState.collect { state ->
+                        when (state) {
+                            is ChangePasswordState.Idle -> {}
+                            is ChangePasswordState.Loading -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                            }
+                            is ChangePasswordState.Success -> {
+                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this@ProfileActivity, state.message, Toast.LENGTH_LONG).show()
+                                viewModel.resetChangePasswordState()
+                                // Auto-logout and redirect to Login
+                                navigateToLogin()
+                            }
+                            is ChangePasswordState.Error -> {
+                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this@ProfileActivity, state.message, Toast.LENGTH_LONG).show()
+                                viewModel.resetChangePasswordState()
+                            }
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.deleteAccountState.collect { state ->
+                        when (state) {
+                            is DeleteAccountState.Idle -> {}
+                            is DeleteAccountState.Loading -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                            }
+                            is DeleteAccountState.Success -> {
+                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this@ProfileActivity, state.message, Toast.LENGTH_LONG).show()
+                                viewModel.resetDeleteAccountState()
+                                navigateToLogin()
+                            }
+                            is DeleteAccountState.Error -> {
+                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this@ProfileActivity, state.message, Toast.LENGTH_LONG).show()
+                                viewModel.resetDeleteAccountState()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -320,6 +552,7 @@ class ProfileActivity : AppCompatActivity() {
         binding.tvProfileNic.text = session.nic
         binding.tvProfileUsername.text = session.username
         binding.tvProfileRole.text = session.role
+        binding.tvProfileEmail.text = if (session.email.isNotBlank()) session.email else "Not Specified"
         binding.tvProfileAddress.text = if (session.address.isNotBlank()) session.address else "Not Specified"
         binding.tvStatusBadge.text = session.status.uppercase()
 
@@ -331,15 +564,15 @@ class ProfileActivity : AppCompatActivity() {
             binding.tvStatusBadge.setTextColor(getColor(R.color.status_pending_text))
         }
 
-        // Strictly Immutable Facility Location Coordinates
+        // Strictly Immutable Facility Location Coordinates for Map Viewer
         val lat = session.latitude
         val lon = session.longitude
         if (lat != null && lon != null) {
-            binding.tvProfileLatitude.text = String.format(Locale.US, "%.5f° %s", Math.abs(lat), if (lat >= 0) "N" else "S")
-            binding.tvProfileLongitude.text = String.format(Locale.US, "%.5f° %s", Math.abs(lon), if (lon >= 0) "E" else "W")
+            currentLatitude = lat
+            currentLongitude = lon
         } else {
-            binding.tvProfileLatitude.text = "6.92710° N (Default Cluster)"
-            binding.tvProfileLongitude.text = "79.86120° E (Default Cluster)"
+            currentLatitude = 6.9271
+            currentLongitude = 79.8612
         }
 
         // Editable Baseline Profile Information from DB

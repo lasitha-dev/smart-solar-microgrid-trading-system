@@ -1,26 +1,34 @@
 [
     {
-        "merged": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-mergeDebugResources-40:\\layout\\activity_register.xml",
-        "source": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-main-43:\\layout\\activity_register.xml"
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_pending_activation.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/activity_pending_activation.xml"
     },
     {
-        "merged": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-mergeDebugResources-40:\\layout\\activity_login.xml",
-        "source": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-main-43:\\layout\\activity_login.xml"
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/dialog_delete_account.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/dialog_delete_account.xml"
     },
     {
-        "merged": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-mergeDebugResources-40:\\layout\\activity_profile.xml",
-        "source": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-main-43:\\layout\\activity_profile.xml"
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_location_picker.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/activity_location_picker.xml"
     },
     {
-        "merged": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-mergeDebugResources-40:\\layout\\activity_pending_activation.xml",
-        "source": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-main-43:\\layout\\activity_pending_activation.xml"
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/dialog_change_password.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/dialog_change_password.xml"
     },
     {
-        "merged": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-mergeDebugResources-40:\\layout\\activity_location_picker.xml",
-        "source": "C:\\Users\\Nethmi Umaya\\.gradle\\daemon\\9.0.0\\com.sliit.ssmts.app-main-43:\\layout\\activity_location_picker.xml"
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_login.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/activity_login.xml"
     },
     {
         "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_profile.xml",
         "source": "com.sliit.ssmts.app-main-43:/layout/activity_profile.xml"
+    },
+    {
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_home.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/activity_home.xml"
+    },
+    {
+        "merged": "com.sliit.ssmts.app-mergeDebugResources-40:/layout/activity_register.xml",
+        "source": "com.sliit.ssmts.app-main-43:/layout/activity_register.xml"
     }
 ]

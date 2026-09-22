@@ -36,6 +36,7 @@ interface IAuthRepository {
      * @param password The account password.
      * @param fullName The full legal name.
      * @param phone The contact telephone number.
+     * @param email The primary email address.
      * @param address The residential/facility address.
      * @param latitude The latitude coordinate of the facility.
      * @param longitude The longitude coordinate of the facility.
@@ -47,6 +48,7 @@ interface IAuthRepository {
         password: String,
         fullName: String,
         phone: String,
+        email: String,
         address: String,
         latitude: Double? = null,
         longitude: Double? = null
@@ -85,6 +87,29 @@ interface IAuthRepository {
      * @return [NetworkResult] containing the updated [UserSession].
      */
     suspend fun requestDeactivation(nic: String, reason: String?, remarks: String?): NetworkResult<UserSession>
+
+    /**
+     * Changes authenticated user's account password on the backend server.
+     *
+     * @param currentPassword Current account password.
+     * @param newPassword Desired new complex password.
+     * @param confirmNewPassword Confirmation of new password.
+     * @return [NetworkResult] containing updated [UserSession] or error.
+     */
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmNewPassword: String
+    ): NetworkResult<UserSession>
+
+    /**
+     * Permanently deletes authenticated user's account upon verifying registered email.
+     * Clears local SQLite session and SharedPreferences on success.
+     *
+     * @param confirmEmail The email address entered for confirmation.
+     * @return [NetworkResult] with success or error details.
+     */
+    suspend fun deleteAccount(confirmEmail: String): NetworkResult<Unit>
 
     /**
      * Retrieves the currently active user session from local Room SQLite.

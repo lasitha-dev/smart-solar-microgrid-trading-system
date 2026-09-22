@@ -4,6 +4,7 @@ package com.sliit.ssmts.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -29,7 +30,16 @@ public final class ActivityProfileBinding implements ViewBinding {
   public final MaterialButton btnCancelEdit;
 
   @NonNull
+  public final MaterialButton btnDeleteAccount;
+
+  @NonNull
   public final MaterialButton btnLogout;
+
+  @NonNull
+  public final MaterialButton btnOpenChangePassword;
+
+  @NonNull
+  public final ImageButton btnProfileBack;
 
   @NonNull
   public final MaterialButton btnRequestDeactivation;
@@ -41,6 +51,9 @@ public final class ActivityProfileBinding implements ViewBinding {
   public final MaterialButton btnToggleEdit;
 
   @NonNull
+  public final MaterialButton btnViewLocationOnMap;
+
+  @NonNull
   public final MaterialCardView cardEditable;
 
   @NonNull
@@ -50,6 +63,9 @@ public final class ActivityProfileBinding implements ViewBinding {
   public final MaterialCardView cardLocation;
 
   @NonNull
+  public final MaterialCardView cardSecurity;
+
+  @NonNull
   public final TextInputEditText etProfileFullName;
 
   @NonNull
@@ -57,6 +73,9 @@ public final class ActivityProfileBinding implements ViewBinding {
 
   @NonNull
   public final LinearLayout llEditActions;
+
+  @NonNull
+  public final LinearLayout llProfileHeaderBar;
 
   @NonNull
   public final ProgressBar progressBar;
@@ -71,13 +90,10 @@ public final class ActivityProfileBinding implements ViewBinding {
   public final TextView tvProfileAddress;
 
   @NonNull
+  public final TextView tvProfileEmail;
+
+  @NonNull
   public final TextView tvProfileHeader;
-
-  @NonNull
-  public final TextView tvProfileLatitude;
-
-  @NonNull
-  public final TextView tvProfileLongitude;
 
   @NonNull
   public final TextView tvProfileNic;
@@ -95,37 +111,44 @@ public final class ActivityProfileBinding implements ViewBinding {
   public final TextView tvStatusBadge;
 
   private ActivityProfileBinding(@NonNull ScrollView rootView,
-      @NonNull MaterialButton btnCancelEdit, @NonNull MaterialButton btnLogout,
-      @NonNull MaterialButton btnRequestDeactivation, @NonNull MaterialButton btnSaveProfile,
-      @NonNull MaterialButton btnToggleEdit, @NonNull MaterialCardView cardEditable,
+      @NonNull MaterialButton btnCancelEdit, @NonNull MaterialButton btnDeleteAccount,
+      @NonNull MaterialButton btnLogout, @NonNull MaterialButton btnOpenChangePassword,
+      @NonNull ImageButton btnProfileBack, @NonNull MaterialButton btnRequestDeactivation,
+      @NonNull MaterialButton btnSaveProfile, @NonNull MaterialButton btnToggleEdit,
+      @NonNull MaterialButton btnViewLocationOnMap, @NonNull MaterialCardView cardEditable,
       @NonNull MaterialCardView cardIdentity, @NonNull MaterialCardView cardLocation,
-      @NonNull TextInputEditText etProfileFullName, @NonNull TextInputEditText etProfilePhone,
-      @NonNull LinearLayout llEditActions, @NonNull ProgressBar progressBar,
+      @NonNull MaterialCardView cardSecurity, @NonNull TextInputEditText etProfileFullName,
+      @NonNull TextInputEditText etProfilePhone, @NonNull LinearLayout llEditActions,
+      @NonNull LinearLayout llProfileHeaderBar, @NonNull ProgressBar progressBar,
       @NonNull TextInputLayout tilProfileFullName, @NonNull TextInputLayout tilProfilePhone,
-      @NonNull TextView tvProfileAddress, @NonNull TextView tvProfileHeader,
-      @NonNull TextView tvProfileLatitude, @NonNull TextView tvProfileLongitude,
-      @NonNull TextView tvProfileNic, @NonNull TextView tvProfileRole,
-      @NonNull TextView tvProfileSubheader, @NonNull TextView tvProfileUsername,
-      @NonNull TextView tvStatusBadge) {
+      @NonNull TextView tvProfileAddress, @NonNull TextView tvProfileEmail,
+      @NonNull TextView tvProfileHeader, @NonNull TextView tvProfileNic,
+      @NonNull TextView tvProfileRole, @NonNull TextView tvProfileSubheader,
+      @NonNull TextView tvProfileUsername, @NonNull TextView tvStatusBadge) {
     this.rootView = rootView;
     this.btnCancelEdit = btnCancelEdit;
+    this.btnDeleteAccount = btnDeleteAccount;
     this.btnLogout = btnLogout;
+    this.btnOpenChangePassword = btnOpenChangePassword;
+    this.btnProfileBack = btnProfileBack;
     this.btnRequestDeactivation = btnRequestDeactivation;
     this.btnSaveProfile = btnSaveProfile;
     this.btnToggleEdit = btnToggleEdit;
+    this.btnViewLocationOnMap = btnViewLocationOnMap;
     this.cardEditable = cardEditable;
     this.cardIdentity = cardIdentity;
     this.cardLocation = cardLocation;
+    this.cardSecurity = cardSecurity;
     this.etProfileFullName = etProfileFullName;
     this.etProfilePhone = etProfilePhone;
     this.llEditActions = llEditActions;
+    this.llProfileHeaderBar = llProfileHeaderBar;
     this.progressBar = progressBar;
     this.tilProfileFullName = tilProfileFullName;
     this.tilProfilePhone = tilProfilePhone;
     this.tvProfileAddress = tvProfileAddress;
+    this.tvProfileEmail = tvProfileEmail;
     this.tvProfileHeader = tvProfileHeader;
-    this.tvProfileLatitude = tvProfileLatitude;
-    this.tvProfileLongitude = tvProfileLongitude;
     this.tvProfileNic = tvProfileNic;
     this.tvProfileRole = tvProfileRole;
     this.tvProfileSubheader = tvProfileSubheader;
@@ -166,9 +189,27 @@ public final class ActivityProfileBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnDeleteAccount;
+      MaterialButton btnDeleteAccount = ViewBindings.findChildViewById(rootView, id);
+      if (btnDeleteAccount == null) {
+        break missingId;
+      }
+
       id = R.id.btnLogout;
       MaterialButton btnLogout = ViewBindings.findChildViewById(rootView, id);
       if (btnLogout == null) {
+        break missingId;
+      }
+
+      id = R.id.btnOpenChangePassword;
+      MaterialButton btnOpenChangePassword = ViewBindings.findChildViewById(rootView, id);
+      if (btnOpenChangePassword == null) {
+        break missingId;
+      }
+
+      id = R.id.btnProfileBack;
+      ImageButton btnProfileBack = ViewBindings.findChildViewById(rootView, id);
+      if (btnProfileBack == null) {
         break missingId;
       }
 
@@ -190,6 +231,12 @@ public final class ActivityProfileBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnViewLocationOnMap;
+      MaterialButton btnViewLocationOnMap = ViewBindings.findChildViewById(rootView, id);
+      if (btnViewLocationOnMap == null) {
+        break missingId;
+      }
+
       id = R.id.cardEditable;
       MaterialCardView cardEditable = ViewBindings.findChildViewById(rootView, id);
       if (cardEditable == null) {
@@ -208,6 +255,12 @@ public final class ActivityProfileBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.cardSecurity;
+      MaterialCardView cardSecurity = ViewBindings.findChildViewById(rootView, id);
+      if (cardSecurity == null) {
+        break missingId;
+      }
+
       id = R.id.etProfileFullName;
       TextInputEditText etProfileFullName = ViewBindings.findChildViewById(rootView, id);
       if (etProfileFullName == null) {
@@ -223,6 +276,12 @@ public final class ActivityProfileBinding implements ViewBinding {
       id = R.id.llEditActions;
       LinearLayout llEditActions = ViewBindings.findChildViewById(rootView, id);
       if (llEditActions == null) {
+        break missingId;
+      }
+
+      id = R.id.llProfileHeaderBar;
+      LinearLayout llProfileHeaderBar = ViewBindings.findChildViewById(rootView, id);
+      if (llProfileHeaderBar == null) {
         break missingId;
       }
 
@@ -250,21 +309,15 @@ public final class ActivityProfileBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvProfileEmail;
+      TextView tvProfileEmail = ViewBindings.findChildViewById(rootView, id);
+      if (tvProfileEmail == null) {
+        break missingId;
+      }
+
       id = R.id.tvProfileHeader;
       TextView tvProfileHeader = ViewBindings.findChildViewById(rootView, id);
       if (tvProfileHeader == null) {
-        break missingId;
-      }
-
-      id = R.id.tvProfileLatitude;
-      TextView tvProfileLatitude = ViewBindings.findChildViewById(rootView, id);
-      if (tvProfileLatitude == null) {
-        break missingId;
-      }
-
-      id = R.id.tvProfileLongitude;
-      TextView tvProfileLongitude = ViewBindings.findChildViewById(rootView, id);
-      if (tvProfileLongitude == null) {
         break missingId;
       }
 
@@ -298,11 +351,12 @@ public final class ActivityProfileBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityProfileBinding((ScrollView) rootView, btnCancelEdit, btnLogout,
-          btnRequestDeactivation, btnSaveProfile, btnToggleEdit, cardEditable, cardIdentity,
-          cardLocation, etProfileFullName, etProfilePhone, llEditActions, progressBar,
-          tilProfileFullName, tilProfilePhone, tvProfileAddress, tvProfileHeader, tvProfileLatitude,
-          tvProfileLongitude, tvProfileNic, tvProfileRole, tvProfileSubheader, tvProfileUsername,
+      return new ActivityProfileBinding((ScrollView) rootView, btnCancelEdit, btnDeleteAccount,
+          btnLogout, btnOpenChangePassword, btnProfileBack, btnRequestDeactivation, btnSaveProfile,
+          btnToggleEdit, btnViewLocationOnMap, cardEditable, cardIdentity, cardLocation,
+          cardSecurity, etProfileFullName, etProfilePhone, llEditActions, llProfileHeaderBar,
+          progressBar, tilProfileFullName, tilProfilePhone, tvProfileAddress, tvProfileEmail,
+          tvProfileHeader, tvProfileNic, tvProfileRole, tvProfileSubheader, tvProfileUsername,
           tvStatusBadge);
     }
     String missingId = rootView.getResources().getResourceName(id);

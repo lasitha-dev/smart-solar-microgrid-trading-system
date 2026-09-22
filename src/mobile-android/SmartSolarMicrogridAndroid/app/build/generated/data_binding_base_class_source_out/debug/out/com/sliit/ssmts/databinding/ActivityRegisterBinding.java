@@ -45,6 +45,9 @@ public final class ActivityRegisterBinding implements ViewBinding {
   public final TextInputEditText etConfirmPassword;
 
   @NonNull
+  public final TextInputEditText etEmail;
+
+  @NonNull
   public final TextInputEditText etFullName;
 
   @NonNull
@@ -73,6 +76,9 @@ public final class ActivityRegisterBinding implements ViewBinding {
 
   @NonNull
   public final TextInputLayout tilConfirmPassword;
+
+  @NonNull
+  public final TextInputLayout tilEmail;
 
   @NonNull
   public final TextInputLayout tilFullName;
@@ -107,12 +113,13 @@ public final class ActivityRegisterBinding implements ViewBinding {
   private ActivityRegisterBinding(@NonNull ScrollView rootView, @NonNull MaterialButton btnRegister,
       @NonNull MaterialButton btnSelectLocationOnMap, @NonNull MaterialCardView cardLocationPicker,
       @NonNull MaterialCardView cardRegister, @NonNull TextInputEditText etAddress,
-      @NonNull TextInputEditText etConfirmPassword, @NonNull TextInputEditText etFullName,
-      @NonNull TextInputEditText etNic, @NonNull TextInputEditText etPassword,
-      @NonNull TextInputEditText etPhone, @NonNull TextInputEditText etUsername,
-      @NonNull ImageView ivLocationConfirmedCheck, @NonNull LinearLayout llLoginPrompt,
-      @NonNull ProgressBar progressBar, @NonNull TextInputLayout tilAddress,
-      @NonNull TextInputLayout tilConfirmPassword, @NonNull TextInputLayout tilFullName,
+      @NonNull TextInputEditText etConfirmPassword, @NonNull TextInputEditText etEmail,
+      @NonNull TextInputEditText etFullName, @NonNull TextInputEditText etNic,
+      @NonNull TextInputEditText etPassword, @NonNull TextInputEditText etPhone,
+      @NonNull TextInputEditText etUsername, @NonNull ImageView ivLocationConfirmedCheck,
+      @NonNull LinearLayout llLoginPrompt, @NonNull ProgressBar progressBar,
+      @NonNull TextInputLayout tilAddress, @NonNull TextInputLayout tilConfirmPassword,
+      @NonNull TextInputLayout tilEmail, @NonNull TextInputLayout tilFullName,
       @NonNull TextInputLayout tilNic, @NonNull TextInputLayout tilPassword,
       @NonNull TextInputLayout tilPhone, @NonNull TextInputLayout tilUsername,
       @NonNull TextView tvErrorMessage, @NonNull TextView tvLocationStatus,
@@ -125,6 +132,7 @@ public final class ActivityRegisterBinding implements ViewBinding {
     this.cardRegister = cardRegister;
     this.etAddress = etAddress;
     this.etConfirmPassword = etConfirmPassword;
+    this.etEmail = etEmail;
     this.etFullName = etFullName;
     this.etNic = etNic;
     this.etPassword = etPassword;
@@ -135,6 +143,7 @@ public final class ActivityRegisterBinding implements ViewBinding {
     this.progressBar = progressBar;
     this.tilAddress = tilAddress;
     this.tilConfirmPassword = tilConfirmPassword;
+    this.tilEmail = tilEmail;
     this.tilFullName = tilFullName;
     this.tilNic = tilNic;
     this.tilPassword = tilPassword;
@@ -210,6 +219,12 @@ public final class ActivityRegisterBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.etEmail;
+      TextInputEditText etEmail = ViewBindings.findChildViewById(rootView, id);
+      if (etEmail == null) {
+        break missingId;
+      }
+
       id = R.id.etFullName;
       TextInputEditText etFullName = ViewBindings.findChildViewById(rootView, id);
       if (etFullName == null) {
@@ -267,6 +282,12 @@ public final class ActivityRegisterBinding implements ViewBinding {
       id = R.id.tilConfirmPassword;
       TextInputLayout tilConfirmPassword = ViewBindings.findChildViewById(rootView, id);
       if (tilConfirmPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.tilEmail;
+      TextInputLayout tilEmail = ViewBindings.findChildViewById(rootView, id);
+      if (tilEmail == null) {
         break missingId;
       }
 
@@ -331,10 +352,11 @@ public final class ActivityRegisterBinding implements ViewBinding {
       }
 
       return new ActivityRegisterBinding((ScrollView) rootView, btnRegister, btnSelectLocationOnMap,
-          cardLocationPicker, cardRegister, etAddress, etConfirmPassword, etFullName, etNic,
-          etPassword, etPhone, etUsername, ivLocationConfirmedCheck, llLoginPrompt, progressBar,
-          tilAddress, tilConfirmPassword, tilFullName, tilNic, tilPassword, tilPhone, tilUsername,
-          tvErrorMessage, tvLocationStatus, tvLoginLink, tvRegisterHeader, tvRegisterSubheader);
+          cardLocationPicker, cardRegister, etAddress, etConfirmPassword, etEmail, etFullName,
+          etNic, etPassword, etPhone, etUsername, ivLocationConfirmedCheck, llLoginPrompt,
+          progressBar, tilAddress, tilConfirmPassword, tilEmail, tilFullName, tilNic, tilPassword,
+          tilPhone, tilUsername, tvErrorMessage, tvLocationStatus, tvLoginLink, tvRegisterHeader,
+          tvRegisterSubheader);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

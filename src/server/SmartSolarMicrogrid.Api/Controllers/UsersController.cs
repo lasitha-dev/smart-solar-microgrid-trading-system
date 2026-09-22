@@ -21,7 +21,7 @@ namespace SmartSolarMicrogrid.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "Backoffice")]
+[Authorize(Roles = "Backoffice,Administrator")]
 [Produces("application/json")]
 public class UsersController : ControllerBase
 {

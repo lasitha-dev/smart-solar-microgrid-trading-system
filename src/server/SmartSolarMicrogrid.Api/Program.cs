@@ -15,6 +15,11 @@ using SmartSolarMicrogrid.Api.Configuration;
 using SmartSolarMicrogrid.Api.Data;
 using SmartSolarMicrogrid.Api.Services;
 
+// ==========================================
+// 0. Load Local .env Configuration File
+// ==========================================
+DotEnvLoader.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================
@@ -22,19 +27,74 @@ var builder = WebApplication.CreateBuilder(args);
 // ==========================================
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection(MongoDbSettings.SectionName));
+builder.Services.PostConfigure<MongoDbSettings>(options =>
+{
+    var envConn = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING");
+    if (!string.IsNullOrWhiteSpace(envConn)) options.ConnectionString = envConn;
+
+    var envDb = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME");
+    if (!string.IsNullOrWhiteSpace(envDb)) options.DatabaseName = envDb;
+
+    var envCol = Environment.GetEnvironmentVariable("MONGODB_USERS_COLLECTION");
+    if (!string.IsNullOrWhiteSpace(envCol)) options.UsersCollectionName = envCol;
+});
 
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.PostConfigure<JwtSettings>(options =>
+{
+    var envKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    if (!string.IsNullOrWhiteSpace(envKey)) options.SecretKey = envKey;
+
+    var envIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+    if (!string.IsNullOrWhiteSpace(envIssuer)) options.Issuer = envIssuer;
+
+    var envAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+    if (!string.IsNullOrWhiteSpace(envAudience)) options.Audience = envAudience;
+
+    var envExpiry = Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES");
+    if (!string.IsNullOrWhiteSpace(envExpiry) && int.TryParse(envExpiry, out var mins)) options.ExpiryMinutes = mins;
+});
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection(EmailSettings.SectionName));
+builder.Services.PostConfigure<EmailSettings>(options =>
+{
+    var envHost = Environment.GetEnvironmentVariable("SMTP_HOST");
+    if (!string.IsNullOrWhiteSpace(envHost)) options.SmtpHost = envHost;
+
+    var envPort = Environment.GetEnvironmentVariable("SMTP_PORT");
+    if (!string.IsNullOrWhiteSpace(envPort) && int.TryParse(envPort, out var p)) options.SmtpPort = p;
+
+    var envSsl = Environment.GetEnvironmentVariable("ENABLE_SSL");
+    if (!string.IsNullOrWhiteSpace(envSsl) && bool.TryParse(envSsl, out var ssl)) options.EnableSsl = ssl;
+
+    var envEmail = Environment.GetEnvironmentVariable("SENDER_EMAIL");
+    if (!string.IsNullOrWhiteSpace(envEmail)) options.SenderEmail = envEmail;
+
+    var envPass = Environment.GetEnvironmentVariable("SENDER_PASSWORD");
+    if (!string.IsNullOrWhiteSpace(envPass)) options.SenderPassword = envPass;
+
+    var envName = Environment.GetEnvironmentVariable("SENDER_NAME");
+    if (!string.IsNullOrWhiteSpace(envName)) options.SenderName = envName;
+
+    var envPortal = Environment.GetEnvironmentVariable("PORTAL_URL");
+    if (!string.IsNullOrWhiteSpace(envPortal)) options.PortalUrl = envPortal;
+});
 
 var jwtSettings = builder.Configuration
     .GetSection(JwtSettings.SectionName)
     .Get<JwtSettings>() ?? new JwtSettings();
+
+var envJwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+if (!string.IsNullOrWhiteSpace(envJwtKey)) jwtSettings.SecretKey = envJwtKey;
 
 // ==========================================
 // 2. Dependency Injection Registrations
 // ==========================================
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // ==========================================
@@ -79,10 +139,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("BackofficeOnly", policy => policy.RequireRole("Backoffice"));
+    options.AddPolicy("BackofficeOnly", policy => policy.RequireRole("Backoffice", "Administrator"));
     options.AddPolicy("GridOperatorOnly", policy => policy.RequireRole("GridOperator"));
     options.AddPolicy("ProsumerOnly", policy => policy.RequireRole("Prosumer"));
-    options.AddPolicy("StaffOnly", policy => policy.RequireRole("Backoffice", "GridOperator"));
+    options.AddPolicy("StaffOnly", policy => policy.RequireRole("Backoffice", "Administrator", "GridOperator"));
 });
 
 // ==========================================

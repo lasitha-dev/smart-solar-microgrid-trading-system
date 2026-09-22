@@ -112,4 +112,149 @@ public class AuthController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, ApiResponseDto<UserResponseDto>.Ok(data, message));
     }
+
+    /// <summary>
+    /// Retrieves the profile details of the currently authenticated user.
+    /// </summary>
+    /// <returns>HTTP 200 with sanitized user profile.</returns>
+    [HttpGet("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponseDto<UserResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCurrentProfile()
+    {
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(ApiResponseDto<object>.Fail("Invalid session or missing user identifier in token."));
+        }
+
+        var (success, message, statusCode, data) = await _userService.GetUserProfileAsync(userId);
+        if (!success)
+        {
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        return Ok(ApiResponseDto<UserResponseDto>.Ok(data));
+    }
+
+    /// <summary>
+    /// Updates the editable profile fields (FullName, Phone) for the currently authenticated user.
+    /// </summary>
+    /// <param name="request">The profile update payload.</param>
+    /// <returns>HTTP 200 with updated user profile.</returns>
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponseDto<UserResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateCurrentProfile([FromBody] UserProfileUpdateDto request)
+    {
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(ApiResponseDto<object>.Fail("Invalid session or missing user identifier in token."));
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return BadRequest(ApiResponseDto<object>.Fail(errors));
+        }
+
+        var (success, message, statusCode, data) = await _userService.UpdateUserProfileAsync(userId, request);
+        if (!success)
+        {
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        return Ok(ApiResponseDto<UserResponseDto>.Ok(data, message));
+    }
+
+    /// <summary>
+    /// Changes the password of the currently authenticated user.
+    /// Validates current password and enforces new password complexity rules.
+    /// </summary>
+    /// <param name="request">The change password request payload.</param>
+    /// <returns>HTTP 200 on success; HTTP 400 on incorrect current password or validation failure.</returns>
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponseDto<UserResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+    {
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(ApiResponseDto<object>.Fail("Invalid session or missing user identifier in token."));
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return BadRequest(ApiResponseDto<object>.Fail(errors));
+        }
+
+        var (success, message, statusCode, data) = await _userService.ChangePasswordAsync(userId, request);
+        if (!success)
+        {
+            _logger.LogWarning("Change password failed for user '{UserId}': {Reason} (HTTP {StatusCode})",
+                userId, message, statusCode);
+
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        _logger.LogInformation("Password successfully changed for user '{UserId}' ({Username}).", userId, data?.Username);
+        return Ok(ApiResponseDto<UserResponseDto>.Ok(data, message));
+    }
+
+    /// <summary>
+    /// Permanently deletes the currently authenticated user's account upon verifying their registered email.
+    /// </summary>
+    /// <param name="request">The delete account confirmation payload containing the confirmation email.</param>
+    /// <returns>HTTP 200 on successful deletion; HTTP 400 on email mismatch or validation failure.</returns>
+    [HttpPost("delete-account")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountDto request)
+    {
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(ApiResponseDto<object>.Fail("Invalid session or missing user identifier in token."));
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return BadRequest(ApiResponseDto<object>.Fail(errors));
+        }
+
+        var (success, message, statusCode, _) = await _userService.DeleteAccountAsync(userId, request);
+        if (!success)
+        {
+            _logger.LogWarning("Account deletion failed for user '{UserId}': {Reason} (HTTP {StatusCode})",
+                userId, message, statusCode);
+
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        _logger.LogInformation("Account '{UserId}' successfully deleted by the user.", userId);
+        return Ok(ApiResponseDto<object>.Ok(null, message));
+    }
+
+    private string? GetCurrentUserId()
+    {
+        return User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? User.FindFirst("userId")?.Value
+            ?? User.FindFirst("id")?.Value
+            ?? User.FindFirst("nic")?.Value;
+    }
 }

@@ -44,6 +44,12 @@
             android:name=".ui.auth.PendingActivationActivity"
             android:exported="false" />
 
+        <!-- Prosumer Home Dashboard Activity -->
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Prosumer Profile Activity -->
         <activity
             android:name=".ui.profile.ProfileActivity"
