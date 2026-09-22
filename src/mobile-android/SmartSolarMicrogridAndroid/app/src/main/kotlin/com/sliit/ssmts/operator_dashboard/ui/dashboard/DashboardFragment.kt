@@ -79,8 +79,8 @@ class DashboardFragment : Fragment() {
 
     private fun setupInteractions() {
         binding.swipeRefreshLayout.setColorSchemeResources(
-            R.color.color_primary,
-            R.color.color_secondary
+            R.color.solar_amber_primary,
+            R.color.emerald_accent
         )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
