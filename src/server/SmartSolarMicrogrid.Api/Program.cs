@@ -31,4 +31,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Root discovery and health status endpoint
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "Smart Solar Microgrid Trading System - Central Web API",
+    status = "Online",
+    version = "1.0.0",
+    description = "C# Web API for Operator Verification, QR Validation, and Operational Dashboard",
+    endpoints = new[]
+    {
+        "/api/reservations/dashboard-metrics",
+        "/api/reservations",
+        "/api/reservations/verify-qr",
+        "/api/reservations/{id}/finalize"
+    }
+}));
+
 app.Run();
