@@ -10,8 +10,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.sliit.ssmts.operator_dashboard.R
-import com.sliit.ssmts.operator_dashboard.databinding.ItemBookingHistoryBinding
+import com.sliit.ssmts.R
+import com.sliit.ssmts.databinding.ItemBookingHistoryBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import java.text.SimpleDateFormat
 import java.util.Date

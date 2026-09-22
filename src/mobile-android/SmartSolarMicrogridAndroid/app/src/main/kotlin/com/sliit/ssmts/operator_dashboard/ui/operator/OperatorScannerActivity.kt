@@ -17,11 +17,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
 import com.sliit.ssmts.operator_dashboard.data.repository.OperatorVerificationRepositoryImpl
-import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorScannerBinding
+import com.sliit.ssmts.databinding.ActivityOperatorScannerBinding
 import com.sliit.ssmts.operator_dashboard.util.QrParseResult
 import com.sliit.ssmts.operator_dashboard.util.QrPayloadParser
 import kotlinx.coroutines.launch
@@ -38,7 +38,11 @@ class OperatorScannerActivity : AppCompatActivity() {
     val viewModel: OperatorScannerViewModel by viewModels {
         viewModelFactory ?: run {
             val database = SsmtsDatabase.getInstance(applicationContext)
-            val api = ApiClient.createOperatorDashboardApi("https://10.0.2.2:7143/")
+            val sessionManager = com.sliit.ssmts.util.SessionManager(applicationContext)
+            val api = ApiClient.createOperatorDashboardApi(
+                baseUrl = "https://10.0.2.2:7143/",
+                tokenProvider = { sessionManager.getAuthToken() }
+            )
             val repository = OperatorVerificationRepositoryImpl(
                 api = api,
                 reservationDao = database.reservationCacheDao(),

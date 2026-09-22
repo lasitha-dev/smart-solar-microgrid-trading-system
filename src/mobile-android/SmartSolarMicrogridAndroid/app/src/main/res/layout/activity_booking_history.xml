@@ -41,7 +41,7 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/operator_text_primary"
             android:textSize="@dimen/text_size_body" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_md"
                 android:text="@string/history_empty_title"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_title"
                 android:textStyle="bold" />
 
@@ -113,7 +113,7 @@
                 android:layout_marginTop="@dimen/spacing_xs"
                 android:gravity="center"
                 android:text="@string/history_empty_desc"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_body" />
         </LinearLayout>
 

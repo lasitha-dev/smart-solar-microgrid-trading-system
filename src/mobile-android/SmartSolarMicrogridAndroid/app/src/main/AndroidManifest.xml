@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-
-  Description: Central Android application manifest defining required permissions (Internet, Camera),
-               hardware feature specifications, and application configurations.
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Smart Solar Microgrid Trading System - Integrated Application Manifest
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -10,10 +10,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Camera hardware access for native QR scanning viewfinder -->
+    <!-- Camera hardware access for native QR scanning viewfinder (Member 4) -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- Camera hardware features are not strictly required so tablets without rear cameras can still run the app -->
+    <!-- Facility Location detection for Solar Prosumers (Member 1) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Camera hardware features optional so tablets/emulators without rear cameras can still run the app -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -23,33 +27,78 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@android:drawable/sym_def_app_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@android:drawable/sym_def_app_icon"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Ssmts.OperatorDashboard">
+        android:theme="@style/Theme.SmartSolarMicrogridAndroid"
+        android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- Main Operational Dashboard Launcher Activity (FR-M4-01) -->
+        <!-- ==========================================
+             Member 1: Authentication & User Lifecycle Activities
+             ========================================== -->
+        <!-- Login Activity (Primary Application Launcher) -->
         <activity
-            android:name=".ui.dashboard.OperatorDashboardActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Registration Activity -->
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Pending Activation Notice Activity -->
+        <activity
+            android:name=".ui.auth.PendingActivationActivity"
+            android:exported="false" />
+
+        <!-- Prosumer Home Dashboard Activity -->
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Prosumer Profile Activity -->
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Facility Location Picker Interactive Map Activity -->
+        <activity
+            android:name=".ui.location.LocationPickerActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- ==========================================
+             Member 4: Operator Verification & Operational Dashboard Activities
+             ========================================== -->
+        <!-- Main Operational Dashboard Activity (FR-M4-01) -->
+        <activity
+            android:name="com.sliit.ssmts.operator_dashboard.ui.dashboard.OperatorDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
+            android:label="@string/app_name_operator" />
+
         <!-- Booking History, Search & Filter Activity (FR-M4-03) -->
         <activity
-            android:name=".ui.history.BookingHistoryActivity"
+            android:name="com.sliit.ssmts.operator_dashboard.ui.history.BookingHistoryActivity"
             android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
             android:label="@string/title_booking_history" />
 
         <!-- Operator Scanner & Verification Activity (FR-M4-05.2) -->
         <activity
-            android:name=".ui.operator.OperatorScannerActivity"
+            android:name="com.sliit.ssmts.operator_dashboard.ui.operator.OperatorScannerActivity"
             android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
             android:label="@string/title_operator_scanner" />
 
     </application>

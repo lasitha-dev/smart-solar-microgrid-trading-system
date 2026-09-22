@@ -60,7 +60,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/spacing_xxs"
-                            android:textColor="@color/text_secondary"
+                            android:textColor="@color/operator_text_secondary"
                             android:textSize="@dimen/text_size_caption"
                             tools:text="Last synchronized: Just now" />
                     </LinearLayout>
@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/title_dashboard"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_display"
                 android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_xs"
                 android:text="@string/dashboard_subtitle"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_body" />
 
             <!-- Active Booking Spotlight Card (FR-M4-01.3) -->
@@ -198,7 +198,7 @@
                 android:layout_marginTop="@dimen/spacing_xl"
                 android:letterSpacing="0.08"
                 android:text="@string/title_operational_metrics"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold" />
 
@@ -236,7 +236,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/metric_pending_title"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/operator_text_primary"
                         android:textSize="@dimen/text_size_subhead"
                         android:textStyle="bold" />
 
@@ -246,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xxs"
                         android:text="@string/metric_pending_desc"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/operator_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -285,7 +285,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/metric_approved_future_title"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/operator_text_primary"
                         android:textSize="@dimen/text_size_subhead"
                         android:textStyle="bold" />
 
@@ -295,7 +295,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xxs"
                         android:text="@string/metric_approved_future_desc"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/operator_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -334,7 +334,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xs"
                         android:text="@string/metric_completed_today_title"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/operator_text_primary"
                         android:textSize="@dimen/text_size_subhead"
                         android:textStyle="bold" />
 
@@ -344,7 +344,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xxs"
                         android:text="@string/metric_completed_today_desc"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/operator_text_secondary"
                         android:textSize="@dimen/text_size_caption" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -357,7 +357,7 @@
                 android:layout_marginTop="@dimen/spacing_xl"
                 android:letterSpacing="0.08"
                 android:text="@string/title_operational_feeds"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 android:textStyle="bold" />
 
@@ -420,7 +420,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/feed_empty_active"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="@color/operator_text_secondary"
                     android:textSize="@dimen/text_size_body" />
             </LinearLayout>
 

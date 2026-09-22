@@ -13,7 +13,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 
 /**
  * Visual viewfinder overlay providing framing guides and dimmed backdrop around the QR target.

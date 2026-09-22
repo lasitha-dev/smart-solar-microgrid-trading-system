@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Unified Material 3 Application Themes
+-->
 <resources>
-    <!-- Base Material 3 Application Theme -->
+    <!-- ==========================================
+         Member 4: Operator Dashboard Theme (Day/Night Light Surface)
+         ========================================== -->
     <style name="Theme.Ssmts.OperatorDashboard" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary Brand Colors -->
         <item name="colorPrimary">@color/color_primary</item>
@@ -59,5 +66,61 @@
         <item name="android:minHeight">@dimen/button_height</item>
         <item name="strokeColor">@color/color_primary</item>
         <item name="android:textColor">@color/color_primary</item>
+    </style>
+
+    <!-- ==========================================
+         Member 1: Prosumer & Auth Theme (Dark-Mode Modern Solar)
+         ========================================== -->
+    <style name="Theme.SmartSolarMicrogridAndroid" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Brand Colors -->
+        <item name="colorPrimary">@color/solar_amber_primary</item>
+        <item name="colorPrimaryDark">@color/solar_amber_dark</item>
+        <item name="colorSecondary">@color/emerald_accent</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Background & Surface -->
+        <item name="android:windowBackground">@color/slate_bg_dark</item>
+        <item name="colorSurface">@color/slate_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorError">@color/error_red</item>
+
+        <!-- Status & Navigation Bar -->
+        <item name="android:statusBarColor">@color/slate_bg_dark</item>
+        <item name="android:navigationBarColor">@color/slate_bg_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Component Defaults -->
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+    </style>
+
+    <!-- Custom Text Input Layout Style -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/slate_input_bg</item>
+        <item name="boxStrokeColor">@color/slate_stroke</item>
+        <item name="boxCornerRadiusTopStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_md</item>
+        <item name="hintTextColor">@color/solar_amber_primary</item>
+        <item name="android:textColorHint">@color/text_muted</item>
+    </style>
+
+    <!-- Custom Solar Button Style -->
+    <style name="Widget.App.Button" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/solar_amber_primary</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+    </style>
+
+    <!-- Outlined Danger Button -->
+    <style name="Widget.App.Button.Danger" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/error_red</item>
+        <item name="android:textColor">@color/error_red</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:minHeight">@dimen/button_height</item>
     </style>
 </resources>

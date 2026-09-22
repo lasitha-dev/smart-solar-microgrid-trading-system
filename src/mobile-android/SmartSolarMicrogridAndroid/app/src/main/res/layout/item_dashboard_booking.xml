@@ -31,7 +31,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_subhead"
                 android:textStyle="bold"
                 tools:text="Colombo Central Microgrid Hub" />
@@ -55,7 +55,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 tools:text="NIC: 199823401234" />
 
@@ -88,7 +88,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_caption"
                 tools:text="Scheduled: 10:30 AM" />
 

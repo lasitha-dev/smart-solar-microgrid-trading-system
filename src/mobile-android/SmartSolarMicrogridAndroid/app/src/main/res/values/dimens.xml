@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Unified Dimension Tokens
+-->
 <resources>
     <!-- Spacing Scale -->
     <dimen name="spacing_xxs">2dp</dimen>
@@ -12,16 +17,22 @@
     <!-- Corner Radii -->
     <dimen name="radius_xs">4dp</dimen>
     <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
     <dimen name="radius_badge">8dp</dimen>
     <dimen name="radius_card">16dp</dimen>
     <dimen name="radius_spotlight">20dp</dimen>
     <dimen name="radius_pill">50dp</dimen>
 
-    <!-- Elevations -->
+    <!-- Elevations & Strokes -->
     <dimen name="elevation_none">0dp</dimen>
     <dimen name="elevation_card">2dp</dimen>
     <dimen name="elevation_spotlight">4dp</dimen>
     <dimen name="elevation_dialog">8dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="stroke_thin">1dp</dimen>
+    <dimen name="stroke_focus">2dp</dimen>
+    <dimen name="stroke_medium">2dp</dimen>
 
     <!-- Typography Sizing -->
     <dimen name="text_size_micro">10sp</dimen>
@@ -31,9 +42,18 @@
     <dimen name="text_size_title">20sp</dimen>
     <dimen name="text_size_display">24sp</dimen>
     <dimen name="text_size_counter">36sp</dimen>
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
+    <dimen name="text_base">16sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">22sp</dimen>
+    <dimen name="text_2xl">26sp</dimen>
 
     <!-- Component Sizing -->
     <dimen name="button_height">52dp</dimen>
+    <dimen name="input_min_height">52dp</dimen>
+    <dimen name="logo_size">72dp</dimen>
     <dimen name="search_bar_height">56dp</dimen>
     <dimen name="chip_height">36dp</dimen>
     <dimen name="status_badge_height">26dp</dimen>

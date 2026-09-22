@@ -7,10 +7,14 @@ package com.sliit.ssmts.operator_dashboard.ui.dashboard
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.sliit.ssmts.operator_dashboard.R
-import com.sliit.ssmts.operator_dashboard.databinding.ActivityOperatorDashboardBinding
+import com.sliit.ssmts.R
+import com.sliit.ssmts.databinding.ActivityOperatorDashboardBinding
 import com.sliit.ssmts.operator_dashboard.ui.history.BookingHistoryActivity
 import com.sliit.ssmts.operator_dashboard.ui.operator.OperatorScannerActivity
+
+import androidx.lifecycle.lifecycleScope
+import com.sliit.ssmts.util.SessionManager
+import kotlinx.coroutines.launch
 
 /**
  * Primary activity entry point for the Grid Operator component.
@@ -32,6 +36,20 @@ class OperatorDashboardActivity : AppCompatActivity() {
 
         setupToolbar()
         setupFab()
+        loadOperatorDetails()
+    }
+
+    /**
+     * Loads active operator credentials from local SQLite session storage.
+     */
+    private fun loadOperatorDetails() {
+        lifecycleScope.launch {
+            val session = SessionManager(this@OperatorDashboardActivity).getActiveSession()
+            if (session != null) {
+                val displayName = if (session.fullName.isNotBlank()) session.fullName else session.username
+                binding.toolbarDashboard.subtitle = "Operator: $displayName (${session.nic})"
+            }
+        }
     }
 
     /**
@@ -44,8 +62,26 @@ class OperatorDashboardActivity : AppCompatActivity() {
                     navigateToBookingHistory()
                     true
                 }
+                R.id.action_logout -> {
+                    logoutOperator()
+                    true
+                }
                 else -> false
             }
+        }
+    }
+
+    /**
+     * Clears local SQLite session credentials and routes back to LoginActivity.
+     */
+    private fun logoutOperator() {
+        lifecycleScope.launch {
+            SessionManager(this@OperatorDashboardActivity).clearSession()
+            val intent = Intent(this@OperatorDashboardActivity, com.sliit.ssmts.ui.auth.LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
         }
     }
 

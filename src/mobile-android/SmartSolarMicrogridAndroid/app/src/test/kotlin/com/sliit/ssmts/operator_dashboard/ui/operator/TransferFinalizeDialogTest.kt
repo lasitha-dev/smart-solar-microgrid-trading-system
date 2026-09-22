@@ -7,7 +7,7 @@ package com.sliit.ssmts.operator_dashboard.ui.operator
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull

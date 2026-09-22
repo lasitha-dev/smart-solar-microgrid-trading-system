@@ -13,17 +13,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
 import com.sliit.ssmts.operator_dashboard.data.repository.DashboardRepositoryImpl
-import com.sliit.ssmts.operator_dashboard.databinding.ActivityBookingHistoryBinding
+import com.sliit.ssmts.databinding.ActivityBookingHistoryBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
+import com.sliit.ssmts.util.SessionManager
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * Screen controller for the Grid Operator booking history and search subsystem.
+ * Activity presenting the full booking history feed with search, status filtering, and live sync.
  */
 class BookingHistoryActivity : AppCompatActivity() {
 
@@ -32,7 +34,11 @@ class BookingHistoryActivity : AppCompatActivity() {
 
     private val viewModel: BookingHistoryViewModel by viewModels {
         val database = SsmtsDatabase.getInstance(applicationContext)
-        val api = ApiClient.createOperatorDashboardApi("https://10.0.2.2:7143/")
+        val sessionManager = SessionManager(applicationContext)
+        val api = ApiClient.createOperatorDashboardApi(
+            baseUrl = "https://10.0.2.2:7143/",
+            tokenProvider = { sessionManager.getAuthToken() }
+        )
         val repository = DashboardRepositoryImpl(api, database.reservationCacheDao())
         BookingHistoryViewModel.Factory(repository)
     }

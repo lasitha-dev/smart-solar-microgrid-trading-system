@@ -1,4 +1,42 @@
+# ==========================================
+# Smart Solar Microgrid Trading System - .gitignore
+# ==========================================
+
+# Planning, Agent Rules & Personal Documentation
 .agents/
 DEVELOPMENT_ROADMAP_MEMBER_4.md
 MEMBER_4_SRS.md
 VIVA_DEMONSTRATION_GUIDE.md
+roadmap_member_1.md
+rules_member_1.md
+
+# Node.js / Web Frontend Dependencies & Build Outputs
+node_modules/
+*/node_modules/
+src/web/smart-solar-microgrid-web/node_modules/
+src/web/smart-solar-microgrid-web/dist/
+
+# .NET Build Outputs & Caches
+bin/
+obj/
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# Android / Gradle Build Outputs & Caches
+**/.gradle/
+.gradle/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.apk
+*.aab
+
+# IDE & Editor Files
+.idea/
+*.iml
+.vscode/

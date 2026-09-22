@@ -8,7 +8,7 @@ import android.content.Context
 import android.widget.EditText
 import android.widget.FrameLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.util.FastTestQrScenarios
 
 /**

@@ -4,7 +4,7 @@
  */
 package com.sliit.ssmts.operator_dashboard.ui.history
 
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
 import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus

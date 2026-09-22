@@ -48,7 +48,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/spacing_md"
         android:text="@string/receipt_title"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/operator_text_primary"
         android:textSize="@dimen/text_size_title"
         android:textStyle="bold" />
 
@@ -59,7 +59,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/spacing_xs"
         android:text="@string/receipt_subtitle"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/operator_text_secondary"
         android:textSize="@dimen/text_size_caption" />
 
     <!-- Receipt Details Card -->
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/receipt_delivered_label"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/operator_text_secondary"
             android:textSize="@dimen/text_size_caption" />
 
         <TextView
@@ -112,7 +112,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_body"
                 android:textStyle="bold"
                 tools:text="Ref: #664fa10b9c3e2e1a4f001201" />
@@ -130,7 +130,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_sm"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/operator_text_secondary"
             android:textSize="@dimen/text_size_caption"
             tools:text="Operator: OP-PERADENIYA-01" />
 
@@ -140,7 +140,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/operator_text_secondary"
             android:textSize="@dimen/text_size_caption"
             tools:text="Time: 2026-09-18T11:45:00Z" />
 

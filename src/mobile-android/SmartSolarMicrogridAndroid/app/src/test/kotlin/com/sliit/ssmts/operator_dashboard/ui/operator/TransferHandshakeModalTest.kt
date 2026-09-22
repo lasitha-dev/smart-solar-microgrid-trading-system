@@ -7,7 +7,7 @@ package com.sliit.ssmts.operator_dashboard.ui.operator
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 import org.junit.Assert.assertEquals

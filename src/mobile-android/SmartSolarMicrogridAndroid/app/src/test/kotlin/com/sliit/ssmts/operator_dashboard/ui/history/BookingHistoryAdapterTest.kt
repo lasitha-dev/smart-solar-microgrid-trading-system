@@ -32,7 +32,7 @@ class BookingHistoryAdapterTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext<Context>()
-        context.setTheme(com.sliit.ssmts.operator_dashboard.R.style.Theme_Ssmts_OperatorDashboard)
+        context.setTheme(com.sliit.ssmts.R.style.Theme_Ssmts_OperatorDashboard)
     }
 
     /**

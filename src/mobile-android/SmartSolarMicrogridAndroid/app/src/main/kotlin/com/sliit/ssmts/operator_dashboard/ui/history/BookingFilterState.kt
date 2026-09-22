@@ -3,7 +3,7 @@
  */
 package com.sliit.ssmts.operator_dashboard.ui.history
 
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 
 /**
  * Represents the 5 distinct filter states for energy trading reservations.

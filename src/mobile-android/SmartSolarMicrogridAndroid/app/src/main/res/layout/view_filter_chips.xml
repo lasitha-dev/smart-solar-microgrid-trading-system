@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/chip_height"
             android:text="@string/filter_chip_all"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/operator_text_primary"
             android:textSize="@dimen/text_size_caption" />
 
         <!-- 2. Pending Filter Chip -->

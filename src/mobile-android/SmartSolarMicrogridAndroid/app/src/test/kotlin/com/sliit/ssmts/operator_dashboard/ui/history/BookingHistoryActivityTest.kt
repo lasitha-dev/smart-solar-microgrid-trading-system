@@ -9,7 +9,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

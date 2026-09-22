@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sliit.ssmts.operator_dashboard.R
-import com.sliit.ssmts.operator_dashboard.databinding.DialogTransferFinalizeBinding
+import com.sliit.ssmts.R
+import com.sliit.ssmts.databinding.DialogTransferFinalizeBinding
 
 /**
  * Dialog prompting the Grid Operator to input and confirm actual delivered power readings.

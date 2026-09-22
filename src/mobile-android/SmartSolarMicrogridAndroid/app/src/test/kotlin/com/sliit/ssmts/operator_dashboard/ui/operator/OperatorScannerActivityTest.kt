@@ -9,7 +9,7 @@ import android.view.View
 import androidx.camera.view.PreviewView
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.button.MaterialButton
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.domain.model.FinalizeTransferResult
 import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 import org.junit.Assert.assertEquals

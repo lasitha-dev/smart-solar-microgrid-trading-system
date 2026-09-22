@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 
 /**

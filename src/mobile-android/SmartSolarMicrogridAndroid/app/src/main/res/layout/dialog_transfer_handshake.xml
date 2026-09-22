@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/handshake_title"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_title"
                 android:textStyle="bold" />
 
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/handshake_subtitle"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_caption" />
         </LinearLayout>
     </LinearLayout>
@@ -83,7 +83,7 @@
                 android:id="@+id/tvHandshakeReservationId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_body"
                 tools:text="Reservation ID: 664fa10b9c3e2e1a4f001201" />
 
@@ -98,7 +98,7 @@
                 android:id="@+id/tvHandshakeProsumer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/operator_text_primary"
                 android:textSize="@dimen/text_size_subhead"
                 android:textStyle="bold"
                 tools:text="Prosumer NIC: 200012345678" />
@@ -114,7 +114,7 @@
                 android:id="@+id/tvHandshakeStation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/operator_text_secondary"
                 android:textSize="@dimen/text_size_body"
                 tools:text="Station: Peradeniya Agro-Voltaic Hub" />
 
@@ -152,6 +152,6 @@
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="@dimen/spacing_xs"
         android:text="@string/btn_cancel"
-        android:textColor="@color/text_secondary" />
+        android:textColor="@color/operator_text_secondary" />
 
 </LinearLayout>

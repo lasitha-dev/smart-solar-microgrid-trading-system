@@ -15,15 +15,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.sliit.ssmts.operator_dashboard.R
+import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
 import com.sliit.ssmts.operator_dashboard.data.repository.DashboardRepositoryImpl
-import com.sliit.ssmts.operator_dashboard.databinding.FragmentDashboardBinding
+import com.sliit.ssmts.databinding.FragmentDashboardBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.ActiveSpotlightReservation
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
 import com.sliit.ssmts.operator_dashboard.util.TimeFormatter
+import com.sliit.ssmts.util.SessionManager
 import kotlinx.coroutines.launch
 
 /**
@@ -38,7 +39,11 @@ class DashboardFragment : Fragment() {
 
     private val viewModel: DashboardViewModel by viewModels {
         val database = SsmtsDatabase.getInstance(requireContext().applicationContext)
-        val api = ApiClient.createOperatorDashboardApi("https://10.0.2.2:7143/")
+        val sessionManager = SessionManager(requireContext().applicationContext)
+        val api = ApiClient.createOperatorDashboardApi(
+            baseUrl = "https://10.0.2.2:7143/",
+            tokenProvider = { sessionManager.getAuthToken() }
+        )
         val repository = DashboardRepositoryImpl(api, database.reservationCacheDao())
         DashboardViewModel.Factory(repository)
     }

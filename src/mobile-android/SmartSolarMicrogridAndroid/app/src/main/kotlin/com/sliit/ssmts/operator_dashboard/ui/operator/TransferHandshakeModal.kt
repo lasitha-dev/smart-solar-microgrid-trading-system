@@ -10,8 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sliit.ssmts.operator_dashboard.R
-import com.sliit.ssmts.operator_dashboard.databinding.DialogTransferHandshakeBinding
+import com.sliit.ssmts.R
+import com.sliit.ssmts.databinding.DialogTransferHandshakeBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.QrVerificationResult
 
 /**

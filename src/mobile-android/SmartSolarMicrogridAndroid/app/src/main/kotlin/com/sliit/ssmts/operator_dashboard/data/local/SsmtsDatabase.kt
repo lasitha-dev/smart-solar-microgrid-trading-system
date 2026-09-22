@@ -1,6 +1,6 @@
 /**
  * Description: Room Database configuration for ssmts_local.db managing local SQLite tables
- * tbl_reservations_cache and tbl_operator_audit_cache for Member 4.
+ * tbl_user_sessions, tbl_reservations_cache, and tbl_operator_audit_cache.
  */
 package com.sliit.ssmts.operator_dashboard.data.local
 
@@ -8,33 +8,43 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.sliit.ssmts.data.local.dao.SessionDao
+import com.sliit.ssmts.data.local.entity.SessionEntity
 import com.sliit.ssmts.operator_dashboard.data.local.dao.OperatorAuditDao
 import com.sliit.ssmts.operator_dashboard.data.local.dao.ReservationCacheDao
 import com.sliit.ssmts.operator_dashboard.data.local.entity.OperatorAuditEntity
 import com.sliit.ssmts.operator_dashboard.data.local.entity.ReservationCacheEntity
 
 /**
- * Main Room database provider managing local SQLite persistence for Member 4.
+ * Main Room database provider managing local SQLite persistence for Member 4 & Member 1.
  */
 @Database(
     entities = [
+        SessionEntity::class,
         ReservationCacheEntity::class,
         OperatorAuditEntity::class
     ],
-    version = 1,
+    version = 4,
     exportSchema = false
 )
 abstract class SsmtsDatabase : RoomDatabase() {
 
     /**
-     * Provides access to reservation cache database operations.
+     * Provides access to active user session operations (Member 1).
+     *
+     * @return SessionDao instance.
+     */
+    abstract fun sessionDao(): SessionDao
+
+    /**
+     * Provides access to reservation cache database operations (Member 4).
      *
      * @return ReservationCacheDao instance.
      */
     abstract fun reservationCacheDao(): ReservationCacheDao
 
     /**
-     * Provides access to operator audit database operations.
+     * Provides access to operator audit database operations (Member 4).
      *
      * @return OperatorAuditDao instance.
      */
