@@ -380,6 +380,11 @@
             Provides access to the MongoDB database and collections required by the Smart Solar Microgrid Trading System.
             </summary>
         </member>
+        <member name="M:SmartSolarMicrogrid.Api.Data.MongoDbContext.#ctor">
+            <summary>
+            Parameterless constructor for unit testing and mocking.
+            </summary>
+        </member>
         <member name="M:SmartSolarMicrogrid.Api.Data.MongoDbContext.#ctor(Microsoft.Extensions.Options.IOptions{SmartSolarMicrogrid.Api.Configuration.MongoDbSettings})">
             <summary>
             Initializes a new instance of the <see cref="T:SmartSolarMicrogrid.Api.Data.MongoDbContext"/> class using injected MongoDB settings.

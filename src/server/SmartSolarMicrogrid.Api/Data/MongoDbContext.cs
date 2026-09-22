@@ -22,6 +22,15 @@ public class MongoDbContext
     private readonly MongoDbSettings _settings;
 
     /// <summary>
+    /// Parameterless constructor for unit testing and mocking.
+    /// </summary>
+    protected MongoDbContext()
+    {
+        _database = null!;
+        _settings = new MongoDbSettings();
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="MongoDbContext"/> class using injected MongoDB settings.
     /// </summary>
     /// <param name="options">The strongly-typed MongoDB configuration settings.</param>
@@ -45,12 +54,12 @@ public class MongoDbContext
     /// <summary>
     /// Gets the underlying MongoDB database instance.
     /// </summary>
-    public IMongoDatabase Database => _database;
+    public virtual IMongoDatabase Database => _database;
 
     /// <summary>
     /// Gets the collection accessor for user entities mapped to "User's Detail".
     /// </summary>
-    public IMongoCollection<User> Users =>
+    public virtual IMongoCollection<User> Users =>
         _database.GetCollection<User>(_settings.UsersCollectionName);
 
     /// <summary>

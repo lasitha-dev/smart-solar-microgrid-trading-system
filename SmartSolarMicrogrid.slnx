@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/server/">
+    <Project Path="src/server/SmartSolarMicrogrid.Api/SmartSolarMicrogrid.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/server/">
+    <Project Path="tests/server/SmartSolarMicrogrid.Api.Tests.csproj" />
+  </Folder>
+</Solution>
