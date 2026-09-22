@@ -10,6 +10,15 @@ VIVA_DEMONSTRATION_GUIDE.md
 roadmap_member_1.md
 rules_member_1.md
 
+# Environment & Secret Configuration Files (NEVER COMMIT REAL SECRETS)
+.env
+*.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
 # Node.js / Web Frontend Dependencies & Build Outputs
 node_modules/
 */node_modules/

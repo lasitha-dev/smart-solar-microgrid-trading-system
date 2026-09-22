@@ -82,9 +82,21 @@ builder.Services.PostConfigure<EmailSettings>(options =>
     if (!string.IsNullOrWhiteSpace(envPortal)) options.PortalUrl = envPortal;
 });
 
-// Configure QR Security options from appsettings (Member 4)
+// Configure QR Security options from appsettings and environment (Member 4)
 builder.Services.Configure<QrSecurityOptions>(
     builder.Configuration.GetSection(QrSecurityOptions.SectionName));
+builder.Services.PostConfigure<QrSecurityOptions>(options =>
+{
+    var envHmac = Environment.GetEnvironmentVariable("QR_HMAC_SECRET");
+    if (!string.IsNullOrWhiteSpace(envHmac)) options.HmacSecret = envHmac;
+
+    var envPrefix = Environment.GetEnvironmentVariable("QR_PAYLOAD_PREFIX");
+    if (!string.IsNullOrWhiteSpace(envPrefix)) options.PayloadPrefix = envPrefix;
+
+    var envTolerance = Environment.GetEnvironmentVariable("QR_TOLERANCE_MINUTES");
+    if (!string.IsNullOrWhiteSpace(envTolerance) && int.TryParse(envTolerance, out var tol))
+        options.ToleranceMinutes = tol;
+});
 
 var jwtSettings = builder.Configuration
     .GetSection(JwtSettings.SectionName)
