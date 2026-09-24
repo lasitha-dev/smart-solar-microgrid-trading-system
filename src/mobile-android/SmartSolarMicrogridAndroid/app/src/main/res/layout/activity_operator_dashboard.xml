@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/slate_bg_dark">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/slate_surface"
+        app:elevation="@dimen/elevation_card">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/app_name"
+            app:titleTextColor="@color/text_primary"
+            app:subtitleTextColor="@color/solar_amber_light"
+            app:navigationIcon="@drawable/ic_sun"
+            app:navigationIconTint="@color/solar_amber_primary"
+            app:menu="@menu/menu_dashboard" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerDashboard"
+        android:name="com.sliit.ssmts.operator_dashboard.ui.dashboard.DashboardFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabScanQr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/spacing_lg"
+        android:text="@string/nav_scanner"
+        android:textColor="@color/text_on_primary"
+        android:textStyle="bold"
+        app:backgroundTint="@color/solar_amber_primary"
+        app:cornerRadius="@dimen/radius_md"
+        app:icon="@drawable/ic_qr_scan_white_24dp"
+        app:iconTint="@color/text_on_primary" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

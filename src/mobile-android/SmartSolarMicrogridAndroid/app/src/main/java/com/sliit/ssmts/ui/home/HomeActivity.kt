@@ -58,6 +58,12 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
+
+        // Navigate to Member 4 Operator Dashboard Console
+        binding.cardNavigateOperatorConsole.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.operator_dashboard.ui.dashboard.OperatorDashboardActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun observeViewModel() {
@@ -90,6 +96,12 @@ class HomeActivity : AppCompatActivity() {
         binding.tvHomeStatusBadge.text = session.status.uppercase()
 
         // Dynamic Role Badge
+        val isOperatorOrAdmin = session.role.equals("GridOperator", ignoreCase = true) ||
+                session.role.equals("Administrator", ignoreCase = true) ||
+                session.role.equals("Backoffice", ignoreCase = true)
+
+        binding.cardNavigateOperatorConsole.visibility = if (isOperatorOrAdmin) android.view.View.VISIBLE else android.view.View.GONE
+
         binding.tvHomeRoleBadge.text = when (session.role) {
             "GridOperator" -> "GRID OPERATOR NODE"
             "Backoffice" -> "BACKOFFICE OFFICER"

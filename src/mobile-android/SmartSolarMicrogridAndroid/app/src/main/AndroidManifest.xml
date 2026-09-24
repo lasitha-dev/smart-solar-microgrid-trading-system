@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Student Name: SILVA M N U
-  Student ID: IT22169112
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
   Module: SE4040 Enterprise Application Development (2026)
-  Component: Identity, Authentication & Account Lifecycle (Member 1)
-  Description: Android application manifest defining permissions, components, and cleartext network security.
+  Component: Smart Solar Microgrid Trading System - Integrated Application Manifest
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Network access for central C# Web API communication -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Camera hardware access for native QR scanning viewfinder (Member 4) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Facility Location detection for Solar Prosumers (Member 1) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Camera hardware features optional so tablets/emulators without rear cameras can still run the app -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +34,10 @@
         android:theme="@style/Theme.SmartSolarMicrogridAndroid"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- Login Activity (Launcher) -->
+        <!-- ==========================================
+             Member 1: Authentication & User Lifecycle Activities
+             ========================================== -->
+        <!-- Login Activity (Primary Application Launcher) -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
@@ -61,6 +76,30 @@
             android:name=".ui.location.LocationPickerActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- ==========================================
+             Member 4: Operator Verification & Operational Dashboard Activities
+             ========================================== -->
+        <!-- Main Operational Dashboard Activity (FR-M4-01) -->
+        <activity
+            android:name="com.sliit.ssmts.operator_dashboard.ui.dashboard.OperatorDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
+            android:label="@string/app_name_operator" />
+
+        <!-- Booking History, Search & Filter Activity (FR-M4-03) -->
+        <activity
+            android:name="com.sliit.ssmts.operator_dashboard.ui.history.BookingHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
+            android:label="@string/title_booking_history" />
+
+        <!-- Operator Scanner & Verification Activity (FR-M4-05.2) -->
+        <activity
+            android:name="com.sliit.ssmts.operator_dashboard.ui.operator.OperatorScannerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ssmts.OperatorDashboard"
+            android:label="@string/title_operator_scanner" />
 
     </application>
 

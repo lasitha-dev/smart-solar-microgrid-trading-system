@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- 1. Native CameraX Viewfinder Surface -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewViewFinder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 2. Viewfinder Framing Overlay (FR-M4-05.2) -->
+    <com.sliit.ssmts.operator_dashboard.ui.operator.ViewfinderOverlayView
+        android:id="@+id/viewfinderOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 3. Top Header Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/layoutScannerHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/slate_surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_sm">
+
+        <ImageButton
+            android:id="@+id/btnScannerBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_close_scanner"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/solar_amber_primary" />
+
+        <TextView
+            android:id="@+id/tvScannerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:text="@string/title_operator_scanner"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_title"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 4. Viewfinder Alignment Instruction Text -->
+    <TextView
+        android:id="@+id/tvScannerInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="140dp"
+        android:background="@drawable/bg_status_approved"
+        android:backgroundTint="@color/slate_surface"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_xs"
+        android:text="@string/scanner_instruction"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_size_caption" />
+
+    <!-- 5. Bottom Controls Container: Torch Toggle & Fast Test QR Trigger -->
+    <LinearLayout
+        android:id="@+id/layoutScannerControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingBottom="@dimen/spacing_xl">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnTorchToggle"
+            android:layout_width="@dimen/scanner_torch_btn_size"
+            android:layout_height="@dimen/scanner_torch_btn_size"
+            android:contentDescription="@string/scanner_torch_toggle"
+            android:src="@android:drawable/ic_menu_compass"
+            app:backgroundTint="@color/slate_surface"
+            app:elevation="4dp"
+            app:tint="@color/solar_amber_primary" />
+
+        <Space
+            android:layout_width="@dimen/spacing_lg"
+            android:layout_height="wrap_content" />
+
+        <!-- Viva Simulation Fast Test QR Trigger (Rule 6.3) -->
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/btnFastTestQr"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/scanner_fast_test_button"
+            android:textColor="@color/text_on_primary"
+            android:textStyle="bold"
+            app:backgroundTint="@color/solar_amber_primary"
+            app:elevation="4dp"
+            app:icon="@android:drawable/ic_menu_agenda"
+            app:iconTint="@color/text_on_primary" />
+    </LinearLayout>
+
+    <!-- 6. Non-Crashing Permission Denial Banner (Section 4 Mandate) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPermissionDenied"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="@dimen/spacing_lg"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/slate_surface"
+        app:cardCornerRadius="@dimen/radius_lg"
+        app:cardElevation="8dp"
+        app:strokeColor="@color/status_cancelled_stroke"
+        app:strokeWidth="1dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:id="@+id/tvPermissionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/permission_camera_title"
+                android:textColor="@color/status_cancelled_text"
+                android:textSize="@dimen/text_size_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPermissionRationale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="@string/permission_camera_rationale"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGrantPermission"
+                style="@style/Widget.App.Button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:text="@string/btn_grant_permission"
+                android:textColor="@color/text_on_primary"
+                app:backgroundTint="@color/solar_amber_primary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermissionUseFastTest"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="@string/btn_use_fast_test"
+                android:textColor="@color/solar_amber_primary"
+                app:strokeColor="@color/solar_amber_primary" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 7. In-Flight Verification Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/layoutVerificationLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scanner_scrim_overlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/solar_amber_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:text="@string/verifying_qr_token"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_subhead" />
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

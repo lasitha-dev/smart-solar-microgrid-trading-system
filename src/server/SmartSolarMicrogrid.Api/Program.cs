@@ -1,9 +1,8 @@
 /*
- * Student Name: SILVA M N U
- * Student ID: IT22169112
+ * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
  * Module: SE4040 Enterprise Application Development (2026)
- * Component: Identity, Authentication & Account Lifecycle (Member 1)
- * Description: Main application entry point configuring dependency injection, JWT authentication, and HTTP request pipeline.
+ * Component: Smart Solar Microgrid Trading System - Unified Central C# Web API
+ * Description: Main application entry point configuring DI, JWT auth, MongoDB, Swagger, and route pipeline.
  */
 
 using System.Text;
@@ -13,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmartSolarMicrogrid.Api.Configuration;
 using SmartSolarMicrogrid.Api.Data;
+using SmartSolarMicrogrid.Api.Repositories;
 using SmartSolarMicrogrid.Api.Services;
 
 // ==========================================
@@ -82,6 +82,22 @@ builder.Services.PostConfigure<EmailSettings>(options =>
     if (!string.IsNullOrWhiteSpace(envPortal)) options.PortalUrl = envPortal;
 });
 
+// Configure QR Security options from appsettings and environment (Member 4)
+builder.Services.Configure<QrSecurityOptions>(
+    builder.Configuration.GetSection(QrSecurityOptions.SectionName));
+builder.Services.PostConfigure<QrSecurityOptions>(options =>
+{
+    var envHmac = Environment.GetEnvironmentVariable("QR_HMAC_SECRET");
+    if (!string.IsNullOrWhiteSpace(envHmac)) options.HmacSecret = envHmac;
+
+    var envPrefix = Environment.GetEnvironmentVariable("QR_PAYLOAD_PREFIX");
+    if (!string.IsNullOrWhiteSpace(envPrefix)) options.PayloadPrefix = envPrefix;
+
+    var envTolerance = Environment.GetEnvironmentVariable("QR_TOLERANCE_MINUTES");
+    if (!string.IsNullOrWhiteSpace(envTolerance) && int.TryParse(envTolerance, out var tol))
+        options.ToleranceMinutes = tol;
+});
+
 var jwtSettings = builder.Configuration
     .GetSection(JwtSettings.SectionName)
     .Get<JwtSettings>() ?? new JwtSettings();
@@ -93,9 +109,18 @@ if (!string.IsNullOrWhiteSpace(envJwtKey)) jwtSettings.SecretKey = envJwtKey;
 // 2. Dependency Injection Registrations
 // ==========================================
 builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddSingleton<IMongoDbContext>(sp => sp.GetRequiredService<MongoDbContext>());
+
+// Member 1 Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+// Member 4 Services
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddSingleton<IQrSignatureService, QrSignatureService>();
+builder.Services.AddScoped<IOperatorVerificationService, OperatorVerificationService>();
+builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
 
 // ==========================================
 // 3. Controllers & JSON Formatting
@@ -166,17 +191,16 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Smart Solar Microgrid API",
+        Title = "Smart Solar Microgrid Central Web API",
         Version = "v1",
-        Description = "Enterprise RESTful Web API for Smart Solar Microgrid Trading System - Member 1 (Auth & User Management)",
+        Description = "Enterprise RESTful Web API for Smart Solar Microgrid Trading System (SE4040 - 2026)",
         Contact = new OpenApiContact
         {
-            Name = "SILVA M N U (IT22169112)",
-            Email = "IT22169112@my.sliit.lk"
+            Name = "Smart Solar Microgrid Enterprise Team",
+            Email = "support@smartgrid.lk"
         }
     });
 
-    // Configure JWT Bearer authorization in Swagger UI
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -217,14 +241,38 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Solar Microgrid API v1");
-    c.RoutePrefix = string.Empty; // Serve Swagger at application root
+    c.RoutePrefix = "swagger";
 });
 
 app.UseCors("AllowAllOrigins");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Central Service Discovery & Health Status Endpoint
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "Smart Solar Microgrid Trading System - Central Web API",
+    status = "Online",
+    version = "1.0.0",
+    modules = new[]
+    {
+        "Member 1: Identity, Authentication & User Lifecycle",
+        "Member 4: Operator Verification & Operational Dashboard"
+    },
+    swagger = "/swagger",
+    endpoints = new[]
+    {
+        "/api/auth/login",
+        "/api/auth/register-prosumer",
+        "/api/users",
+        "/api/prosumers/pending",
+        "/api/reservations/dashboard-metrics",
+        "/api/reservations",
+        "/api/reservations/verify-qr",
+        "/api/reservations/{id}/finalize"
+    }
+}));
 
 app.Run();

@@ -1,9 +1,9 @@
 /*
- * Student Name: SILVA M N U
- * Student ID: IT22169112
+ * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
  * Module: SE4040 Enterprise Application Development (2026)
- * Component: Identity, Authentication & Account Lifecycle (Member 1)
- * Description: App module Gradle build configuration defining dependencies, SDK levels, and build features.
+ * Component: Smart Solar Microgrid Trading System - Integrated Android App
+ * Description: Unified Gradle build configuration supporting Auth & Account Lifecycle (Member 1)
+ *              and Operator Verification & Operational Dashboard (Member 4).
  */
 
 plugins {
@@ -51,17 +51,29 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
-    // AndroidX & UI
+    // AndroidX Core & UI
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.activity.ktx)
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-    // Lifecycle (ViewModel & LiveData)
+    // Jetpack Navigation Component
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    // Lifecycle (ViewModel, LiveData, Runtime)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -72,19 +84,35 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
-    // Coroutines
+    // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Room SQLite Persistence
+    // CameraX (Viewfinder for Operator QR Scanning)
+    val cameraxVersion = "1.3.4"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+
+    // ZXing Barcode & QR Code Processing
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.zxing:core:3.5.3")
+
+    // Local SQLite Persistence (Room)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Testing
+    // Testing Suite
     testImplementation(libs.junit)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("io.mockk:mockk:1.13.11")
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

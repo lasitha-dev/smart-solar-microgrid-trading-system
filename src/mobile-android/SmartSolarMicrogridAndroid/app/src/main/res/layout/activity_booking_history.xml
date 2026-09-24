@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/slate_bg_dark"
+    android:orientation="vertical">
+
+    <!-- Top Material Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/slate_surface"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIconTint="@color/solar_amber_primary"
+        app:title="@string/title_booking_history"
+        app:titleTextColor="@color/text_primary" />
+
+    <!-- Search Input Box (FR-M4-03.2) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutSearchInput"
+        style="@style/Widget.App.TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_md"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:hint="@string/search_reservations_hint"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_md"
+        app:boxCornerRadiusBottomStart="@dimen/radius_md"
+        app:boxCornerRadiusTopEnd="@dimen/radius_md"
+        app:boxCornerRadiusTopStart="@dimen/radius_md"
+        app:boxBackgroundColor="@color/slate_input_bg"
+        app:boxStrokeColor="@color/slate_stroke"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/text_secondary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSearchQuery"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/search_bar_height"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_muted"
+            android:textSize="@dimen/text_size_body" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 5-State Filter Chips (FR-M4-03.3) -->
+    <include
+        android:id="@+id/layoutFilterChips"
+        layout="@layout/view_filter_chips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_xs" />
+
+    <!-- Content Area: RecyclerView with SwipeRefresh and Empty State -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBookingHistory"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:paddingVertical="@dimen/spacing_sm"
+                tools:listitem="@layout/item_booking_history" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- Empty State View (FR-M4-03.6) -->
+        <LinearLayout
+            android:id="@+id/layoutHistoryEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_xl"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/tvEmptyGraphic"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/bg_status_pending"
+                android:gravity="center"
+                android:text="@string/empty_graphic_symbol"
+                android:textColor="@color/status_pending_text"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:text="@string/history_empty_title"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:gravity="center"
+                android:text="@string/history_empty_desc"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+        </LinearLayout>
+
+        <!-- Loading Spinner -->
+        <ProgressBar
+            android:id="@+id/progressBarHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/solar_amber_primary"
+            android:visibility="gone" />
+
+        <!-- Error State View -->
+        <LinearLayout
+            android:id="@+id/layoutHistoryError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvHistoryErrorMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/status_cancelled_text"
+                android:textSize="@dimen/text_size_body"
+                tools:text="Failed to load reservation records" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHistoryRetry"
+                style="@style/Widget.App.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="@string/action_retry_sync"
+                android:textColor="@color/text_on_primary"
+                app:backgroundTint="@color/solar_amber_primary" />
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

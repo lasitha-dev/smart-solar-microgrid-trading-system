@@ -1,14 +1,51 @@
-
 # ==========================================
 # Smart Solar Microgrid Trading System - .gitignore
-# Student Name: SILVA M N U (IT22169112)
 # ==========================================
 
-# Node.js / Web Frontend Dependencies
+# Planning, Agent Rules & Personal Documentation
+.agents/
+DEVELOPMENT_ROADMAP_MEMBER_4.md
+MEMBER_4_SRS.md
+VIVA_DEMONSTRATION_GUIDE.md
+roadmap_member_1.md
+rules_member_1.md
+
+# Environment & Secret Configuration Files (NEVER COMMIT REAL SECRETS)
+.env
+*.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Node.js / Web Frontend Dependencies & Build Outputs
 node_modules/
 */node_modules/
 src/web/smart-solar-microgrid-web/node_modules/
+src/web/smart-solar-microgrid-web/dist/
 
-# Member 1 Personal Planning & Rule Files
-roadmap_member_1.md
-rules_member_1.md
+# .NET Build Outputs & Caches
+bin/
+obj/
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# Android / Gradle Build Outputs & Caches
+**/.gradle/
+.gradle/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.apk
+*.aab
+
+# IDE & Editor Files
+.idea/
+*.iml
+.vscode/

@@ -43,7 +43,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Auto-login if valid active session exists in SQLite
         viewModel.checkExistingSession {
-            navigateToHome()
+            routeAfterLogin()
         }
     }
 
@@ -101,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
                                 state.message ?: getString(R.string.login_title),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            navigateToHome()
+                            routeAfterLogin()
                         }
                         is AuthUiState.PendingActivation -> {
                             setLoading(false)
@@ -136,6 +136,24 @@ class LoginActivity : AppCompatActivity() {
     private fun showErrorBanner(message: String) {
         binding.tvErrorMessage.text = message
         binding.tvErrorMessage.visibility = View.VISIBLE
+    }
+
+    private fun routeAfterLogin() {
+        lifecycleScope.launch {
+            val session = com.sliit.ssmts.util.SessionManager(this@LoginActivity).getActiveSession()
+            if (session?.role.equals("GridOperator", ignoreCase = true)) {
+                navigateToOperatorDashboard()
+            } else {
+                navigateToHome()
+            }
+        }
+    }
+
+    private fun navigateToOperatorDashboard() {
+        val intent = Intent(this, com.sliit.ssmts.operator_dashboard.ui.dashboard.OperatorDashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     private fun navigateToHome() {

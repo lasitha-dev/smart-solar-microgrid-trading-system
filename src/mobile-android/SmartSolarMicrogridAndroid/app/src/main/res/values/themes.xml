@@ -1,12 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Student Name: SILVA M N U
-  Student ID: IT22169112
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
   Module: SE4040 Enterprise Application Development (2026)
-  Component: Identity, Authentication & Account Lifecycle (Member 1)
-  Description: Material 3 dark-mode application theme for Smart Solar Microgrid Android app.
+  Component: Unified Material 3 Application Themes
 -->
 <resources>
+    <!-- ==========================================
+         Member 4: Operator Dashboard Theme (Unified Dark Modern Solar)
+         ========================================== -->
+    <style name="Theme.Ssmts.OperatorDashboard" parent="Theme.SmartSolarMicrogridAndroid">
+        <!-- Primary Brand Colors -->
+        <item name="colorPrimary">@color/solar_amber_primary</item>
+        <item name="colorPrimaryVariant">@color/solar_amber_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="colorPrimaryContainer">@color/solar_amber_alpha15</item>
+        <item name="colorOnPrimaryContainer">@color/solar_amber_light</item>
+
+        <!-- Secondary & Tertiary Colors -->
+        <item name="colorSecondary">@color/emerald_accent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/emerald_alpha15</item>
+        <item name="colorOnSecondaryContainer">@color/emerald_light</item>
+        <item name="colorTertiary">@color/color_tertiary</item>
+        <item name="colorOnTertiary">@color/white</item>
+
+        <!-- System Windows & Surfaces -->
+        <item name="android:statusBarColor">@color/slate_bg_dark</item>
+        <item name="android:navigationBarColor">@color/slate_bg_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/slate_bg_dark</item>
+        <item name="colorSurface">@color/slate_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/slate_surface_light</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+
+        <!-- Component Defaults -->
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+    </style>
+
+    <!-- Operational Dashboard Metric Card Style -->
+    <style name="Widget.Ssmts.Card.Metric" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_lg</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">@color/slate_surface</item>
+        <item name="strokeColor">@color/slate_stroke</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+    </style>
+
+    <!-- Active Booking Spotlight Card Style -->
+    <style name="Widget.Ssmts.Card.Spotlight" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_lg</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">@color/slate_surface</item>
+        <item name="strokeColor">@color/slate_surface_light</item>
+        <item name="strokeWidth">@dimen/stroke_thin</item>
+    </style>
+
+    <!-- Filter Chips Style (FR-M4-03.3) -->
+    <style name="Widget.Ssmts.FilterChip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipCornerRadius">@dimen/radius_pill</item>
+        <item name="chipMinHeight">@dimen/chip_height</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+        <item name="chipBackgroundColor">@color/selector_chip_background</item>
+        <item name="chipStrokeColor">@color/selector_chip_stroke</item>
+        <item name="chipStrokeWidth">@dimen/stroke_thin</item>
+        <item name="android:textColor">@color/selector_chip_text</item>
+    </style>
+
+    <!-- Primary Action Button Style -->
+    <style name="Widget.Ssmts.Button.Primary" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="backgroundTint">@color/solar_amber_primary</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Outlined Secondary Button Style -->
+    <style name="Widget.Ssmts.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="strokeColor">@color/solar_amber_primary</item>
+        <item name="android:textColor">@color/solar_amber_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ==========================================
+         Member 1: Prosumer & Auth Theme (Dark-Mode Modern Solar)
+         ========================================== -->
     <style name="Theme.SmartSolarMicrogridAndroid" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Brand Colors -->
         <item name="colorPrimary">@color/solar_amber_primary</item>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Description: Transfer Handshake Modal layout displaying verified prosumer credentials,
+  station assignment, and allocated bay before physical energy transfer (FR-M4-06.4).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutTransferHandshake"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/slate_surface"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <!-- Header Drag Handle (for BottomSheet presentation) -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_md"
+        android:background="@color/slate_stroke" />
+
+    <!-- Verified Badge Icon & Title -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/handshake_title"
+            android:src="@android:drawable/checkbox_on_background"
+            app:tint="@color/emerald_accent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHandshakeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/handshake_title"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_title"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHandshakeSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/handshake_subtitle"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_caption" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Reservation Metadata Details Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        app:cardBackgroundColor="@color/slate_input_bg"
+        app:cardCornerRadius="@dimen/radius_lg"
+        app:cardElevation="2dp"
+        app:strokeColor="@color/slate_stroke"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md">
+
+            <!-- Reservation ID -->
+            <TextView
+                android:id="@+id/tvHandshakeReservationId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_body"
+                tools:text="Reservation ID: 664fa10b9c3e2e1a4f001201" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/spacing_xs"
+                android:background="@color/slate_stroke" />
+
+            <!-- Prosumer NIC -->
+            <TextView
+                android:id="@+id/tvHandshakeProsumer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_subhead"
+                android:textStyle="bold"
+                tools:text="Prosumer NIC: 200012345678" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/spacing_xs"
+                android:background="@color/slate_stroke" />
+
+            <!-- Microgrid Station Name -->
+            <TextView
+                android:id="@+id/tvHandshakeStation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_size_body"
+                tools:text="Station: Peradeniya Agro-Voltaic Hub" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/spacing_xs"
+                android:background="@color/slate_stroke" />
+
+            <!-- Allocated Bay -->
+            <TextView
+                android:id="@+id/tvHandshakeBay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/solar_amber_primary"
+                android:textSize="@dimen/text_size_subhead"
+                android:textStyle="bold"
+                tools:text="Allocated Bay: BAY-02" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Action Buttons: Proceed to Transfer & Cancel -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnProceedFinalize"
+        style="@style/Widget.App.Button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:text="@string/btn_proceed_finalize"
+        android:textColor="@color/text_on_primary"
+        app:backgroundTint="@color/solar_amber_primary" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelHandshake"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:text="@string/btn_cancel"
+        android:textColor="@color/text_secondary" />
+
+</LinearLayout>

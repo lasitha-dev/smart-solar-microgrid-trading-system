@@ -1,23 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Student Name: SILVA M N U
-  Student ID: IT22169112
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
   Module: SE4040 Enterprise Application Development (2026)
-  Component: Identity, Authentication & Account Lifecycle (Member 1)
-  Description: Centralized string resource dictionary ensuring zero hardcoded strings in mobile application UI.
+  Component: Unified String Resources Dictionary
 -->
 <resources>
-    <!-- App & General -->
+    <!-- App & General Navigation -->
     <string name="app_name">Smart Solar Microgrid</string>
+    <string name="app_name_operator">SSMTS Operator</string>
     <string name="app_tagline">Decentralized Peer-to-Peer Solar Trading</string>
     <string name="loading">Please wait…</string>
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
 
+    <!-- Operational Dashboard Navigation & Titles (Member 4) -->
+    <string name="title_dashboard">Operational Dashboard</string>
+    <string name="title_booking_history">Booking History &amp; Feeds</string>
+    <string name="title_operator_scanner">Operator QR Scanner</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_history">History</string>
+    <string name="nav_scanner">Scan QR</string>
+
+    <!-- Operational Dashboard Metrics (FR-M4-01) -->
+    <string name="dashboard_subtitle">Real-time trading slot monitoring and grid verification</string>
+    <string name="title_operational_metrics">OPERATIONAL METRICS</string>
+    <string name="metric_pending_title">Pending Bookings</string>
+    <string name="metric_pending_desc">Slots awaiting operator validation</string>
+    <string name="metric_approved_future_title">Approved Future</string>
+    <string name="metric_approved_future_desc">Scheduled within 7-day window</string>
+    <string name="metric_completed_today_title">Completed Today</string>
+    <string name="metric_completed_today_desc">Transfers finalized today</string>
+
+    <!-- Active Booking Spotlight Widget (FR-M4-01.3) -->
+    <string name="spotlight_badge_label">ACTIVE SPOTLIGHT</string>
+    <string name="spotlight_no_active">No upcoming active reservation scheduled for today.</string>
+    <string name="spotlight_bay_prefix">Bay: %1$s</string>
+    <string name="spotlight_countdown_prefix">Starts in: %1$s</string>
+    <string name="spotlight_estimated_prefix">Estimated: %1$.2f kWh</string>
+
+    <!-- Offline Banner & Cache (FR-M4-01.5) -->
+    <string name="banner_offline_mode">Offline Mode — Displaying cached records</string>
+    <string name="banner_last_synced_format">Last synchronized: %1$s</string>
+    <string name="action_retry_sync">Retry Sync</string>
+
+    <!-- Current & Pending Booking Feeds (FR-M4-02) -->
+    <string name="title_operational_feeds">OPERATIONAL BOOKING FEEDS</string>
+    <string name="tab_all">All</string>
+    <string name="tab_today_active">Today\'s Active</string>
+    <string name="tab_pending_queue">Pending Queue</string>
+    <string name="tab_today_active_format">Today\'s Active (%1$d)</string>
+    <string name="tab_pending_queue_format">Pending Queue (%1$d)</string>
+    <string name="feed_empty_active">No active energy transfer slots for today.</string>
+    <string name="feed_empty_pending">No pending reservations awaiting approval.</string>
+
+    <!-- Booking History, Search & Filter (FR-M4-03) -->
+    <string name="search_reservations_hint">Search by station, NIC, or reservation ID…</string>
+    <string name="filter_chip_all">All</string>
+    <string name="filter_chip_pending">Pending</string>
+    <string name="filter_chip_approved">Approved</string>
+    <string name="filter_chip_completed">Completed</string>
+    <string name="filter_chip_cancelled">Cancelled</string>
+
+    <!-- Booking History Item Details (FR-M4-03.5) -->
+    <string name="label_ref_id">Ref: #%1$s</string>
+    <string name="label_station">Station: %1$s</string>
+    <string name="label_prosumer_nic">Prosumer NIC: %1$s</string>
+    <string name="label_bay">Bay: %1$s</string>
+    <string name="label_scheduled_time">Scheduled: %1$s</string>
+    <string name="label_estimated_kwh">Estimated: %1$.2f kWh</string>
+    <string name="label_metered_kwh">Metered: %1$.2f kWh</string>
+    <string name="label_kwh_unit">kWh</string>
+
+    <!-- Empty State View (FR-M4-03.6) -->
+    <string name="empty_graphic_symbol">Ø</string>
+    <string name="history_empty_title">No Reservations Found</string>
+    <string name="history_empty_desc">No reservations match the specified search query or selected filter chips.</string>
+
+    <!-- Grid Operator Scanner & Camera (FR-M4-05) -->
+    <string name="desc_close_scanner">Close Scanner</string>
+    <string name="scanner_instruction">Align prosumer QR code inside the viewfinder</string>
+    <string name="scanner_torch_toggle">Toggle Flashlight</string>
+    <string name="scanner_fast_test_button">Fast Test QR</string>
+    <string name="scanner_fast_test_dialog_title">Viva Simulation: Inject Test QR</string>
+    <string name="scanner_fast_test_dialog_desc">Select a simulated QR payload scenario to inject directly into the operator verification pipeline without a physical device:</string>
+    <string name="scanner_fast_test_scenario_approved">1. Valid Approved Reservation (25.0 kWh)</string>
+    <string name="scanner_fast_test_scenario_completed">2. Already Completed Reservation (Conflict)</string>
+    <string name="scanner_fast_test_scenario_malformed">3. Malformed QR Payload (Syntax Error)</string>
+    <string name="scanner_fast_test_scenario_custom">4. Custom QR Payload String</string>
+    <string name="scanner_fast_test_custom_hint">Enter raw QR payload</string>
+    <string name="btn_inject_test_qr">Inject Scenario</string>
+    <string name="btn_use_fast_test">Use Fast Test QR Simulator</string>
+    <string name="scanner_payload_malformed_toast">Rejected: Malformed QR payload syntax</string>
+    <string name="scanner_payload_injected_toast">Injected test QR payload: %1$s</string>
+    <string name="permission_camera_title">Camera Permission Required</string>
+    <string name="permission_camera_rationale">Camera hardware access is required to scan prosumer transaction QR tokens for energy transfer validation.</string>
+    <string name="btn_grant_permission">Grant Camera Access</string>
+    <string name="permission_denied_banner">Camera access was denied. Use Fast Test QR or enable camera in system settings.</string>
+
+    <string name="verifying_qr_token">Verifying QR token with central Web API…</string>
+    <string name="err_verification_generic">Unable to verify reservation. Please check network connectivity.</string>
+
+    <!-- QR Server Verification & Handshake Modal (FR-M4-06) -->
+    <string name="handshake_title">Reservation Verified</string>
+    <string name="handshake_subtitle">Cryptographic token validated by central API.</string>
+    <string name="handshake_reservation_id">Reservation ID: %1$s</string>
+    <string name="handshake_prosumer">Prosumer NIC: %1$s</string>
+    <string name="handshake_station">Station: %1$s</string>
+    <string name="handshake_bay">Allocated Bay: %1$s</string>
+    <string name="btn_proceed_finalize">Proceed to Transfer</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- QR Error Rejection Dialogs (FR-M4-06.3) -->
+    <string name="qr_error_title">QR Verification Failed</string>
+    <string name="err_already_completed">This reservation has already been completed and finalized.</string>
+    <string name="err_invalid_signature">Invalid cryptographic QR signature. Token may have been altered.</string>
+    <string name="err_reservation_not_found">Reservation record not found in system.</string>
+    <string name="err_not_approved">Reservation is not in Approved state.</string>
+    <string name="err_outside_window">Current time is outside the scheduled operational window.</string>
+    <string name="err_malformed_qr">Malformed QR payload. Expected SSMTS-QR standard format.</string>
+    <string name="btn_dismiss">Dismiss</string>
+
+    <!-- Energy-Transfer Finalization & Metering (FR-M4-07) -->
+    <string name="finalize_dialog_title">Finalize Energy Transfer</string>
+    <string name="finalize_dialog_subtitle">Enter actual delivered power measured by station meter.</string>
+    <string name="label_metered_input">Actual Metered Power (kWh)</string>
+    <string name="hint_metered_kwh">e.g. 24.65</string>
+    <string name="error_invalid_kwh_range">Enter a valid energy value between 0.01 and 999.99 kWh.</string>
+    <string name="label_operator_notes">Operational Notes (Optional)</string>
+    <string name="hint_operator_notes">e.g. Transfer completed without voltage anomalies.</string>
+    <string name="btn_confirm_transfer">Confirm &amp; Finalize</string>
+    <string name="transfer_in_progress">Finalizing transfer with central Web API…</string>
+
+    <!-- Transfer Completed Receipt (FR-M4-07.4) -->
+    <string name="receipt_title">Transfer Finalized</string>
+    <string name="receipt_subtitle">Energy transfer completed and committed successfully.</string>
+    <string name="receipt_delivered_label">Actual Delivered Energy</string>
+    <string name="receipt_metered_kwh_format">Delivered: %1$.2f kWh</string>
+    <string name="receipt_ref_format">Reservation Ref: #%1$s</string>
+    <string name="receipt_operator_format">Operator: %1$s</string>
+    <string name="receipt_timestamp_format">Time: %1$s</string>
+    <string name="receipt_cache_synced">Local SQLite cache synchronized &amp; audited</string>
+    <string name="btn_done">Done</string>
+
+    <!-- Status Badge Values -->
+    <string name="status_completed">Completed</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_cancelled">Cancelled</string>
+
+    <!-- ==========================================
+         Member 1: Identity, Auth & Prosumer Strings
+         ========================================== -->
     <!-- Login Screen -->
     <string name="login_title">Welcome Back</string>
-    <string name="login_subtitle">Sign in to access your prosumer dashboard</string>
+    <string name="login_subtitle">Sign in to access your prosumer or operator console</string>
     <string name="label_identifier">Username or NIC</string>
     <string name="hint_identifier">Enter your Username or NIC</string>
     <string name="label_password">Password</string>
@@ -133,6 +270,8 @@
     <string name="home_quick_actions">Navigation &amp; Account</string>
     <string name="btn_view_profile">My Profile</string>
     <string name="btn_view_profile_desc">Manage account details, facility coordinates &amp; security</string>
+    <string name="btn_open_operator_console">Operator Console</string>
+    <string name="btn_open_operator_console_desc">Open field verification, QR scanner &amp; live metrics</string>
     <string name="home_section_microgrid">Microgrid Node Overview</string>
     <string name="home_card_generation">Solar Generation</string>
     <string name="home_card_generation_val">4.85 kW (Optimal)</string>

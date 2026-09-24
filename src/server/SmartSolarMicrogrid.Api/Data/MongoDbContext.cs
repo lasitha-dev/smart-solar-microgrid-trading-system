@@ -1,11 +1,11 @@
 /*
- * Student Name: SILVA M N U
- * Student ID: IT22169112
+ * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
  * Module: SE4040 Enterprise Application Development (2026)
- * Component: Identity, Authentication & Account Lifecycle (Member 1)
- * Description: MongoDB database context configuring client connection and collections using MongoDB.Driver 3.1.0.
+ * Component: Central MongoDB Context for Users and Energy Reservations
+ * Description: MongoDB database context configuring client connection, collections, and unique indexes.
  */
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Configuration;
@@ -14,9 +14,19 @@ using SmartSolarMicrogrid.Api.Models;
 namespace SmartSolarMicrogrid.Api.Data;
 
 /// <summary>
+/// Interface defining the database context and accessible MongoDB collections.
+/// </summary>
+public interface IMongoDbContext
+{
+    IMongoCollection<User> Users { get; }
+    IMongoCollection<EnergyReservation> EnergyReservations { get; }
+    IMongoDatabase Database { get; }
+}
+
+/// <summary>
 /// Provides access to the MongoDB database and collections required by the Smart Solar Microgrid Trading System.
 /// </summary>
-public class MongoDbContext
+public class MongoDbContext : IMongoDbContext
 {
     private readonly IMongoDatabase _database;
     private readonly MongoDbSettings _settings;
@@ -24,7 +34,7 @@ public class MongoDbContext
     /// <summary>
     /// Parameterless constructor for unit testing and mocking.
     /// </summary>
-    protected MongoDbContext()
+    public MongoDbContext()
     {
         _database = null!;
         _settings = new MongoDbSettings();
@@ -34,19 +44,22 @@ public class MongoDbContext
     /// Initializes a new instance of the <see cref="MongoDbContext"/> class using injected MongoDB settings.
     /// </summary>
     /// <param name="options">The strongly-typed MongoDB configuration settings.</param>
-    /// <exception cref="ArgumentNullException">Thrown when connection settings or database name is missing.</exception>
-    public MongoDbContext(IOptions<MongoDbSettings> options)
+    /// <param name="configuration">Optional application configuration fallback.</param>
+    public MongoDbContext(IOptions<MongoDbSettings> options, IConfiguration? configuration = null)
     {
-        _settings = options.Value ?? throw new ArgumentNullException(nameof(options), "MongoDB settings must be provided.");
+        _settings = options.Value ?? new MongoDbSettings();
 
-        if (string.IsNullOrWhiteSpace(_settings.ConnectionString))
-        {
-            throw new ArgumentException("MongoDB ConnectionString cannot be empty.", nameof(options));
-        }
+        var connectionString = !string.IsNullOrWhiteSpace(_settings.ConnectionString)
+            ? _settings.ConnectionString
+            : configuration?["DatabaseSettings:ConnectionString"] ?? "mongodb://localhost:27017";
 
-        var clientSettings = MongoClientSettings.FromConnectionString(_settings.ConnectionString);
+        var databaseName = !string.IsNullOrWhiteSpace(_settings.DatabaseName)
+            ? _settings.DatabaseName
+            : configuration?["DatabaseSettings:DatabaseName"] ?? "SmartSolarMicrogridDb";
+
+        var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
         var client = new MongoClient(clientSettings);
-        _database = client.GetDatabase(_settings.DatabaseName);
+        _database = client.GetDatabase(databaseName);
 
         EnsureIndexesCreated();
     }
@@ -60,15 +73,23 @@ public class MongoDbContext
     /// Gets the collection accessor for user entities mapped to "User's Detail".
     /// </summary>
     public virtual IMongoCollection<User> Users =>
-        _database.GetCollection<User>(_settings.UsersCollectionName);
+        _database.GetCollection<User>(_settings.UsersCollectionName.IfBlank("User's Detail"));
 
     /// <summary>
-    /// Ensures required unique indexes on NIC and Username fields exist in MongoDB.
+    /// Gets the collection accessor for energy reservations.
+    /// </summary>
+    public virtual IMongoCollection<EnergyReservation> EnergyReservations =>
+        _database.GetCollection<EnergyReservation>("EnergyReservation");
+
+    /// <summary>
+    /// Ensures required unique indexes on NIC, Username, and Email fields exist in MongoDB.
     /// </summary>
     private void EnsureIndexesCreated()
     {
         try
         {
+            if (_database == null) return;
+
             var usersCollection = Users;
 
             // Unique index for NIC
@@ -93,4 +114,10 @@ public class MongoDbContext
             // Index creation failure will not block initialization
         }
     }
+}
+
+internal static class StringExtensions
+{
+    public static string IfBlank(this string? source, string fallback) =>
+        string.IsNullOrWhiteSpace(source) ? fallback : source;
 }

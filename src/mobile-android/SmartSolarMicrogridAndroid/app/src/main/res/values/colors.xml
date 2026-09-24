@@ -1,12 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Student Name: SILVA M N U
-  Student ID: IT22169112
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
   Module: SE4040 Enterprise Application Development (2026)
-  Component: Identity, Authentication & Account Lifecycle (Member 1)
-  Description: Color palette definitions for dark-mode themed Smart Solar Microgrid mobile application.
+  Component: Unified Color Resources for Smart Solar Microgrid System
 -->
 <resources>
+    <!-- ==========================================
+         Member 4: Grid Operator Dashboard & Viewfinder Palette
+         ========================================== -->
+    <!-- Primary Brand Palette: Clean Modern Solar/Grid Theme -->
+    <color name="color_primary">#1B5E20</color>
+    <color name="color_primary_variant">#2E7D32</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#C8E6C9</color>
+    <color name="color_on_primary_container">#002105</color>
+
+    <!-- Secondary Accent: Energy / Battery Warmth -->
+    <color name="color_secondary">#F57F17</color>
+    <color name="color_secondary_variant">#FFB300</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_secondary_container">#FFF3E0</color>
+    <color name="color_on_secondary_container">#4E2600</color>
+
+    <!-- Tertiary Accent: Modern Electric Cyan -->
+    <color name="color_tertiary">#00838F</color>
+    <color name="color_on_tertiary">#FFFFFF</color>
+    <color name="color_tertiary_container">#E0F7FA</color>
+    <color name="color_on_tertiary_container">#002022</color>
+
+    <!-- Operator Surfaces & Backgrounds -->
+    <color name="surface_background">#F8FAF8</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="surface_card_stroke">#E0E0E0</color>
+    <color name="surface_card_elevated">#FFFFFF</color>
+    <color name="surface_divider">#EEEEEE</color>
+
+    <!-- Operator Typography (Light Surface High Contrast) -->
+    <color name="operator_text_primary">#212121</color>
+    <color name="operator_text_secondary">#757575</color>
+    <color name="operator_text_hint">#9E9E9E</color>
+    <color name="operator_text_inverse">#FFFFFF</color>
+
+    <!--
+      MANDATORY STATUS BADGE PALETTE (FR-M4-03.4)
+      Completed: Container #E8F5E9, Text #2E7D32
+      Approved:  Container #E3F2FD, Text #1565C0
+      Pending:   Container #FFF8E1, Text #F57F17
+      Cancelled: Container #FFEBEE, Text #C62828
+    -->
+    <color name="status_completed_container">#E8F5E9</color>
+    <color name="status_completed_text">#2E7D32</color>
+    <color name="status_completed_stroke">#C8E6C9</color>
+
+    <color name="status_approved_container">#E3F2FD</color>
+    <color name="status_approved_text">#1565C0</color>
+    <color name="status_approved_stroke">#BBDEFB</color>
+
+    <color name="status_pending_container">#FFF8E1</color>
+    <color name="status_pending_text">#F57F17</color>
+    <color name="status_pending_stroke">#FFE082</color>
+
+    <color name="status_cancelled_container">#FFEBEE</color>
+    <color name="status_cancelled_text">#C62828</color>
+    <color name="status_cancelled_stroke">#FFCDD2</color>
+
+    <!-- Spotlight Widget Gradient Colors (Emerald to Slate Dark Surface) -->
+    <color name="spotlight_gradient_start">#064E3B</color>
+    <color name="spotlight_gradient_end">#1E293B</color>
+    <color name="spotlight_accent_pill">#33FFFFFF</color>
+
+    <!-- Camera Viewfinder & Scanner Overlay -->
+    <color name="scanner_scrim_overlay">#99000000</color>
+    <color name="scanner_scrim_header">#66000000</color>
+    <color name="scanner_scrim_footer">#AA000000</color>
+    <color name="scanner_reticle_frame">#00E676</color>
+    <color name="scanner_reticle_glow">#3300E676</color>
+
+    <!-- Feedback & Offline Banner -->
+    <color name="offline_banner_bg">#FFF3E0</color>
+    <color name="offline_banner_text">#E65100</color>
+    <color name="error_bg">#FFEBEE</color>
+    <color name="error_text">#C62828</color>
+
+    <!-- ==========================================
+         Member 1: Prosumer Dark-Theme & Auth Palette
+         ========================================== -->
     <!-- Brand Solar Colors -->
     <color name="solar_amber_primary">#F59E0B</color>
     <color name="solar_amber_light">#FDE68A</color>
@@ -26,15 +104,16 @@
     <color name="slate_stroke">#475569</color>
     <color name="slate_input_bg">#131D31</color>
 
-    <!-- Typography Colors -->
+    <!-- Typography Colors (Dark Theme Light Text) -->
     <color name="text_primary">#F8FAFC</color>
     <color name="text_secondary">#94A3B8</color>
     <color name="text_muted">#64748B</color>
+    <color name="text_hint">#64748B</color>
     <color name="text_on_primary">#0F172A</color>
+    <color name="text_inverse">#0F172A</color>
 
     <!-- Alert / Status Indicators -->
     <color name="status_pending_bg">#78350F</color>
-    <color name="status_pending_text">#FDE68A</color>
     <color name="status_active_bg">#064E3B</color>
     <color name="status_active_text">#A7F3D0</color>
     <color name="status_deactivated_bg">#7F1D1D</color>
@@ -42,7 +121,7 @@
     <color name="error_red">#EF4444</color>
     <color name="error_red_dark">#DC2626</color>
 
-    <!-- Core Palette -->
+    <!-- Common Core Palette -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
