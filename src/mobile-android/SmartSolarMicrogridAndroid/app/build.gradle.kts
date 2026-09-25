@@ -2,7 +2,8 @@
  * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Smart Solar Microgrid Trading System - Integrated Android App
- * Description: Unified Gradle build configuration supporting Auth & Account Lifecycle (Member 1)
+ * Description: Unified Gradle build configuration supporting Auth & Account Lifecycle (Member 1),
+ *              Microgrid Nodes & Maps (Member 2), Reservation Workflow (Member 3),
  *              and Operator Verification & Operational Dashboard (Member 4).
  */
 

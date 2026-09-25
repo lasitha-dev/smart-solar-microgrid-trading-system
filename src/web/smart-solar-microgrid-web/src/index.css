@@ -241,6 +241,7 @@ button, input, select, textarea {
   background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  border: none;
 }
 
 .btn-success:hover {
@@ -253,6 +254,7 @@ button, input, select, textarea {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  border: none;
 }
 
 .btn-danger:hover {
@@ -411,7 +413,7 @@ input:-webkit-autofill:active {
 .table-container .data-table,
 .overflow-x-auto .data-table {
   width: 100% !important;
-  min-width: max-content !important; /* Forces table to stretch and trigger scroll */
+  min-width: max-content !important;
 }
 
 .data-table,
@@ -702,4 +704,3 @@ input:-webkit-autofill:active {
     padding: 1rem !important;
   }
 }
-

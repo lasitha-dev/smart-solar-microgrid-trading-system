@@ -230,6 +230,71 @@ public class FakeReservationRepository : IReservationRepository
         return Task.CompletedTask;
     }
 
+    public Task<IEnumerable<EnergyReservation>> GetAllAsync(string? prosumerId = null, string? status = null)
+    {
+        var query = _store.Values.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(prosumerId) && !prosumerId.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.ProsumerId == prosumerId || r.ProsumerNic == prosumerId);
+        }
+        if (!string.IsNullOrWhiteSpace(status) && !status.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+        }
+        return Task.FromResult<IEnumerable<EnergyReservation>>(query.ToList());
+    }
+
+    public Task UpdateAsync(EnergyReservation reservation)
+    {
+        _store[reservation.Id] = reservation;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(string id)
+    {
+        _store.Remove(id);
+        return Task.CompletedTask;
+    }
+
+    private readonly Dictionary<string, EnergyBookingSlot> _slots = new();
+
+    public Task<EnergyBookingSlot?> GetSlotByIdAsync(string slotId)
+    {
+        _slots.TryGetValue(slotId, out var slot);
+        return Task.FromResult(slot);
+    }
+
+    public Task<IEnumerable<EnergyBookingSlot>> GetAvailableSlotsAsync(string stationId, DateTime date)
+    {
+        var day = date.Date;
+        var slots = _slots.Values.Where(s => s.StationId == stationId && s.SlotDate.Date == day);
+        return Task.FromResult<IEnumerable<EnergyBookingSlot>>(slots.ToList());
+    }
+
+    public Task UpdateSlotStatusAsync(string slotId, string status)
+    {
+        if (_slots.TryGetValue(slotId, out var slot))
+        {
+            slot.Status = status;
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task<bool> TryReserveSlotAsync(string slotId)
+    {
+        if (_slots.TryGetValue(slotId, out var slot) && slot.Status == "Open")
+        {
+            slot.Status = "Reserved";
+            return Task.FromResult(true);
+        }
+        return Task.FromResult(false);
+    }
+
+    public Task SeedSlotsAsync(string stationId)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
     {
         var nowUtc = DateTime.UtcNow;

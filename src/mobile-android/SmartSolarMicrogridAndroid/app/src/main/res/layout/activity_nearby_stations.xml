@@ -174,6 +174,18 @@
                     android:textStyle="bold"
                     tools:text="Available Bays: 3 / 4" />
             </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBookAtStation"
+                style="@style/Widget.App.Button"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="12dp"
+                android:text="Book Energy Slot Here"
+                android:textColor="@color/text_on_primary"
+                android:textSize="13sp"
+                app:backgroundTint="@color/solar_amber_primary"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

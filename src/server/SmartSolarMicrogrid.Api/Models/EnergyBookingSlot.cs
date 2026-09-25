@@ -1,9 +1,8 @@
 /*
- * Student Role: Member 2
+ * Student Role: Member 2 & Member 3
  * Module: SE4040 Enterprise Application Development (2026)
- * Component: Microgrid Nodes, Schedules & Maps (Member 2)
+ * Component: Microgrid Nodes, Schedules & Energy Reservation Workflow
  * Description: Data model representing a bookable energy slot at a microgrid station mapped to 'EnergyBookingSlots'.
- * Author: Member 2
  */
 
 using System;
@@ -14,7 +13,6 @@ namespace SmartSolarMicrogrid.Api.Models;
 
 /// <summary>
 /// Description: Data model representing a bookable time slot at a microgrid station persisted in MongoDB.
-/// Author: Member 2
 /// </summary>
 [BsonIgnoreExtraElements]
 public class EnergyBookingSlot

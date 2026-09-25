@@ -3,7 +3,7 @@
  * Student ID: IT22169112
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Identity, Authentication & Account Lifecycle (Member 1)
- * Description: Master React router tree wiring protected Backoffice administration routes.
+ * Description: Master React router tree wiring protected Backoffice administration and Energy Reservation routes.
  */
 
 import React from 'react';
@@ -15,12 +15,14 @@ import { PendingApprovalsPage } from './pages/PendingApprovalsPage';
 import { UserManagementPage } from './pages/UserManagementPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
 import { StationListPage } from './features/microgrid-nodes/pages/StationListPage';
+import ReservationListPage from './features/reservations/ReservationListPage';
+import SlotBookingPage from './features/reservations/SlotBookingPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
 
 const DashboardRedirect = () => {
   const { isGridOperator } = useAuth();
-  return <Navigate to={isGridOperator ? "/profile" : "/pending-approvals"} replace />;
+  return <Navigate to={isGridOperator ? "/reservations" : "/pending-approvals"} replace />;
 };
 
 const BackofficeOnlyRoute = ({ children }) => {
@@ -79,9 +81,13 @@ export const App = () => {
             </BackofficeOnlyRoute>
           }
         />
+        <Route path="reservations" element={<ReservationListPage />} />
+        <Route path="book-slot" element={<SlotBookingPage />} />
         <Route path="profile" element={<StaffProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
 };
+
+export default App;

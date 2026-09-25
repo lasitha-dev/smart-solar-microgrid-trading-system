@@ -10,6 +10,7 @@
 
 package com.sliit.ssmts.microgrid_nodes.ui.map
 
+import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
@@ -268,9 +269,18 @@ class NearbyStationsActivity : AppCompatActivity() {
         if (station.status.equals("Active", ignoreCase = true)) {
             binding.tvSelectedStationStatus.setBackgroundResource(R.drawable.bg_badge_active)
             binding.tvSelectedStationStatus.setTextColor(getColor(R.color.status_active_text))
+            binding.btnBookAtStation.visibility = View.VISIBLE
+            binding.btnBookAtStation.setOnClickListener {
+                val intent = Intent(this, com.sliit.ssmts.reservation_workflow.ui.booking.SlotSelectionActivity::class.java).apply {
+                    putExtra(com.sliit.ssmts.reservation_workflow.ui.booking.SlotSelectionActivity.EXTRA_STATION_ID, station.id)
+                    putExtra(com.sliit.ssmts.reservation_workflow.ui.booking.SlotSelectionActivity.EXTRA_STATION_NAME, station.stationName)
+                }
+                startActivity(intent)
+            }
         } else {
             binding.tvSelectedStationStatus.setBackgroundResource(R.drawable.bg_badge_pending)
             binding.tvSelectedStationStatus.setTextColor(getColor(R.color.status_pending_text))
+            binding.btnBookAtStation.visibility = View.GONE
         }
     }
 }

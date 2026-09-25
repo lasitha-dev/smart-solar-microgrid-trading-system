@@ -341,4 +341,52 @@
     <string name="station_details_status">Status: %1$s</string>
     <string name="my_solar_grid">My Solar Grid</string>
     <string name="my_solar_grid_desc">Registered Prosumer Solar Facility</string>
+
+    <!-- ==========================================
+         Member 3: Reservation Workflow Strings
+         ========================================== -->
+    <!-- Slot Selection Screen -->
+    <string name="title_slot_selection">Select Date &amp; Time</string>
+    <string name="btn_select_date">Choose Date</string>
+    <string name="label_selected_date">Selected Date: %s</string>
+    <string name="label_available_slots">Available Energy Slots</string>
+    <string name="msg_no_slots">No slots available for this date.</string>
+    <string name="label_available">Available</string>
+
+    <!-- Create Reservation Screen -->
+    <string name="title_create_reservation">New Reservation</string>
+    <string name="label_selected_slot">Selected Energy Slot</string>
+    <string name="hint_prosumer_nic">Prosumer NIC (e.g. 200112345678)</string>
+    <string name="hint_estimated_kwh">Estimated Energy (kWh)</string>
+    <string name="btn_confirm_booking">Confirm Booking</string>
+    <string name="msg_booking_success">Reservation created successfully!</string>
+    <string name="err_invalid_nic">Please enter a valid NIC number.</string>
+    <string name="err_invalid_kwh">Please enter a value between 0.1 and 500.0 kWh.</string>
+
+    <!-- Booking Summary Screen -->
+    <string name="title_booking_summary">Booking Summary</string>
+    <string name="label_reservation_details">Reservation Details</string>
+    <string name="label_reservation_id">Reservation ID</string>
+    <string name="label_summary_station">Station</string>
+    <string name="label_summary_scheduled_time">Scheduled Time</string>
+    <string name="label_summary_prosumer_nic">Prosumer NIC</string>
+    <string name="btn_reschedule">Reschedule</string>
+    <string name="btn_cancel_reservation">Cancel Booking</string>
+
+    <!-- Update / Cancel Dialogs -->
+    <string name="title_reschedule">Reschedule Reservation</string>
+    <string name="subtitle_reschedule">Select a new date and time for your reservation.</string>
+    <string name="btn_select_new_date">Select New Date</string>
+    <string name="label_no_slot_selected">No slot selected</string>
+    <string name="title_cancel_confirm">Cancel Reservation?</string>
+    <string name="msg_cancel_confirm">Are you sure you want to cancel this reservation? This action cannot be undone.</string>
+    <string name="msg_12_hour_rule">Cannot modify — less than 12 hours until scheduled time.</string>
+    <string name="err_12_hour_rule_update">Reschedule blocked: less than 12 hours remain before your scheduled slot.</string>
+    <string name="err_12_hour_rule_cancel">Cancellation blocked: less than 12 hours remain before your scheduled slot.</string>
+    <string name="hint_cancel_reason">Cancellation Reason (Optional)</string>
+    <string name="label_qr_code">Reservation QR Token</string>
+    <string name="btn_copy_token">Copy Token</string>
+    <string name="btn_view_history">View My Booking History</string>
+    <string name="msg_token_copied">QR Token copied to clipboard</string>
+    <string name="btn_confirm">Confirm</string>
 </resources>

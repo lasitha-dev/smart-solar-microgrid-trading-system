@@ -45,4 +45,9 @@ public class ReservationFilterQueryDto
     /// Optional ISO date string filtering current daily bookings.
     /// </summary>
     public DateTime? Date { get; set; }
+
+    /// <summary>
+    /// Optional Prosumer ID to retrieve prosumer-specific reservations.
+    /// </summary>
+    public string? ProsumerId { get; set; }
 }

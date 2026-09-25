@@ -1,5 +1,13 @@
-// Description: Repository abstraction defining data access queries, aggregations, and mutations for EnergyReservation records.
+/*
+ * Student Role: Member 3 & Member 4
+ * Module: SE4040 Enterprise Application Development (2026)
+ * Component: Energy Reservation Workflow & Operator Dashboard
+ * Description: Repository abstraction defining data access queries, aggregations, and mutations for EnergyReservation records.
+ */
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using SmartSolarMicrogrid.Api.DTOs;
 using SmartSolarMicrogrid.Api.Models;
 
@@ -16,6 +24,11 @@ public interface IReservationRepository
     Task<EnergyReservation?> GetByIdAsync(string id);
 
     /// <summary>
+    /// Retrieves reservations filtered optionally by prosumer ID and status.
+    /// </summary>
+    Task<IEnumerable<EnergyReservation>> GetAllAsync(string? prosumerId = null, string? status = null);
+
+    /// <summary>
     /// Retrieves a reservation matching the encoded QR payload string.
     /// </summary>
     Task<EnergyReservation?> GetByQrCodeAsync(string qrCode);
@@ -29,6 +42,41 @@ public interface IReservationRepository
     /// Inserts a new reservation document into MongoDB.
     /// </summary>
     Task CreateAsync(EnergyReservation reservation);
+
+    /// <summary>
+    /// Updates an existing reservation document in MongoDB.
+    /// </summary>
+    Task UpdateAsync(EnergyReservation reservation);
+
+    /// <summary>
+    /// Deletes a reservation by its unique identifier.
+    /// </summary>
+    Task DeleteAsync(string id);
+
+    /// <summary>
+    /// Retrieves a booking slot by its unique identifier.
+    /// </summary>
+    Task<EnergyBookingSlot?> GetSlotByIdAsync(string slotId);
+
+    /// <summary>
+    /// Retrieves available energy booking slots for a given station and date.
+    /// </summary>
+    Task<IEnumerable<EnergyBookingSlot>> GetAvailableSlotsAsync(string stationId, DateTime date);
+
+    /// <summary>
+    /// Updates the status of an energy booking slot (e.g. Open, Reserved, Closed).
+    /// </summary>
+    Task UpdateSlotStatusAsync(string slotId, string status);
+
+    /// <summary>
+    /// Atomically attempts to transition an Open slot to Reserved.
+    /// </summary>
+    Task<bool> TryReserveSlotAsync(string slotId);
+
+    /// <summary>
+    /// Seeds sample slots for development and demonstration.
+    /// </summary>
+    Task SeedSlotsAsync(string stationId);
 
     /// <summary>
     /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.

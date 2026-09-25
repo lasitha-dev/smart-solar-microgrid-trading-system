@@ -1,5 +1,5 @@
 /*
- * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
+ * Student Name: SILVA M N U (IT22169112), Kumarasinghe S.S (IT22221414), A.L.M Athulathmudali (IT21129544) & Member 2
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Smart Solar Microgrid Trading System - Unified Central C# Web API
  * Description: Main application entry point configuring DI, JWT auth, MongoDB, Swagger, and route pipeline.
@@ -118,6 +118,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // Member 2 Services
 builder.Services.AddScoped<IStationService, StationService>();
+
+// Member 3 Services
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 // Member 4 Services
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
@@ -262,6 +265,8 @@ app.MapGet("/", () => Results.Ok(new
     modules = new[]
     {
         "Member 1: Identity, Authentication & User Lifecycle",
+        "Member 2: Microgrid Node Management, Schedules & Maps",
+        "Member 3: Energy Reservation Workflow",
         "Member 4: Operator Verification & Operational Dashboard"
     },
     swagger = "/swagger",
@@ -270,9 +275,11 @@ app.MapGet("/", () => Results.Ok(new
         "/api/auth/login",
         "/api/auth/register-prosumer",
         "/api/users",
-        "/api/prosumers/pending",
-        "/api/reservations/dashboard-metrics",
+        "/api/stations",
+        "/api/stations/nearby",
+        "/api/reservations/slots",
         "/api/reservations",
+        "/api/reservations/dashboard-metrics",
         "/api/reservations/verify-qr",
         "/api/reservations/{id}/finalize"
     }

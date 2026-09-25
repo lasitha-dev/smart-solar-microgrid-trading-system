@@ -282,6 +282,140 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Book Energy Slot Navigation Button Card (Member 3) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNavigateBookSlot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/slate_surface"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:cardElevation="@dimen/card_elevation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardNavigateNearbyStations"
+            app:strokeColor="@color/emerald_accent"
+            app:strokeWidth="@dimen/stroke_medium">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_md">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_badge_active"
+                    android:contentDescription="@string/btn_confirm_booking"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_battery_bolt"
+                    app:tint="@color/emerald_accent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_md"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Book Energy Slot"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_md"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Schedule and reserve battery charging bays"
+                        android:textColor="@color/text_muted"
+                        android:textSize="@dimen/text_xs" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="Book Energy Slot"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/emerald_accent" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Prosumer Booking History Navigation Button Card (Member 3) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNavigateBookingHistory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/slate_surface"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:cardElevation="@dimen/card_elevation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardNavigateBookSlot"
+            app:strokeColor="@color/solar_amber_primary"
+            app:strokeWidth="@dimen/stroke_medium">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_md">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_badge_pending"
+                    android:contentDescription="My Reservations"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_history"
+                    app:tint="@color/solar_amber_primary" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_md"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="My Energy Reservations"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_md"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="View QR tokens, status &amp; reschedule bookings"
+                        android:textColor="@color/text_muted"
+                        android:textSize="@dimen/text_xs" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="My Reservations"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/solar_amber_primary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Grid Operator Console Navigation Button Card (Visible for GridOperator / Admin) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardNavigateOperatorConsole"
@@ -297,7 +431,7 @@
             app:cardElevation="@dimen/card_elevation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardNavigateNearbyStations"
+            app:layout_constraintTop_toBottomOf="@id/cardNavigateBookingHistory"
             app:strokeColor="@color/emerald_accent"
             app:strokeWidth="@dimen/stroke_medium"
             tools:visibility="visible">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
+  Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544) & Kumarasinghe S.S (IT22221414)
   Module: SE4040 Enterprise Application Development (2026)
   Component: Smart Solar Microgrid Trading System - Integrated Application Manifest
 -->
@@ -13,7 +13,7 @@
     <!-- Camera hardware access for native QR scanning viewfinder (Member 4) -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- Facility Location detection for Solar Prosumers (Member 1) -->
+    <!-- Facility Location detection for Solar Prosumers (Member 1 & 2) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -92,6 +92,33 @@
             android:windowSoftInputMode="adjustResize" />
 
         <!-- ==========================================
+             Member 3: Reservation Workflow Activities
+             ========================================== -->
+        <!-- Slot Selection Screen -->
+        <activity
+            android:name="com.sliit.ssmts.reservation_workflow.ui.booking.SlotSelectionActivity"
+            android:exported="false"
+            android:label="@string/title_slot_selection" />
+
+        <!-- Create Reservation Screen -->
+        <activity
+            android:name="com.sliit.ssmts.reservation_workflow.ui.booking.CreateReservationActivity"
+            android:exported="false"
+            android:label="@string/title_create_reservation" />
+
+        <!-- Booking Summary & QR Receipt Screen -->
+        <activity
+            android:name="com.sliit.ssmts.reservation_workflow.ui.summary.BookingSummaryActivity"
+            android:exported="false"
+            android:label="@string/title_booking_summary" />
+
+        <!-- Prosumer Booking History Screen -->
+        <activity
+            android:name="com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryActivity"
+            android:exported="false"
+            android:label="My Booking History" />
+
+        <!-- ==========================================
              Member 4: Operator Verification & Operational Dashboard Activities
              ========================================== -->
         <!-- Main Operational Dashboard Activity (FR-M4-01) -->
@@ -101,7 +128,7 @@
             android:theme="@style/Theme.Ssmts.OperatorDashboard"
             android:label="@string/app_name_operator" />
 
-        <!-- Booking History, Search & Filter Activity (FR-M4-03) -->
+        <!-- Operator Booking History, Search & Filter Activity (FR-M4-03) -->
         <activity
             android:name="com.sliit.ssmts.operator_dashboard.ui.history.BookingHistoryActivity"
             android:exported="false"
