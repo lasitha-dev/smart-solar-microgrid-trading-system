@@ -13,6 +13,7 @@
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
+    <string name="btn_back">Back</string>
 
     <!-- Operational Dashboard Navigation & Titles (Member 4) -->
     <string name="title_dashboard">Operational Dashboard</string>
@@ -324,4 +325,18 @@
     <string name="msg_profile_updated">Profile updated successfully.</string>
     <string name="msg_deactivation_success">Account successfully deactivated.</string>
     <string name="msg_logged_out">Logged out successfully.</string>
+
+    <!-- Member 2: Microgrid Nodes, Schedules & Maps -->
+    <string name="title_nearby_stations">Nearby Microgrid Nodes</string>
+    <string name="btn_nearby_stations">Nearby Microgrid Nodes</string>
+    <string name="btn_nearby_stations_desc">Discover solar substations and battery bays on live map</string>
+    <string name="stations_found_format">%1$d active stations nearby</string>
+    <string name="location_permission_denied">Location permission denied. Showing default region (Colombo).</string>
+    <string name="refresh_stations">Refresh Stations</string>
+    <string name="loading_stations">Loading nearby microgrid nodes…</string>
+    <string name="no_stations_found">No microgrid stations found within %1$.0f km.</string>
+    <string name="station_distance_snippet">Distance: %1$.2f km | Available Bays: %2$d</string>
+    <string name="station_details_capacity">Capacity: %1$.1f kWh</string>
+    <string name="station_details_bays">Available Bays: %1$d / %2$d</string>
+    <string name="station_details_status">Status: %1$s</string>
 </resources>

@@ -34,6 +34,20 @@
         android:theme="@style/Theme.SmartSolarMicrogridAndroid"
         android:networkSecurityConfig="@xml/network_security_config">
 
+        <!-- Google Play Services Maps API Key (Member 2) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <!-- ==========================================
+             Member 2: Microgrid Nodes, Schedules & Maps Activities
+             ========================================== -->
+        <!-- Nearby Microgrid Stations Live Map Activity -->
+        <activity
+            android:name="com.sliit.ssmts.microgrid_nodes.ui.map.NearbyStationsActivity"
+            android:exported="false"
+            android:label="@string/title_nearby_stations" />
+
         <!-- ==========================================
              Member 1: Authentication & User Lifecycle Activities
              ========================================== -->
