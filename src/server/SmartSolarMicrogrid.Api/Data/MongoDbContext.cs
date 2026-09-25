@@ -20,6 +20,8 @@ public interface IMongoDbContext
 {
     IMongoCollection<User> Users { get; }
     IMongoCollection<EnergyReservation> EnergyReservations { get; }
+    IMongoCollection<SolarStationInfo> SolarStations { get; }
+    IMongoCollection<EnergyBookingSlot> EnergyBookingSlots { get; }
     IMongoDatabase Database { get; }
 }
 
@@ -82,6 +84,18 @@ public class MongoDbContext : IMongoDbContext
         _database.GetCollection<EnergyReservation>("EnergyReservation");
 
     /// <summary>
+    /// Gets the collection accessor for solar microgrid stations mapped to "SolarStationInfo".
+    /// </summary>
+    public virtual IMongoCollection<SolarStationInfo> SolarStations =>
+        _database.GetCollection<SolarStationInfo>("SolarStationInfo");
+
+    /// <summary>
+    /// Gets the collection accessor for energy booking slots mapped to "EnergyBookingSlots".
+    /// </summary>
+    public virtual IMongoCollection<EnergyBookingSlot> EnergyBookingSlots =>
+        _database.GetCollection<EnergyBookingSlot>("EnergyBookingSlots");
+
+    /// <summary>
     /// Ensures required unique indexes on NIC, Username, and Email fields exist in MongoDB.
     /// </summary>
     private void EnsureIndexesCreated()
@@ -108,6 +122,20 @@ public class MongoDbContext : IMongoDbContext
             var emailIndexModel = new CreateIndexModel<User>(emailIndexKeys, emailIndexOptions);
 
             usersCollection.Indexes.CreateMany([nicIndexModel, usernameIndexModel, emailIndexModel]);
+
+            // Index for SolarStations: StationName
+            var stationsCollection = SolarStations;
+            var stationNameIndexKeys = Builders<SolarStationInfo>.IndexKeys.Ascending(s => s.StationName);
+            var stationNameIndexModel = new CreateIndexModel<SolarStationInfo>(stationNameIndexKeys, new CreateIndexOptions { Name = "ix_stations_name" });
+            stationsCollection.Indexes.CreateOne(stationNameIndexModel);
+
+            // Index for EnergyBookingSlots: StationId + SlotDate
+            var slotsCollection = EnergyBookingSlots;
+            var slotIndexKeys = Builders<EnergyBookingSlot>.IndexKeys
+                .Ascending(s => s.StationId)
+                .Ascending(s => s.SlotDate);
+            var slotIndexModel = new CreateIndexModel<EnergyBookingSlot>(slotIndexKeys, new CreateIndexOptions { Name = "ix_slots_station_date" });
+            slotsCollection.Indexes.CreateOne(slotIndexModel);
         }
         catch
         {
