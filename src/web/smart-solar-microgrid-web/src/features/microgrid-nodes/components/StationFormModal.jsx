@@ -2,11 +2,13 @@
  * Student Role: Member 2
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Microgrid Nodes, Schedules & Maps (Member 2)
- * Description: Modal form dialog for creating and updating solar microgrid station nodes with validation.
+ * Description: Modal form dialog for creating and updating solar microgrid station nodes with interactive Leaflet GPS Map Picker.
  * Author: Member 2
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import {
   X,
   Zap,
@@ -14,8 +16,39 @@ import {
   BatteryCharging,
   Clock,
   Save,
-  AlertCircle
+  AlertCircle,
+  Compass,
+  Crosshair
 } from 'lucide-react';
+
+/**
+ * Creates custom amber solar pin icon for Leaflet map without broken asset dependencies.
+ */
+const createPinIcon = () => {
+  return L.divIcon({
+    className: 'solar-station-pin',
+    html: `
+      <div style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+        <div style="
+          width: 24px;
+          height: 24px;
+          background: #f59e0b;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid #ffffff;
+          box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <div style="width: 8px; height: 8px; background: #0f172a; border-radius: 50%;"></div>
+        </div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 28]
+  });
+};
 
 export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const isEditing = Boolean(initialData?.id);
@@ -28,11 +61,18 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
     capacityKwh: 100,
     totalBatterySlots: 4,
     openTime: '06:00',
-    closeTime: '20:00'
+    closeTime: '20:00',
+    status: 'Active'
   });
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+
+  // Map references
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markerInstanceRef = useRef(null);
 
   useEffect(() => {
     if (initialData) {
@@ -44,7 +84,8 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
         capacityKwh: initialData.capacityKwh ?? 100,
         totalBatterySlots: initialData.totalBatterySlots ?? initialData.batterySlots?.length ?? 4,
         openTime: initialData.schedule?.openTime || '06:00',
-        closeTime: initialData.schedule?.closeTime || '20:00'
+        closeTime: initialData.schedule?.closeTime || '20:00',
+        status: initialData.status || 'Active'
       });
     } else {
       setFormData({
@@ -55,11 +96,119 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
         capacityKwh: 100,
         totalBatterySlots: 4,
         openTime: '06:00',
-        closeTime: '20:00'
+        closeTime: '20:00',
+        status: 'Active'
       });
     }
     setError('');
   }, [initialData, isOpen]);
+
+  // Teardown map instance when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerInstanceRef.current = null;
+      }
+      setShowMapPicker(false);
+    }
+  }, [isOpen]);
+
+  // Initialize and synchronize Leaflet Map Picker
+  useEffect(() => {
+    if (!isOpen || !showMapPicker || !mapContainerRef.current) return;
+
+    const currentLat = parseFloat(formData.lat) || 6.9271;
+    const currentLng = parseFloat(formData.lng) || 79.8612;
+
+    if (!mapInstanceRef.current) {
+      const map = L.map(mapContainerRef.current, {
+        center: [currentLat, currentLng],
+        zoom: 13,
+        zoomControl: true
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      const marker = L.marker([currentLat, currentLng], {
+        icon: createPinIcon(),
+        draggable: true
+      }).addTo(map);
+
+      marker.on('dragend', (e) => {
+        const position = e.target.getLatLng();
+        setFormData((prev) => ({
+          ...prev,
+          lat: parseFloat(position.lat.toFixed(6)),
+          lng: parseFloat(position.lng.toFixed(6))
+        }));
+      });
+
+      map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        marker.setLatLng([lat, lng]);
+        setFormData((prev) => ({
+          ...prev,
+          lat: parseFloat(lat.toFixed(6)),
+          lng: parseFloat(lng.toFixed(6))
+        }));
+      });
+
+      mapInstanceRef.current = map;
+      markerInstanceRef.current = marker;
+    } else {
+      mapInstanceRef.current.setView([currentLat, currentLng], 13);
+      if (markerInstanceRef.current) {
+        markerInstanceRef.current.setLatLng([currentLat, currentLng]);
+      }
+    }
+
+    const timer = setTimeout(() => {
+      mapInstanceRef.current?.invalidateSize();
+    }, 200);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showMapPicker, isOpen]);
+
+  // Sync marker position if manual input changes
+  useEffect(() => {
+    if (mapInstanceRef.current && markerInstanceRef.current) {
+      const latVal = parseFloat(formData.lat);
+      const lngVal = parseFloat(formData.lng);
+      if (!isNaN(latVal) && !isNaN(lngVal) && latVal >= -90 && latVal <= 90 && lngVal >= -180 && lngVal <= 180) {
+        markerInstanceRef.current.setLatLng([latVal, lngVal]);
+      }
+    }
+  }, [formData.lat, formData.lng]);
+
+  const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLat = parseFloat(position.coords.latitude.toFixed(6));
+          const newLng = parseFloat(position.coords.longitude.toFixed(6));
+          setFormData((prev) => ({
+            ...prev,
+            lat: newLat,
+            lng: newLng
+          }));
+          if (mapInstanceRef.current && markerInstanceRef.current) {
+            mapInstanceRef.current.flyTo([newLat, newLng], 14);
+            markerInstanceRef.current.setLatLng([newLat, newLng]);
+          }
+        },
+        () => {
+          setError('Unable to retrieve current browser GPS position.');
+        }
+      );
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -106,7 +255,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
 
     // Prepare payload matching StationCreateDto / StationUpdateDto
     const payload = {
-      ...(isEditing && { id: initialData.id }),
+      ...(isEditing && { id: initialData.id, status: formData.status }),
       stationName: formData.stationName.trim(),
       location: {
         lat: latVal,
@@ -145,7 +294,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-content"
-        style={{ maxWidth: '640px', maxHeight: '92vh', overflowY: 'auto' }}
+        style={{ maxWidth: '680px', maxHeight: '92vh', overflowY: 'auto' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -195,28 +344,125 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
               </div>
             )}
 
-            {/* Station Name */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontWeight: 600 }}>
-                Station Node Name <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                type="text"
-                name="stationName"
-                className="form-control"
-                placeholder="e.g. Colombo Fort Solar Hub"
-                value={formData.stationName}
-                onChange={handleChange}
-                required
-              />
+            {/* Station Name & Status (in Edit Mode) */}
+            <div style={{ display: 'grid', gridTemplateColumns: isEditing ? '1.8fr 1.2fr' : '1fr', gap: '1rem' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontWeight: 600 }}>
+                  Station Node Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="stationName"
+                  className="form-control"
+                  placeholder="e.g. Colombo Fort Solar Hub"
+                  value={formData.stationName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {isEditing && (
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 600 }}>
+                    Station Status
+                  </label>
+                  <select
+                    name="status"
+                    className="form-control"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Maintenance">Maintenance</option>
+                  </select>
+                </div>
+              )}
             </div>
 
-            {/* Location (Lat, Lng) */}
+            {/* Location (Lat, Lng) with 'Select on Map' Trigger */}
             <div>
-              <label className="form-label" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <MapPin size={16} style={{ color: 'var(--solar-amber)' }} />
-                <span>GPS Location Coordinates <span style={{ color: '#ef4444' }}>*</span></span>
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                <label className="form-label" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem', margin: 0 }}>
+                  <MapPin size={16} style={{ color: 'var(--solar-amber)' }} />
+                  <span>GPS Location Coordinates <span style={{ color: '#ef4444' }}>*</span></span>
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() => setShowMapPicker(!showMapPicker)}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.2rem 0.6rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    borderColor: showMapPicker ? 'var(--solar-amber)' : 'var(--border-subtle)',
+                    color: showMapPicker ? 'var(--solar-amber)' : 'var(--text-main)',
+                    background: showMapPicker ? 'rgba(245, 158, 11, 0.1)' : 'transparent'
+                  }}
+                  title="Toggle Interactive GPS Map Picker"
+                >
+                  <Compass size={14} />
+                  <span>{showMapPicker ? 'Hide Map Picker' : 'Select on Map'}</span>
+                </button>
+              </div>
+
+              {/* Collapsible Interactive Leaflet Map Picker Canvas */}
+              {showMapPicker && (
+                <div
+                  style={{
+                    marginBottom: '0.75rem',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-md)',
+                    overflow: 'hidden',
+                    background: '#0f172a'
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: '0.4rem 0.75rem',
+                      background: 'var(--bg-card-header)',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    <span style={{ color: 'var(--solar-amber)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Crosshair size={13} />
+                      Click anywhere on the map or drag the pin to set GPS coordinates
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleGetCurrentLocation}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-main)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        fontSize: '0.75rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Locate Me
+                    </button>
+                  </div>
+                  <div
+                    ref={mapContainerRef}
+                    style={{
+                      height: '240px',
+                      width: '100%',
+                      zIndex: 1
+                    }}
+                  />
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Latitude (-90 to +90)</label>

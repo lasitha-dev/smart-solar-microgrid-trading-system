@@ -17,7 +17,6 @@ import {
   Clock,
   RotateCcw,
   Edit,
-  Trash2,
   AlertCircle,
   Plus,
   Search,
@@ -87,6 +86,33 @@ export const StationListPage = () => {
     setDeactivatingStation(station);
     setDeactivateError('');
     setIsDeactivateOpen(true);
+  };
+
+  const handleToggleStatus = async (station) => {
+    const isActive = station.status?.toLowerCase() === 'active';
+    if (isActive) {
+      // Trying to deactivate (ON -> OFF): open confirmation modal to enforce FAT 409 Conflict validation
+      handleOpenDeactivate(station);
+    } else {
+      // Trying to reactivate (OFF -> ON): call updateStation with status 'Active'
+      setLoading(true);
+      setError('');
+      try {
+        await stationService.updateStation(station.id, {
+          stationName: station.stationName,
+          location: station.location,
+          capacityKwh: station.capacityKwh,
+          totalBatterySlots: station.totalBatterySlots ?? station.batterySlots?.length,
+          schedule: station.schedule,
+          status: 'Active'
+        });
+        await fetchStations();
+      } catch (err) {
+        setError(err.message || 'Failed to reactivate station node.');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleSaveStation = async (payload) => {
@@ -332,7 +358,7 @@ export const StationListPage = () => {
 
                       {/* Action Buttons */}
                       <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'inline-flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.65rem', justifyContent: 'flex-end' }}>
                           <button
                             className="btn btn-outline btn-sm"
                             onClick={() => handleEdit(station)}
@@ -342,19 +368,54 @@ export const StationListPage = () => {
                             <Edit size={14} />
                           </button>
 
-                          <button
-                            className="btn btn-outline btn-sm"
-                            onClick={() => handleOpenDeactivate(station)}
-                            title="Deactivate Station Node"
-                            disabled={!isActive}
+                          {/* Status Toggle Switch (Active = ON, Inactive/Maintenance = OFF) */}
+                          <label
                             style={{
-                              padding: '0.35rem 0.5rem',
-                              color: isActive ? '#ef4444' : 'var(--text-dim)',
-                              borderColor: isActive ? 'rgba(239, 68, 68, 0.3)' : 'var(--border-subtle)'
+                              position: 'relative',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              cursor: 'pointer',
+                              margin: 0
                             }}
+                            title={isActive ? 'Node is Active. Click to deactivate.' : 'Node is Inactive. Click to reactivate.'}
                           >
-                            <Trash2 size={14} />
-                          </button>
+                            <input
+                              type="checkbox"
+                              checked={isActive}
+                              onChange={() => handleToggleStatus(station)}
+                              style={{
+                                opacity: 0,
+                                width: 0,
+                                height: 0,
+                                position: 'absolute'
+                              }}
+                            />
+                            <div
+                              style={{
+                                width: '38px',
+                                height: '22px',
+                                background: isActive ? '#10b981' : '#475569',
+                                borderRadius: '22px',
+                                transition: 'background-color 0.2s ease',
+                                position: 'relative',
+                                boxShadow: isActive ? '0 0 8px rgba(16, 185, 129, 0.4)' : 'none'
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  background: '#ffffff',
+                                  borderRadius: '50%',
+                                  position: 'absolute',
+                                  top: '3px',
+                                  left: isActive ? '19px' : '3px',
+                                  transition: 'left 0.2s ease',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                                }}
+                              />
+                            </div>
+                          </label>
                         </div>
                       </td>
                     </tr>
