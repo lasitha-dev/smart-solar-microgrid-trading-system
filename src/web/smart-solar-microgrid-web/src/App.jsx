@@ -14,6 +14,7 @@ import { LoginPage } from './pages/LoginPage';
 import { PendingApprovalsPage } from './pages/PendingApprovalsPage';
 import { UserManagementPage } from './pages/UserManagementPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
+import { StationListPage } from './features/microgrid-nodes/pages/StationListPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
 
@@ -59,6 +60,22 @@ export const App = () => {
           element={
             <BackofficeOnlyRoute>
               <UserManagementPage />
+            </BackofficeOnlyRoute>
+          }
+        />
+        <Route
+          path="admin/stations"
+          element={
+            <BackofficeOnlyRoute>
+              <StationListPage />
+            </BackofficeOnlyRoute>
+          }
+        />
+        <Route
+          path="stations"
+          element={
+            <BackofficeOnlyRoute>
+              <StationListPage />
             </BackofficeOnlyRoute>
           }
         />

@@ -43,7 +43,6 @@ api.interceptors.response.use(
         window.location.href = '/login?expired=true';
       }
     }
-    
     // Extract formatted API message
     const message =
       error.response?.data?.message ||
@@ -51,7 +50,9 @@ api.interceptors.response.use(
       error.message ||
       'An unexpected network error occurred.';
       
-    return Promise.reject(new Error(message));
+    const customError = new Error(message);
+    customError.response = error.response;
+    return Promise.reject(customError);
   }
 );
 

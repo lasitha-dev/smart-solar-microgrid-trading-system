@@ -154,6 +154,29 @@ export const AdminLayout = () => {
                   <span>User Directory</span>
                 </div>
               </NavLink>
+
+              <NavLink
+                to="/admin/stations"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Zap size={18} style={{ color: 'var(--solar-amber)' }} />
+                  <span>Microgrid Stations</span>
+                </div>
+              </NavLink>
             </>
           )}
 
