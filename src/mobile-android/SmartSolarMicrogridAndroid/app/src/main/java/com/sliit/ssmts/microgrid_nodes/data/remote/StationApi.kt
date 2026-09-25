@@ -8,6 +8,7 @@
 
 package com.sliit.ssmts.microgrid_nodes.data.remote
 
+import com.sliit.ssmts.data.remote.dto.ApiResponse
 import com.sliit.ssmts.microgrid_nodes.domain.model.MicrogridStation
 import retrofit2.Response
 import retrofit2.http.GET
@@ -25,12 +26,12 @@ interface StationApi {
      * @param lat Geographic latitude coordinate of user/device.
      * @param lng Geographic longitude coordinate of user/device.
      * @param radiusKm Radial search distance threshold in kilometers (default 15.0 km).
-     * @return Retrofit [Response] wrapping a list of [MicrogridStation] objects sorted by distance.
+     * @return Retrofit [Response] wrapping standard [ApiResponse] with a list of [MicrogridStation] objects sorted by distance.
      */
     @GET("api/stations/nearby")
     suspend fun getNearbyStations(
         @Query("lat") lat: Double,
         @Query("lng") lng: Double,
         @Query("radiusKm") radiusKm: Double = 15.0
-    ): Response<List<MicrogridStation>>
+    ): Response<ApiResponse<List<MicrogridStation>>>
 }

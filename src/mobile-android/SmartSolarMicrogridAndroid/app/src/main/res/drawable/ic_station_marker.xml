@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Student Role: Member 2
+  Module: SE4040 Enterprise Application Development (2026)
+  Component: Microgrid Nodes, Schedules & Maps (Member 2)
+  Description: Custom vector marker icon for Solar Microgrid Substation nodes.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87 -3.13,-7 -7,-7z" />
+    <path
+        android:fillColor="#0B1120"
+        android:pathData="M11,6L7,11h4l-1,5 5,-6h-4z" />
+</vector>

@@ -44,8 +44,13 @@ class StationRepositoryImpl(
         try {
             val response = stationApi.getNearbyStations(lat = lat, lng = lng, radiusKm = radiusKm)
             if (response.isSuccessful) {
-                val stations = response.body() ?: emptyList()
-                NetworkResult.Success(stations)
+                val apiResponse = response.body()
+                if (apiResponse != null && !apiResponse.success) {
+                    NetworkResult.Error(response.code(), apiResponse.message ?: "Failed to retrieve nearby stations.")
+                } else {
+                    val stations = apiResponse?.data ?: emptyList()
+                    NetworkResult.Success(stations)
+                }
             } else {
                 val errorBody = response.errorBody()?.string()
                 val message = parseErrorMessage(errorBody, response.code())

@@ -339,4 +339,6 @@
     <string name="station_details_capacity">Capacity: %1$.1f kWh</string>
     <string name="station_details_bays">Available Bays: %1$d / %2$d</string>
     <string name="station_details_status">Status: %1$s</string>
+    <string name="my_solar_grid">My Solar Grid</string>
+    <string name="my_solar_grid_desc">Registered Prosumer Solar Facility</string>
 </resources>

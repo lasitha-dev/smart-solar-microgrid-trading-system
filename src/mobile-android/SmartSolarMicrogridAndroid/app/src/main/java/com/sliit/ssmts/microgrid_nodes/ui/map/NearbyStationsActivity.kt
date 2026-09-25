@@ -2,83 +2,76 @@
  * Student Role: Member 2
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Microgrid Nodes, Schedules & Maps (Member 2)
- * Description: Interactive Google Maps Activity plotting active solar microgrid nodes, available battery slots, and proximity calculations.
+ * Description: Interactive OpenStreetMap (osmdroid) Activity plotting active solar microgrid nodes and available battery slots relative to the Prosumer's registered solar grid location.
  * Author: Member 2
  */
 
+@file:Suppress("DEPRECATION")
+
 package com.sliit.ssmts.microgrid_nodes.ui.map
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.sliit.ssmts.R
 import com.sliit.ssmts.databinding.ActivityNearbyStationsBinding
 import com.sliit.ssmts.microgrid_nodes.domain.model.MicrogridStation
+import com.sliit.ssmts.util.SessionManager
 import kotlinx.coroutines.launch
+import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import java.util.Locale
 
 /**
- * Description: Map view activity displaying physical microgrid substations and real-time bay availability.
+ * Description: Map view activity displaying physical microgrid substations and real-time bay availability
+ * using OpenStreetMap (osmdroid), calculated relative to the logged-in prosumer's registered home solar grid coordinates.
  * Author: Member 2
  */
-class NearbyStationsActivity : AppCompatActivity(), OnMapReadyCallback {
+class NearbyStationsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNearbyStationsBinding
     private val viewModel: StationMapViewModel by viewModels { StationMapViewModelFactory(this) }
-
-    private var googleMap: GoogleMap? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var sessionManager: SessionManager
 
     // Default fallback coordinates (Colombo, Sri Lanka)
-    private val defaultLocation = LatLng(6.9271, 79.8612)
-    private var currentLocation: LatLng = defaultLocation
-    private val markerStationMap = HashMap<Marker, MicrogridStation>()
-
-    private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
-
-        if (fineLocationGranted || coarseLocationGranted) {
-            enableMyLocationAndFetch()
-        } else {
-            Toast.makeText(this, getString(R.string.location_permission_denied), Toast.LENGTH_LONG).show()
-            useFallbackLocationAndFetch()
-        }
+    companion object {
+        private const val DEFAULT_LAT = 6.9271
+        private const val DEFAULT_LNG = 79.8612
+        private const val SEARCH_RADIUS_KM = 15.0
+        private const val DEFAULT_ZOOM_LEVEL = 14.0
     }
 
+    private var homeLocation: GeoPoint = GeoPoint(DEFAULT_LAT, DEFAULT_LNG)
+    private var homeMarker: Marker? = null
+
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize osmdroid configuration
+        Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
+        Configuration.getInstance().userAgentValue = packageName
+
         binding = ActivityNearbyStationsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        sessionManager = SessionManager(applicationContext)
 
         setupUI()
-        initMap()
+        setupMapView()
         observeViewModel()
+        fetchSavedLocationAndLoadStations()
     }
 
     private fun setupUI() {
@@ -87,86 +80,88 @@ class NearbyStationsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         binding.btnRecenter.setOnClickListener {
-            checkPermissionsAndFetchLocation()
+            binding.map.controller.animateTo(homeLocation)
+            viewModel.loadNearbyStations(homeLocation.latitude, homeLocation.longitude, SEARCH_RADIUS_KM)
         }
     }
 
-    private fun initMap() {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
-    }
+    private fun setupMapView() {
+        binding.map.apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(true)
+            controller.setZoom(DEFAULT_ZOOM_LEVEL)
+            controller.setCenter(homeLocation)
+        }
 
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-
-        // Setup map UI
-        googleMap?.uiSettings?.isZoomControlsEnabled = true
-        googleMap?.uiSettings?.isCompassEnabled = true
-
-        googleMap?.setOnMarkerClickListener { marker ->
-            val station = markerStationMap[marker]
-            if (station != null) {
-                showStationDetails(station)
+        // Tap on map background to dismiss bottom details card
+        val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                binding.cardStationDetails.visibility = View.GONE
+                return false
             }
-            marker.showInfoWindow()
-            false
-        }
 
-        googleMap?.setOnMapClickListener {
-            binding.cardStationDetails.visibility = View.GONE
-        }
-
-        checkPermissionsAndFetchLocation()
+            override fun longPressHelper(p: GeoPoint?): Boolean = false
+        })
+        binding.map.overlays.add(mapEventsOverlay)
     }
 
-    private fun checkPermissionsAndFetchLocation() {
-        val fineGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
 
-        val coarseGranted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
+    }
 
-        if (fineGranted || coarseGranted) {
-            enableMyLocationAndFetch()
-        } else {
-            locationPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
+    /**
+     * Retrieves the prosumer's registered solar grid GPS coordinates from local SQLite session,
+     * centers the map on the prosumer's home node, and queries nearby microgrid substations.
+     */
+    private fun fetchSavedLocationAndLoadStations() {
+        lifecycleScope.launch {
+            val session = sessionManager.getActiveSession()
+            val savedLat = session?.latitude
+            val savedLng = session?.longitude
+
+            val targetLat = if (savedLat != null && savedLat != 0.0) savedLat else DEFAULT_LAT
+            val targetLng = if (savedLng != null && savedLng != 0.0) savedLng else DEFAULT_LNG
+
+            homeLocation = GeoPoint(targetLat, targetLng)
+
+            binding.map.controller.setCenter(homeLocation)
+            binding.map.controller.animateTo(homeLocation)
+            renderHomeMarker()
+
+            viewModel.loadNearbyStations(targetLat, targetLng, SEARCH_RADIUS_KM)
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun enableMyLocationAndFetch() {
-        try {
-            googleMap?.isMyLocationEnabled = true
-        } catch (_: SecurityException) { }
+    /**
+     * Renders a distinct Blue pin representing the prosumer's registered solar home facility.
+     */
+    private fun renderHomeMarker() {
+        homeMarker?.let { binding.map.overlays.remove(it) }
 
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    currentLocation = LatLng(location.latitude, location.longitude)
-                } else {
-                    currentLocation = defaultLocation
-                }
-                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 13f))
-                viewModel.loadNearbyStations(currentLocation.latitude, currentLocation.longitude)
+        val marker = Marker(binding.map).apply {
+            position = homeLocation
+            title = getString(R.string.my_solar_grid)
+            snippet = getString(R.string.my_solar_grid_desc)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            ContextCompat.getDrawable(this@NearbyStationsActivity, R.drawable.ic_home_marker)?.let {
+                icon = it
             }
-            .addOnFailureListener {
-                useFallbackLocationAndFetch()
+            setOnMarkerClickListener { m, _ ->
+                binding.cardStationDetails.visibility = View.GONE
+                m.showInfoWindow()
+                true
             }
-    }
+        }
 
-    private fun useFallbackLocationAndFetch() {
-        currentLocation = defaultLocation
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 12f))
-        viewModel.loadNearbyStations(currentLocation.latitude, currentLocation.longitude)
+        homeMarker = marker
+        binding.map.overlays.add(marker)
+        binding.map.invalidate()
     }
 
     private fun observeViewModel() {
@@ -197,40 +192,64 @@ class NearbyStationsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun renderStationsOnMap(stations: List<MicrogridStation>) {
-        googleMap?.clear()
-        markerStationMap.clear()
+        // Clear previous overlays while keeping background tap listener
+        binding.map.overlays.clear()
+
+        // Re-add tap overlay to dismiss card on background click
+        val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                binding.cardStationDetails.visibility = View.GONE
+                return false
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean = false
+        })
+        binding.map.overlays.add(mapEventsOverlay)
+
+        // Always re-add the prosumer home solar grid marker
+        renderHomeMarker()
 
         binding.tvStationsCount.text = getString(R.string.stations_found_format, stations.size)
 
         if (stations.isEmpty()) {
-            Toast.makeText(this, getString(R.string.no_stations_found, 15.0), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_stations_found, SEARCH_RADIUS_KM), Toast.LENGTH_SHORT).show()
+            binding.map.invalidate()
             return
         }
 
+        val stationIcon = ContextCompat.getDrawable(this, R.drawable.ic_station_marker)
+
         for (station in stations) {
-            val stationLatLng = LatLng(station.lat, station.lng)
+            val stationPoint = GeoPoint(station.lat, station.lng)
             val snippetText = getString(
                 R.string.station_distance_snippet,
                 station.distanceKm,
                 station.availableBatterySlots
             )
 
-            val markerOptions = MarkerOptions()
-                .position(stationLatLng)
-                .title(station.stationName)
-                .snippet(snippetText)
-                .icon(
-                    if (station.availableBatterySlots > 0)
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-                    else
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-                )
+            val marker = Marker(binding.map).apply {
+                position = stationPoint
+                title = station.stationName
+                snippet = snippetText
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                if (stationIcon != null) {
+                    icon = stationIcon
+                }
 
-            val marker = googleMap?.addMarker(markerOptions)
-            if (marker != null) {
-                markerStationMap[marker] = station
+                // CRITICAL UI FIX: Set an setOnMarkerClickListener for the station markers.
+                // When clicked, populate the cardStationDetails TextViews and set the card to View.VISIBLE.
+                // Return true to consume the click.
+                setOnMarkerClickListener { clickedMarker, _ ->
+                    showStationDetails(station)
+                    clickedMarker.showInfoWindow()
+                    true
+                }
             }
+
+            binding.map.overlays.add(marker)
         }
+
+        binding.map.invalidate()
     }
 
     private fun showStationDetails(station: MicrogridStation) {
