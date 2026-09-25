@@ -207,7 +207,7 @@ export const UserManagementPage = () => {
             alignItems: 'flex-end'
           }}>
             {/* Search Input */}
-            <div className="form-group" style={{ marginBottom: 0, gridColumn: 'span 2' }}>
+            <div className="form-group filter-grid-2-span" style={{ marginBottom: 0 }}>
               <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <Search size={14} />
                 <span>Search by NIC, Username, Name, or Email</span>
@@ -288,8 +288,8 @@ export const UserManagementPage = () => {
       </div>
 
       {/* User Directory Table */}
-      <div className="table-container">
-        <table className="data-table">
+      <div className="table-container overflow-x-auto">
+        <table className="data-table whitespace-nowrap">
           <thead>
             <tr>
               <th>NIC</th>

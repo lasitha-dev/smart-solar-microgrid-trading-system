@@ -262,8 +262,8 @@ export const PendingApprovalsPage = () => {
 
       {/* Single Clean Table View with Separate Facility Address & Coordinates Columns */}
       {pendingProsumers.length > 0 && (
-        <div className="table-container">
-          <table className="data-table">
+        <div className="table-container overflow-x-auto">
+          <table className="data-table whitespace-nowrap">
             <thead>
               <tr>
                 <th>Prosumer Details</th>

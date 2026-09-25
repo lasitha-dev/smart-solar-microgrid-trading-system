@@ -345,7 +345,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
             )}
 
             {/* Station Name & Status (in Edit Mode) */}
-            <div style={{ display: 'grid', gridTemplateColumns: isEditing ? '1.8fr 1.2fr' : '1fr', gap: '1rem' }}>
+            <div className={isEditing ? "responsive-grid-edit-status" : ""}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" style={{ fontWeight: 600 }}>
                   Station Node Name <span style={{ color: '#ef4444' }}>*</span>
@@ -463,7 +463,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="responsive-grid-2">
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Latitude (-90 to +90)</label>
                   <input
@@ -509,7 +509,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
             </div>
 
             {/* Capacity & Battery Slots */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="responsive-grid-2">
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Zap size={16} style={{ color: 'var(--solar-amber)' }} />
@@ -553,7 +553,7 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
                 <Clock size={16} style={{ color: 'var(--solar-amber)' }} />
                 <span>Daily Operating Trading Hours (24H Format)</span>
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="responsive-grid-2">
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Open Time (HH:mm)</label>
                   <input

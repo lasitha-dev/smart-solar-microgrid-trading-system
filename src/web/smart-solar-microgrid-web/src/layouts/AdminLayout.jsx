@@ -264,14 +264,14 @@ export const AdminLayout = () => {
       </aside>
 
       {/* Main Page Wrapper */}
-      <div className="main-content">
+      <div className="main-content" style={{ minWidth: 0, overflowX: 'hidden' }}>
         {/* Top Navbar */}
         <header className="top-navbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-sm mobile-menu-toggle"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{ display: 'inline-flex' }}
+              aria-label="Toggle navigation menu"
             >
               {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -283,7 +283,7 @@ export const AdminLayout = () => {
         </header>
 
         {/* Dynamic Nested Content */}
-        <main className="page-body">
+        <main className="page-body" style={{ minWidth: 0 }}>
           <Outlet context={{ refreshPendingCount: fetchPendingCount }} />
         </main>
       </div>

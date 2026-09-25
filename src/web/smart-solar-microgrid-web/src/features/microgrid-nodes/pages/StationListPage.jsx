@@ -242,8 +242,8 @@ export const StationListPage = () => {
           </span>
         </div>
 
-        <div className="table-container">
-          <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="table-container overflow-x-auto">
+          <table className="data-table whitespace-nowrap" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
                 <th>Station Name</th>
