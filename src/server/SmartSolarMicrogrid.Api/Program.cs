@@ -116,6 +116,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Member 2 Services
+builder.Services.AddScoped<IStationService, StationService>();
+
 // Member 4 Services
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddSingleton<IQrSignatureService, QrSignatureService>();
