@@ -39,9 +39,19 @@
 
     <!-- Update / Cancel Dialogs (Phase 6) -->
     <string name="title_reschedule">Reschedule Reservation</string>
+    <string name="subtitle_reschedule">Select a new date and time for your reservation.</string>
+    <string name="btn_select_new_date">Select New Date</string>
+    <string name="label_no_slot_selected">No slot selected</string>
     <string name="title_cancel_confirm">Cancel Reservation?</string>
     <string name="msg_cancel_confirm">Are you sure you want to cancel this reservation? This action cannot be undone.</string>
     <string name="msg_12_hour_rule">Cannot modify — less than 12 hours until scheduled time.</string>
+    <string name="err_12_hour_rule_update">Reschedule blocked: less than 12 hours remain before your scheduled slot.</string>
+    <string name="err_12_hour_rule_cancel">Cancellation blocked: less than 12 hours remain before your scheduled slot.</string>
+    <string name="hint_cancel_reason">Cancellation Reason (Optional)</string>
+    <string name="label_qr_code">Reservation QR Token</string>
+    <string name="btn_copy_token">Copy Token</string>
+    <string name="btn_view_history">View My Booking History</string>
+    <string name="msg_token_copied">QR Token copied to clipboard</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_dismiss">Dismiss</string>
 </resources>

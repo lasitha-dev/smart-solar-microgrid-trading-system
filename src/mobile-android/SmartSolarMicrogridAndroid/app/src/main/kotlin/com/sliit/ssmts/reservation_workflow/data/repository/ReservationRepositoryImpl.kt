@@ -73,7 +73,7 @@ class ReservationRepositoryImpl(
                 
                 NetworkResult.Success(reservation)
             } else {
-                val errorMsg = response.body()?.message ?: "Validation failed or slot unavailable"
+                val errorMsg = extractErrorMessage(response.errorBody()?.string(), response.body()?.message, "Validation failed or slot unavailable")
                 NetworkResult.Error(response.code().toString(), errorMsg)
             }
         } catch (e: Exception) {
@@ -121,7 +121,8 @@ class ReservationRepositoryImpl(
                 dao.upsert(mapToEntity(dto))
                 NetworkResult.Success(mapToDomain(dto))
             } else {
-                NetworkResult.Error(response.code().toString(), response.body()?.message ?: "Update blocked by business rule")
+                val errorMsg = extractErrorMessage(response.errorBody()?.string(), response.body()?.message, "Update blocked by business rule")
+                NetworkResult.Error(response.code().toString(), errorMsg)
             }
         } catch (e: Exception) {
             NetworkResult.Exception(e)
@@ -136,16 +137,47 @@ class ReservationRepositoryImpl(
                 dao.updateStatus(id, "Cancelled")
                 NetworkResult.Success(Unit)
             } else {
-                NetworkResult.Error(response.code().toString(), response.body()?.message ?: "Cancellation blocked by 12-hour rule")
+                val errorMsg = extractErrorMessage(response.errorBody()?.string(), response.body()?.message, "Cancellation blocked by 12-hour rule")
+                NetworkResult.Error(response.code().toString(), errorMsg)
             }
         } catch (e: Exception) {
             NetworkResult.Exception(e)
         }
     }
 
+    private fun extractErrorMessage(errorBody: String?, bodyMessage: String?, defaultMsg: String): String {
+        if (!errorBody.isNullOrBlank()) {
+            try {
+                val jsonObject = com.google.gson.JsonParser.parseString(errorBody).asJsonObject
+                if (jsonObject.has("message") && !jsonObject.get("message").isJsonNull) {
+                    return jsonObject.get("message").asString
+                }
+            } catch (_: Exception) {}
+        }
+        return bodyMessage ?: defaultMsg
+    }
+
     override fun getMyReservations(prosumerId: String): Flow<List<Reservation>> {
-        return dao.getAllByProsumer(prosumerId).map { entities ->
+        val flow = if (prosumerId.isBlank()) dao.getAll() else dao.getAllByProsumer(prosumerId)
+        return flow.map { entities ->
             entities.map { mapEntityToDomain(it) }
+        }
+    }
+
+    override suspend fun syncReservations(prosumerId: String): NetworkResult<List<Reservation>> {
+        return try {
+            val queryId = if (prosumerId.isBlank()) null else prosumerId
+            val response = api.getProsumerReservations(queryId)
+            if (response.isSuccessful && response.body()?.success == true) {
+                val dtos = response.body()?.data ?: emptyList()
+                val entities = dtos.map { mapToEntity(it) }
+                dao.upsertAll(entities)
+                NetworkResult.Success(dtos.map { mapToDomain(it) })
+            } else {
+                NetworkResult.Error(response.code().toString(), response.body()?.message ?: "Failed to sync reservations")
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
         }
     }
 

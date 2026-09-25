@@ -42,6 +42,13 @@ namespace SmartSolarMicrogrid.Api.Services
                 throw new BusinessRuleException("SLOT_UNAVAILABLE", $"Slot is currently {slot.Status}.");
             }
 
+            // Atomically reserve the slot to prevent race conditions / double bookings
+            var reserved = await _repository.TryReserveSlotAsync(dto.BookingSlotId);
+            if (!reserved)
+            {
+                throw new BusinessRuleException("SLOT_UNAVAILABLE", "Slot was just taken by another user. Please select another slot.");
+            }
+
             // Create reservation
             var reservation = new EnergyReservation
             {
@@ -55,9 +62,6 @@ namespace SmartSolarMicrogrid.Api.Services
             };
 
             await _repository.CreateAsync(reservation);
-
-            // Update slot status to Reserved
-            await _repository.UpdateSlotStatusAsync(dto.BookingSlotId, "Reserved");
 
             return reservation;
         }

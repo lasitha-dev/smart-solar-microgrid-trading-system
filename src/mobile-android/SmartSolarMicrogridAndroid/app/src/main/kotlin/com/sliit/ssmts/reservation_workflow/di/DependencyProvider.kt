@@ -54,7 +54,7 @@ object DependencyProvider {
         return retrofit!!
     }
 
-    private fun getReservationApi(): ReservationApi {
+    fun getReservationApi(): ReservationApi {
         return getRetrofit().create(ReservationApi::class.java)
     }
 

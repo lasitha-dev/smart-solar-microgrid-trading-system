@@ -2,12 +2,19 @@
  * Student: Kumarasinghe S.S | IT22221414
  * Branch: feature/member-3-reservation-workflow
  * Component: Reservation Workflow (Member 3) - SE4040 EAD 2026
- * Description: Activity displaying the reservation summary receipt.
+ * Description: Activity displaying the reservation summary receipt with QR support and viva demo options.
  */
 
 package com.sliit.ssmts.reservation_workflow.ui.summary
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -17,12 +24,17 @@ import com.sliit.ssmts.operator_dashboard.R
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityBookingSummaryBinding
 import com.sliit.ssmts.reservation_workflow.di.DependencyProvider
 import com.sliit.ssmts.reservation_workflow.di.ViewModelFactory
+import com.sliit.ssmts.reservation_workflow.domain.model.Reservation
 import com.sliit.ssmts.reservation_workflow.domain.model.ReservationStatus
 import com.sliit.ssmts.reservation_workflow.ui.common.UiState
+import com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryActivity
 import com.sliit.ssmts.reservation_workflow.ui.manage.CancelReservationDialog
 import com.sliit.ssmts.reservation_workflow.ui.manage.UpdateReservationDialog
 import com.sliit.ssmts.reservation_workflow.ui.manage.ManageReservationViewModel
+import com.sliit.ssmts.reservation_workflow.util.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class BookingSummaryActivity : AppCompatActivity(), 
@@ -32,6 +44,8 @@ class BookingSummaryActivity : AppCompatActivity(),
     private lateinit var binding: ActivityBookingSummaryBinding
     private lateinit var viewModel: BookingSummaryViewModel
     private lateinit var manageViewModel: ManageReservationViewModel
+    private var currentReservation: Reservation? = null
+    private var currentReservationId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +53,12 @@ class BookingSummaryActivity : AppCompatActivity(),
         binding = ActivityBookingSummaryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Toolbar back navigation
+        setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener { finish() }
         
         // Extract reservation data from Intent
         val reservationId = intent.getStringExtra("RESERVATION_ID") ?: return
+        currentReservationId = reservationId
         
         // Setup ViewModel
         val repository = DependencyProvider.getReservationRepository(this)
@@ -57,16 +72,31 @@ class BookingSummaryActivity : AppCompatActivity(),
                 when (state) {
                     is UiState.Idle -> { /* do nothing */ }
                     is UiState.Loading -> {
-                        binding.tvStatusBadge.text = "Loading..."
+                        binding.tvStatusBadge.text = getString(R.string.status_pending)
                     }
                     is UiState.Success -> {
                         val reservation = state.data
+                        currentReservation = reservation
                         binding.tvReservationId.text = reservation.id
                         binding.tvStation.text = reservation.stationId
-                        binding.tvScheduledTime.text = reservation.scheduledDateTime.toString()
+                        binding.tvScheduledTime.text = DateTimeFormatter.toDisplayString(reservation.scheduledDateTime)
                         binding.tvProsumerNic.text = reservation.prosumerId
                         
                         applyStatusBadge(reservation.status)
+
+                        // QR Code display
+                        if (!reservation.qrCode.isNullOrEmpty()) {
+                            binding.cardQrCode.visibility = View.VISIBLE
+                            binding.tvQrToken.text = reservation.qrCode
+                            binding.btnCopyQrToken.setOnClickListener {
+                                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("QR Token", reservation.qrCode)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(this@BookingSummaryActivity, R.string.msg_token_copied, Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            binding.cardQrCode.visibility = View.GONE
+                        }
                     }
                     is UiState.Error -> {
                         Toast.makeText(this@BookingSummaryActivity, state.message, Toast.LENGTH_LONG).show()
@@ -111,16 +141,65 @@ class BookingSummaryActivity : AppCompatActivity(),
         
         viewModel.loadReservation(reservationId)
         
-        // Reschedule button
+        // Reschedule button with scheduled time passed for 12-hour rule check
         binding.btnReschedule.setOnClickListener {
-            val dialog = com.sliit.ssmts.reservation_workflow.ui.manage.UpdateReservationDialog()
-            dialog.show(supportFragmentManager, com.sliit.ssmts.reservation_workflow.ui.manage.UpdateReservationDialog.TAG)
+            val millis = currentReservation?.scheduledDateTime?.time ?: System.currentTimeMillis()
+            val dialog = UpdateReservationDialog.newInstance(millis)
+            dialog.show(supportFragmentManager, UpdateReservationDialog.TAG)
         }
         
-        // Cancel button
+        // Cancel button with scheduled time passed for 12-hour rule check
         binding.btnCancel.setOnClickListener {
-            val dialog = com.sliit.ssmts.reservation_workflow.ui.manage.CancelReservationDialog()
-            dialog.show(supportFragmentManager, com.sliit.ssmts.reservation_workflow.ui.manage.CancelReservationDialog.TAG)
+            val millis = currentReservation?.scheduledDateTime?.time ?: System.currentTimeMillis()
+            val dialog = CancelReservationDialog.newInstance(millis)
+            dialog.show(supportFragmentManager, CancelReservationDialog.TAG)
+        }
+
+        // View History button
+        binding.btnViewHistory.setOnClickListener {
+            val intent = Intent(this, BookingHistoryActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_booking_summary, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_seed_slots -> {
+                lifecycleScope.launch {
+                    try {
+                        val api = DependencyProvider.getReservationApi()
+                        val response = withContext(Dispatchers.IO) { api.seedSlots() }
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@BookingSummaryActivity, "Demo slots successfully seeded in database!", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this@BookingSummaryActivity, "Seed failed: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@BookingSummaryActivity, "Seed error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                    }
+                }
+                true
+            }
+            R.id.action_demo_blocked -> {
+                // Simulate a booking only 2 hours away to demonstrate the 12-hour block UI
+                val blockedMillis = System.currentTimeMillis() + (2 * 3600 * 1000L)
+                val dialog = CancelReservationDialog.newInstance(blockedMillis)
+                dialog.show(supportFragmentManager, CancelReservationDialog.TAG)
+                true
+            }
+            R.id.action_demo_allowed -> {
+                // Simulate a booking 25 hours away to demonstrate normal cancellation allowed UI
+                val allowedMillis = System.currentTimeMillis() + (25 * 3600 * 1000L)
+                val dialog = CancelReservationDialog.newInstance(allowedMillis)
+                dialog.show(supportFragmentManager, CancelReservationDialog.TAG)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
     
@@ -162,19 +241,17 @@ class BookingSummaryActivity : AppCompatActivity(),
         binding.cardStatusBadge.setCardBackgroundColor(ContextCompat.getColor(this, bgColor))
     }
 
-    override fun onCancelConfirmed() {
-        val currentState = viewModel.summaryState.value
-        if (currentState is UiState.Success) {
-            manageViewModel.cancelReservation(currentState.data, "User Requested Cancellation")
+    override fun onCancelConfirmed(reason: String?) {
+        val reservation = currentReservation
+        if (reservation != null) {
+            manageViewModel.cancelReservation(reservation, reason ?: "User Requested Cancellation")
         }
     }
 
     override fun onUpdateConfirmed(newDate: Date) {
-        val currentState = viewModel.summaryState.value
-        if (currentState is UiState.Success) {
-            // For demo, re-using the same slotId but with new Date. 
-            // In a real flow, they'd select a specific new Slot from the Date.
-            manageViewModel.updateReservation(currentState.data, currentState.data.bookingSlotId, newDate)
+        val reservation = currentReservation
+        if (reservation != null) {
+            manageViewModel.updateReservation(reservation, reservation.bookingSlotId, newDate)
         }
     }
 }

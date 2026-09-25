@@ -2,7 +2,7 @@
  * Student: Kumarasinghe S.S | IT22221414
  * Branch: feature/member-3-reservation-workflow
  * Component: Reservation Workflow (Member 3) - SE4040 EAD 2026
- * Description: RecyclerView Adapter for displaying reservation history items.
+ * Description: RecyclerView Adapter for displaying reservation history items with item click listener.
  */
 
 package com.sliit.ssmts.reservation_workflow.ui.history
@@ -20,7 +20,9 @@ import com.sliit.ssmts.reservation_workflow.domain.model.Reservation
 import com.sliit.ssmts.reservation_workflow.domain.model.ReservationStatus
 import com.sliit.ssmts.reservation_workflow.util.DateTimeFormatter
 
-class BookingHistoryAdapter : ListAdapter<Reservation, BookingHistoryAdapter.ViewHolder>(DiffCallback) {
+class BookingHistoryAdapter(
+    private val onItemClick: (Reservation) -> Unit = {}
+) : ListAdapter<Reservation, BookingHistoryAdapter.ViewHolder>(DiffCallback) {
 
     class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val tvBookingId: TextView = view.findViewById(R.id.tvBookingId)
@@ -28,7 +30,7 @@ class BookingHistoryAdapter : ListAdapter<Reservation, BookingHistoryAdapter.Vie
         val tvBookingStation: TextView = view.findViewById(R.id.tvBookingStation)
         val tvBookingDateTime: TextView = view.findViewById(R.id.tvBookingDateTime)
         
-        fun bind(reservation: Reservation) {
+        fun bind(reservation: Reservation, onItemClick: (Reservation) -> Unit) {
             tvBookingId.text = reservation.id
             tvBookingStation.text = reservation.stationId
             tvBookingDateTime.text = DateTimeFormatter.toDisplayString(reservation.scheduledDateTime)
@@ -46,6 +48,10 @@ class BookingHistoryAdapter : ListAdapter<Reservation, BookingHistoryAdapter.Vie
             tvStatusBadge.text = label
             tvStatusBadge.setTextColor(ContextCompat.getColor(context, textColor))
             tvStatusBadge.setBackgroundColor(ContextCompat.getColor(context, bgColor))
+
+            view.setOnClickListener {
+                onItemClick(reservation)
+            }
         }
     }
 
@@ -56,7 +62,7 @@ class BookingHistoryAdapter : ListAdapter<Reservation, BookingHistoryAdapter.Vie
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), onItemClick)
     }
 
     companion object {

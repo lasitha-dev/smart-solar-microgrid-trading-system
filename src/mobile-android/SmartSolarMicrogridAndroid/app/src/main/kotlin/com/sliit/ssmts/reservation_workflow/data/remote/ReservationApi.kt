@@ -31,7 +31,7 @@ interface ReservationApi {
 
     @GET("api/reservations")
     suspend fun getProsumerReservations(
-        @Query("prosumerId") prosumerId: String,
+        @Query("prosumerId") prosumerId: String? = null,
         @Query("status") status: String? = null
     ): Response<ApiResponseDto<List<ReservationResponseDto>>>
 
@@ -46,4 +46,13 @@ interface ReservationApi {
         @Path("id") id: String,
         @Query("reason") reason: String? = null
     ): Response<ApiResponseDto<Any>>
+
+    @PATCH("api/reservations/{id}/approve")
+    suspend fun approveReservation(
+        @Path("id") id: String,
+        @Query("operatorId") operatorId: String
+    ): Response<ApiResponseDto<Any>>
+
+    @POST("api/reservations/seed")
+    suspend fun seedSlots(): Response<ApiResponseDto<Any>>
 }

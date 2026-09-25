@@ -2,26 +2,31 @@
  * Student: Kumarasinghe S.S | IT22221414
  * Branch: feature/member-3-reservation-workflow
  * Component: Reservation Workflow (Member 3) - SE4040 EAD 2026
- * Description: Activity displaying a list of all user's reservations with search/filter.
+ * Description: Activity displaying a list of all user's reservations with Room Flow, network sync, and filtering.
  */
 
 package com.sliit.ssmts.reservation_workflow.ui.history
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.ChipGroup
 import com.sliit.ssmts.operator_dashboard.R
 import com.sliit.ssmts.operator_dashboard.databinding.ActivityBookingHistoryBinding
-import com.sliit.ssmts.reservation_workflow.domain.model.Reservation
-import com.sliit.ssmts.reservation_workflow.domain.model.ReservationStatus
-import java.util.Date
+import com.sliit.ssmts.reservation_workflow.di.DependencyProvider
+import com.sliit.ssmts.reservation_workflow.di.ViewModelFactory
+import com.sliit.ssmts.reservation_workflow.ui.summary.BookingSummaryActivity
+import kotlinx.coroutines.launch
 
 class BookingHistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBookingHistoryBinding
+    private lateinit var viewModel: BookingHistoryViewModel
     private lateinit var adapter: BookingHistoryAdapter
+    private val prosumerId = "" // Empty string loads all reservations
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,52 +37,58 @@ class BookingHistoryActivity : AppCompatActivity() {
         // Toolbar back navigation
         binding.toolbar.setNavigationOnClickListener { finish() }
         
-        // Setup RecyclerView
-        adapter = BookingHistoryAdapter()
+        // Setup ViewModel
+        val repository = DependencyProvider.getReservationRepository(this)
+        val factory = ViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[BookingHistoryViewModel::class.java]
+
+        // Setup RecyclerView with click listener
+        adapter = BookingHistoryAdapter { reservation ->
+            val intent = Intent(this, BookingSummaryActivity::class.java).apply {
+                putExtra("RESERVATION_ID", reservation.id)
+            }
+            startActivity(intent)
+        }
         binding.rvBookingHistory.layoutManager = LinearLayoutManager(this)
         binding.rvBookingHistory.adapter = adapter
         
         // Setup Filter Chips
-        binding.cgFilters.setOnCheckedStateChangeListener { group, checkedIds ->
+        binding.cgFilters.setOnCheckedStateChangeListener { _, checkedIds ->
             val checkedId = checkedIds.firstOrNull()
             when (checkedId) {
-                R.id.chipPending -> filterReservations(ReservationStatus.PENDING)
-                R.id.chipApproved -> filterReservations(ReservationStatus.APPROVED)
-                else -> filterReservations(null) // All
+                R.id.chipPending -> viewModel.filterByStatus("Pending")
+                R.id.chipApproved -> viewModel.filterByStatus("Approved")
+                R.id.chipCompleted -> viewModel.filterByStatus("Completed")
+                R.id.chipCancelled -> viewModel.filterByStatus("Cancelled")
+                else -> viewModel.filterByStatus("All")
             }
         }
-        
-        // Load mock data for now
-        loadMockHistory()
-    }
-    
-    private fun filterReservations(status: ReservationStatus?) {
-        // Mock filtering
-        loadMockHistory(status)
-    }
-    
-    private fun loadMockHistory(statusFilter: ReservationStatus? = null) {
-        val mockData = listOf(
-            Reservation("RES-001", "200112345678", "Station A", "S1", Date(), ReservationStatus.APPROVED, null),
-            Reservation("RES-002", "200112345678", "Station B", "S2", Date(System.currentTimeMillis() + 86400000), ReservationStatus.PENDING, null),
-            Reservation("RES-003", "200112345678", "Station A", "S3", Date(System.currentTimeMillis() - 86400000), ReservationStatus.COMPLETED, null),
-            Reservation("RES-004", "200112345678", "Station C", "S4", Date(System.currentTimeMillis() + 172800000), ReservationStatus.CANCELLED, null)
-        )
-        
-        val filtered = if (statusFilter != null) {
-            mockData.filter { it.status == statusFilter }
-        } else {
-            mockData
+
+        // Observe Data
+        lifecycleScope.launch {
+            viewModel.reservations.collect { list ->
+                adapter.submitList(list)
+                if (list.isEmpty()) {
+                    binding.tvEmptyState.visibility = View.VISIBLE
+                    binding.rvBookingHistory.visibility = View.GONE
+                } else {
+                    binding.tvEmptyState.visibility = View.GONE
+                    binding.rvBookingHistory.visibility = View.VISIBLE
+                }
+            }
         }
-        
-        adapter.submitList(filtered)
-        
-        if (filtered.isEmpty()) {
-            binding.tvEmptyState.visibility = View.VISIBLE
-            binding.rvBookingHistory.visibility = View.GONE
-        } else {
-            binding.tvEmptyState.visibility = View.GONE
-            binding.rvBookingHistory.visibility = View.VISIBLE
+
+        // Observe Loading State
+        lifecycleScope.launch {
+            viewModel.isLoading.collect { loading ->
+                binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reload and sync latest data from server
+        viewModel.loadHistory(prosumerId)
     }
 }

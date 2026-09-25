@@ -157,12 +157,58 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- QR Code Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardQrCode"
+            style="@style/Widget.Ssmts.Card.Metric"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_qr_code"
+                    android:textColor="@color/text_primary"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <TextView
+                    android:id="@+id/tvQrToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="#F5F5F5"
+                    android:padding="12dp"
+                    android:fontFamily="monospace"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_primary"
+                    android:textIsSelectable="true" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCopyQrToken"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/btn_copy_token" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
@@ -183,6 +229,16 @@
                 android:layout_weight="1"
                 android:text="@string/btn_cancel_reservation" />
         </LinearLayout>
+
+        <!-- View History Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewHistory"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/btn_view_history" />
 
     </LinearLayout>
 </ScrollView>

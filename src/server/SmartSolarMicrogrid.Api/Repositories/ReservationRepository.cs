@@ -85,5 +85,69 @@ namespace SmartSolarMicrogrid.Api.Repositories
 
             await _slots.UpdateOneAsync(s => s.Id == slotId, update);
         }
+
+        public async Task<bool> TryReserveSlotAsync(string slotId)
+        {
+            var filter = Builders<EnergyBookingSlot>.Filter.And(
+                Builders<EnergyBookingSlot>.Filter.Eq(s => s.Id, slotId),
+                Builders<EnergyBookingSlot>.Filter.Eq(s => s.Status, "Open")
+            );
+            var update = Builders<EnergyBookingSlot>.Update
+                .Set(s => s.Status, "Reserved")
+                .Set(s => s.UpdatedAt, DateTime.UtcNow);
+
+            var result = await _slots.FindOneAndUpdateAsync(filter, update);
+            return result != null;
+        }
+
+        public async Task SeedSlotsAsync(string stationId)
+        {
+            var today = DateTime.UtcNow.Date;
+            var slots = new List<EnergyBookingSlot>();
+
+            for (int i = 0; i <= 10; i++)
+            {
+                var date = today.AddDays(i);
+
+                slots.Add(new EnergyBookingSlot
+                {
+                    StationId = stationId,
+                    SlotDate = date,
+                    StartTime = new TimeSpan(8, 0, 0),
+                    EndTime = new TimeSpan(9, 0, 0),
+                    BatterySlotId = "Bay-1",
+                    Status = "Open",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                slots.Add(new EnergyBookingSlot
+                {
+                    StationId = stationId,
+                    SlotDate = date,
+                    StartTime = new TimeSpan(10, 0, 0),
+                    EndTime = new TimeSpan(11, 0, 0),
+                    BatterySlotId = "Bay-2",
+                    Status = "Open",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                slots.Add(new EnergyBookingSlot
+                {
+                    StationId = stationId,
+                    SlotDate = date,
+                    StartTime = new TimeSpan(14, 0, 0),
+                    EndTime = new TimeSpan(15, 0, 0),
+                    BatterySlotId = "Bay-3",
+                    Status = "Open",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
+            await _slots.DeleteManyAsync(Builders<EnergyBookingSlot>.Filter.Eq(s => s.StationId, stationId));
+            await _slots.InsertManyAsync(slots);
+        }
     }
 }

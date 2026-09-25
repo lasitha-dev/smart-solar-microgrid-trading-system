@@ -78,9 +78,9 @@ namespace SmartSolarMicrogrid.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReservations([FromQuery] string prosumerId, [FromQuery] string? status)
+        public async Task<IActionResult> GetReservations([FromQuery] string? prosumerId, [FromQuery] string? status)
         {
-            var reservations = await _reservationService.GetProsumerReservationsAsync(prosumerId, status);
+            var reservations = await _reservationService.GetProsumerReservationsAsync(prosumerId ?? string.Empty, status);
             var dtos = reservations.Select(MapToDto);
             return Ok(ApiResponse<IEnumerable<ReservationResponseDto>>.SuccessResponse(dtos));
         }
@@ -143,59 +143,8 @@ namespace SmartSolarMicrogrid.Api.Controllers
         public async Task<IActionResult> SeedSlots()
         {
             var stationId = "60d5ec49f1b2c42d8c3b4a59"; // Dummy Station A
-            var today = DateTime.UtcNow.Date;
-            
-            var slots = new List<EnergyBookingSlot>();
-            
-            // Generate 3 slots per day for the next 10 days
-            for (int i = 0; i <= 10; i++)
-            {
-                var date = today.AddDays(i);
-                
-                slots.Add(new EnergyBookingSlot
-                {
-                    StationId = stationId,
-                    SlotDate = date,
-                    StartTime = new TimeSpan(8, 0, 0),
-                    EndTime = new TimeSpan(9, 0, 0),
-                    BatterySlotId = "Bay-1",
-                    Status = "Open",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-                
-                slots.Add(new EnergyBookingSlot
-                {
-                    StationId = stationId,
-                    SlotDate = date,
-                    StartTime = new TimeSpan(10, 0, 0),
-                    EndTime = new TimeSpan(11, 0, 0),
-                    BatterySlotId = "Bay-2",
-                    Status = "Open",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-                
-                slots.Add(new EnergyBookingSlot
-                {
-                    StationId = stationId,
-                    SlotDate = date,
-                    StartTime = new TimeSpan(14, 0, 0),
-                    EndTime = new TimeSpan(15, 0, 0),
-                    BatterySlotId = "Bay-3",
-                    Status = "Open",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                });
-            }
-            
-            var client = new MongoClient("mongodb+srv://sathnarakumarasinghe_db_user:poGE90v3aWflFkmC@solarmicrogrid.eu70nfe.mongodb.net");
-            var db = client.GetDatabase("SmartSolarMicrogridDb");
-            var collection = db.GetCollection<EnergyBookingSlot>("EnergyBookingSlots");
-            await collection.DeleteManyAsync(Builders<EnergyBookingSlot>.Filter.Empty);
-            await collection.InsertManyAsync(slots);
-            
-            return Ok($"Seeded {slots.Count} slots");
+            await _repository.SeedSlotsAsync(stationId);
+            return Ok(ApiResponse<object>.SuccessResponse(new { stationId, count = 33 }, "Seeded 3 slots per day for next 10 days"));
         }
 
         private static ReservationResponseDto MapToDto(Models.EnergyReservation r)

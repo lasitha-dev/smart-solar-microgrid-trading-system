@@ -20,4 +20,5 @@ interface IReservationRepository {
     suspend fun updateReservation(id: String, newSlotId: String, newTime: Date): NetworkResult<Reservation>
     suspend fun cancelReservation(id: String, reason: String?): NetworkResult<Unit>
     fun getMyReservations(prosumerId: String): Flow<List<Reservation>>
+    suspend fun syncReservations(prosumerId: String): NetworkResult<List<Reservation>>
 }

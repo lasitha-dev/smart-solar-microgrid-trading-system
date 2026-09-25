@@ -23,9 +23,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Select a new date and time for your reservation."
+        android:text="@string/subtitle_reschedule"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="@color/text_secondary" />
+
+    <!-- Rule Violation Warning Card (12-hour rule block) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardRuleViolation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#FFF8E1"
+        app:strokeColor="#FFC107"
+        app:strokeWidth="1dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvRuleViolationMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/err_12_hour_rule_update"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#F57F17"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSelectNewDate"
@@ -33,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Select New Date"
+        android:text="@string/btn_select_new_date"
         app:icon="@drawable/ic_baseline_arrow_back_24" />
         
     <!-- Selected Slot Info -->
@@ -42,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="No slot selected"
+        android:text="@string/label_no_slot_selected"
         android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="@color/text_primary"

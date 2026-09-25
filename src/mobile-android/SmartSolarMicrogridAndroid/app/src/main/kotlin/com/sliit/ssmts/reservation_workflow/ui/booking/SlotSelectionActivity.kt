@@ -2,7 +2,7 @@
  * Student: Kumarasinghe S.S | IT22221414
  * Branch: feature/member-3-reservation-workflow
  * Component: Reservation Workflow (Member 3) - SE4040 EAD 2026
- * Description: Activity for selecting an available energy slot (Date & Time).
+ * Description: Activity for selecting an available energy slot (Date & Time) with dynamic station selector.
  */
 
 package com.sliit.ssmts.reservation_workflow.ui.booking
@@ -11,8 +11,12 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +31,7 @@ import com.sliit.ssmts.reservation_workflow.di.DependencyProvider
 import com.sliit.ssmts.reservation_workflow.di.ViewModelFactory
 import com.sliit.ssmts.reservation_workflow.domain.model.EnergySlot
 import com.sliit.ssmts.reservation_workflow.ui.common.UiState
+import com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryActivity
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,6 +44,16 @@ class SlotSelectionActivity : AppCompatActivity() {
     private val calendar = Calendar.getInstance()
     private val dateFormatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
+    private val stations = listOf(
+        StationItem("Station A – Solar Bay (Main Microgrid)", "60d5ec49f1b2c42d8c3b4a59"),
+        StationItem("Station B – North Grid (Substation)", "60d5ec49f1b2c42d8c3b4a60")
+    )
+    private var selectedStationId = "60d5ec49f1b2c42d8c3b4a59"
+
+    data class StationItem(val name: String, val id: String) {
+        override fun toString(): String = name
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -46,6 +61,26 @@ class SlotSelectionActivity : AppCompatActivity() {
         binding = ActivitySlotSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        setSupportActionBar(binding.toolbar)
+
+        // Setup Station Spinner with high-contrast readable layouts
+        val stationAdapter = ArrayAdapter(
+            this,
+            com.sliit.ssmts.operator_dashboard.R.layout.spinner_station_item,
+            stations
+        ).apply {
+            setDropDownViewResource(com.sliit.ssmts.operator_dashboard.R.layout.spinner_station_dropdown_item)
+        }
+        binding.spinnerStation.adapter = stationAdapter
+        binding.spinnerStation.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedStationId = stations[position].id
+                loadSlotsForDate()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         // Set up initial state
         updateDateLabel()
         
@@ -106,6 +141,23 @@ class SlotSelectionActivity : AppCompatActivity() {
         // Load demo slots for today
         loadSlotsForDate()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu?.add(0, 100, 0, "My Bookings")?.apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            setIcon(android.R.drawable.ic_menu_agenda)
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == 100) {
+            val intent = Intent(this, BookingHistoryActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
     
     override fun onResume() {
         super.onResume()
@@ -145,13 +197,11 @@ class SlotSelectionActivity : AppCompatActivity() {
     }
     
     /**
-     * Loads available energy slots for the selected date from API.
+     * Loads available energy slots for the selected station and date from API.
      */
     private fun loadSlotsForDate() {
         val date = calendar.time
-        // Assuming user selects a station, passing a valid MongoDB ObjectId to avoid backend crash
-        val mockStationId = "60d5ec49f1b2c42d8c3b4a59"
-        viewModel.loadSlots(mockStationId, date)
+        viewModel.loadSlots(selectedStationId, date)
     }
     
     /**

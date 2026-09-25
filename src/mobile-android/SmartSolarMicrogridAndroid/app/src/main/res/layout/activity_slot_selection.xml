@@ -23,14 +23,46 @@
             app:titleTextColor="?attr/colorOnPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Station Selector Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardStationPicker"
+        style="@style/Widget.Ssmts.Card.Metric"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Microgrid Charging Station"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                android:textColor="@color/text_secondary" />
+
+            <Spinner
+                android:id="@+id/spinnerStation"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Date Picker Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardDatePicker"
         style="@style/Widget.Ssmts.Card.Metric"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/cardStationPicker">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -67,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:text="@string/label_available_slots"
         android:textColor="@color/text_primary"
         android:textAppearance="?attr/textAppearanceTitleSmall"

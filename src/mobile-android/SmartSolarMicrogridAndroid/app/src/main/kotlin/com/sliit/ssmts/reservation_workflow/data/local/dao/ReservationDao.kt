@@ -19,6 +19,9 @@ interface ReservationDao {
     @Query("SELECT * FROM tbl_reservations_cache WHERE prosumerId = :prosumerId ORDER BY scheduledDateTime DESC")
     fun getAllByProsumer(prosumerId: String): Flow<List<ReservationEntity>>
 
+    @Query("SELECT * FROM tbl_reservations_cache ORDER BY scheduledDateTime DESC")
+    fun getAll(): Flow<List<ReservationEntity>>
+
     @Query("SELECT * FROM tbl_reservations_cache WHERE reservationId = :id")
     suspend fun getById(id: String): ReservationEntity?
 

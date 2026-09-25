@@ -16,6 +16,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORS — allow Vite dev server (Member 3 UI testing)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Configure MongoDB
 var mongoConnectionString = builder.Configuration["DatabaseSettings:ConnectionString"] ?? "mongodb://localhost:27017";
 var mongoDatabaseName = builder.Configuration["DatabaseSettings:DatabaseName"] ?? "SmartSolarMicrogridDb";
@@ -33,13 +44,11 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+// Enable CORS before routing
+app.UseCors("DevCors");
 
 app.UseAuthorization();
 

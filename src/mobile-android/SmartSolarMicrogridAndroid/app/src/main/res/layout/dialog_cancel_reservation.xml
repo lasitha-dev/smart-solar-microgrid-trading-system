@@ -4,6 +4,7 @@
   Layout: Cancel Reservation Confirmation Dialog
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -25,6 +26,52 @@
         android:text="@string/msg_cancel_confirm"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="@color/text_secondary" />
+
+    <!-- Rule Violation Warning Card (12-hour rule block) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardRuleViolation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#FFF8E1"
+        app:strokeColor="#FFC107"
+        app:strokeWidth="1dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvRuleViolationMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/err_12_hour_rule_cancel"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#F57F17"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Reason Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCancelReason"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/hint_cancel_reason">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCancelReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLines="3" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

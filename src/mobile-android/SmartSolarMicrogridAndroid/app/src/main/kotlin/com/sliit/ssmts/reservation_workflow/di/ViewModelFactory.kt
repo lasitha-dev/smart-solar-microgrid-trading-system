@@ -30,6 +30,9 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(BookingSummaryViewModel::class.java) -> {
                 BookingSummaryViewModel(repository) as T
             }
+            modelClass.isAssignableFrom(com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryViewModel::class.java) -> {
+                com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryViewModel(repository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

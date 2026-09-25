@@ -19,5 +19,7 @@ namespace SmartSolarMicrogrid.Api.Repositories
         Task<EnergyBookingSlot?> GetSlotByIdAsync(string slotId);
         Task<IEnumerable<EnergyBookingSlot>> GetAvailableSlotsAsync(string stationId, DateTime date);
         Task UpdateSlotStatusAsync(string slotId, string status);
+        Task<bool> TryReserveSlotAsync(string slotId);
+        Task SeedSlotsAsync(string stationId);
     }
 }

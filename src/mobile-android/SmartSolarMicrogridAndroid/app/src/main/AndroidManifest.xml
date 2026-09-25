@@ -33,6 +33,11 @@
             android:name="com.sliit.ssmts.reservation_workflow.ui.summary.BookingSummaryActivity"
             android:exported="false" />
 
+        <!-- Member 3: Booking History List -->
+        <activity
+            android:name="com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
