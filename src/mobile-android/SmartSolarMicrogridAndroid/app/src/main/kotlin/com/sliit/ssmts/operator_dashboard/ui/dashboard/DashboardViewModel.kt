@@ -182,6 +182,32 @@ class DashboardViewModel(
     }
 
     /**
+     * Rejects a pending reservation and updates the operational dashboard state.
+     *
+     * @param reservationId Identifier of the reservation to reject.
+     * @param reason Optional rejection reason.
+     * @param onComplete Callback invoked with result success or error message.
+     */
+    fun rejectReservation(reservationId: String, reason: String? = null, onComplete: ((Boolean, String?) -> Unit)? = null) {
+        viewModelScope.launch {
+            when (val result = repository.rejectReservation(reservationId, reason, operatorId)) {
+                is NetworkResult.Success -> {
+                    refresh()
+                    onComplete?.invoke(true, null)
+                }
+                is NetworkResult.Error -> {
+                    refresh()
+                    onComplete?.invoke(false, result.message)
+                }
+                is NetworkResult.Exception -> {
+                    refresh()
+                    onComplete?.invoke(false, result.throwable.localizedMessage ?: "Failed to reject reservation.")
+                }
+            }
+        }
+    }
+
+    /**
      * Factory for constructing DashboardViewModel instances with injected IDashboardRepository.
      */
     class Factory(

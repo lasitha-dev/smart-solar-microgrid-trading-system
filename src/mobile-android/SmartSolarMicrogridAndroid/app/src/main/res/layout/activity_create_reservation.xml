@@ -7,7 +7,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_background">
+    android:background="@color/slate_bg_dark"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,11 +20,11 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/slate_surface"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:navigationIconTint="?attr/colorOnPrimary"
+            app:navigationIconTint="@color/text_primary"
             app:title="@string/title_create_reservation"
-            app:titleTextColor="?attr/colorOnPrimary" />
+            app:titleTextColor="@color/text_primary" />
 
         <!-- Selected Slot Info Card -->
         <com.google.android.material.card.MaterialCardView
@@ -31,7 +32,12 @@
             style="@style/Widget.Ssmts.Card.Metric"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp">
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/slate_surface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/slate_stroke"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -43,16 +49,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_selected_slot"
-                    android:textColor="@color/text_secondary"
-                    android:textAppearance="?attr/textAppearanceLabelMedium" />
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="@color/solar_amber_primary"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvSlotInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textColor="@color/text_primary"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+                    android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -62,18 +70,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/slate_surface"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/slate_stroke"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <!-- Prosumer NIC -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilProsumerNic"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.App.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_prosumer_nic">
@@ -89,10 +102,10 @@
                 <!-- Estimated kWh -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilEstimatedKwh"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.App.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="16dp"
                     android:hint="@string/hint_estimated_kwh">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -110,7 +123,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="@string/btn_confirm_booking" />
+                    android:text="@string/btn_confirm_booking"
+                    app:cornerRadius="8dp" />
 
                 <!-- Loading Indicator -->
                 <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -120,7 +134,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="16dp"
                     android:visibility="gone"
-                    app:indicatorColor="?attr/colorPrimary" />
+                    app:indicatorColor="@color/solar_amber_primary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

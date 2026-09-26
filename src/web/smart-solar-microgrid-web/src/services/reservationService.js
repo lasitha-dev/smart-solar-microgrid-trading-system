@@ -79,6 +79,15 @@ export const reservationService = {
     return response.data;
   },
 
+  rejectReservation: async (id, reason = null, operatorId = 'OP-001') => {
+    const query = new URLSearchParams();
+    if (reason) query.append('reason', reason);
+    if (operatorId) query.append('operatorId', operatorId);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    const response = await api.patch(`/reservations/${id}/reject${queryString}`);
+    return response.data;
+  },
+
   getAvailableSlots: async (stationId, date) => {
     const dateStr = date instanceof Date ? date.toISOString().split('T')[0] : date;
     const response = await api.get(`/reservations/slots?stationId=${stationId}&date=${dateStr}`);

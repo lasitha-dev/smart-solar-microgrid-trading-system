@@ -5,30 +5,47 @@
 -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/Widget.Ssmts.Card.Metric"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="@color/surface_card">
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="@color/slate_surface"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/slate_stroke"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <ImageView
+            android:id="@+id/ivBatteryIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_battery_bolt"
+            app:tint="@color/solar_amber_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvTimeRange"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTimeRange" />
+
         <!-- Time Range (e.g. 08:00 - 09:00) -->
         <TextView
             android:id="@+id/tvTimeRange"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/text_primary"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/chipAvailability"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/ivBatteryIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="08:00 - 09:00" />
 
-        <!-- Station + Bay -->
+        <!-- Station + Bay (e.g. Kandy Solar Microgrid • Bay-01) -->
         <TextView
             android:id="@+id/tvStationBay"
             android:layout_width="0dp"
@@ -37,8 +54,9 @@
             android:textColor="@color/text_secondary"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             app:layout_constraintEnd_toStartOf="@+id/chipAvailability"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTimeRange" />
+            app:layout_constraintStart_toStartOf="@id/tvTimeRange"
+            app:layout_constraintTop_toBottomOf="@id/tvTimeRange"
+            tools:text="Kandy Solar Microgrid • Bay-01" />
 
         <!-- Availability Chip -->
         <com.google.android.material.chip.Chip
@@ -46,12 +64,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_available"
-            android:textColor="@color/status_approved_text"
-            app:chipBackgroundColor="@color/status_approved_container"
+            android:textColor="@color/status_active_text"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:chipBackgroundColor="@color/status_active_bg"
             app:chipCornerRadius="@dimen/radius_pill"
+            app:chipStrokeColor="@color/emerald_dark"
+            app:chipStrokeWidth="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

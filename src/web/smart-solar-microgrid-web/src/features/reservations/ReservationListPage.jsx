@@ -7,10 +7,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { reservationService } from '../../services/reservationService';
+import { useAuth } from '../../context/AuthContext';
 import StatusBadge from './components/StatusBadge';
 import ReservationDetailModal from './ReservationDetailModal';
 
 const ReservationListPage = () => {
+  const { user } = useAuth();
+  const operatorId = user?.nic || user?.userId || user?.username || 'OP-COLOMBO-01';
+
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +25,10 @@ const ReservationListPage = () => {
   const [actionInProgress, setActionInProgress] = useState({});
   const [seeding, setSeeding] = useState(false);
 
-  const operatorId = 'OP-COLOMBO-01';
+  // Rejection modal state
+  const [rejectModalReservation, setRejectModalReservation] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
 
   useEffect(() => {
     fetchReservations();
@@ -107,6 +114,39 @@ const ReservationListPage = () => {
       showToast(err.message || 'Cancellation error.', 'error');
     } finally {
       setActionInProgress((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleOpenReject = (res) => {
+    setRejectModalReservation(res);
+    setRejectReason('Bay unavailable or scheduled grid maintenance');
+  };
+
+  const handleCloseReject = () => {
+    setRejectModalReservation(null);
+    setRejectReason('');
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectModalReservation) return;
+    const resId = rejectModalReservation.id;
+    setRejecting(true);
+    setActionInProgress((prev) => ({ ...prev, [resId]: true }));
+    try {
+      const res = await reservationService.rejectReservation(resId, rejectReason || 'Operator rejected', operatorId);
+      if (res?.success || res?.status === 'Cancelled' || res?.id) {
+        showToast(`Reservation ${resId.substring(0, 8)} rejected.`, 'info');
+        handleCloseReject();
+        setSelectedRes(null);
+        await fetchReservations();
+      } else {
+        showToast(res?.message || 'Rejection failed.', 'error');
+      }
+    } catch (err) {
+      showToast(err.message || 'Rejection error occurred.', 'error');
+    } finally {
+      setRejecting(false);
+      setActionInProgress((prev) => ({ ...prev, [resId]: false }));
     }
   };
 
@@ -442,23 +482,43 @@ const ReservationListPage = () => {
                           </button>
 
                           {res.status === 'Pending' && (
-                            <button
-                              onClick={() => handleApprove(res.id)}
-                              disabled={actionInProgress[res.id]}
-                              style={{
-                                padding: '6px 14px',
-                                borderRadius: '6px',
-                                border: 'none',
-                                backgroundColor: '#16A34A',
-                                color: '#FFFFFF',
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                              }}
-                            >
-                              {actionInProgress[res.id] ? '...' : '✓ Approve'}
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleApprove(res.id)}
+                                disabled={actionInProgress[res.id]}
+                                style={{
+                                  padding: '6px 14px',
+                                  borderRadius: '6px',
+                                  border: 'none',
+                                  backgroundColor: '#16A34A',
+                                  color: '#FFFFFF',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                }}
+                              >
+                                {actionInProgress[res.id] ? '...' : '✓ Approve'}
+                              </button>
+
+                              <button
+                                onClick={() => handleOpenReject(res)}
+                                disabled={actionInProgress[res.id]}
+                                style={{
+                                  padding: '6px 14px',
+                                  borderRadius: '6px',
+                                  border: 'none',
+                                  backgroundColor: '#DC2626',
+                                  color: '#FFFFFF',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                }}
+                              >
+                                ✕ Reject
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -478,7 +538,175 @@ const ReservationListPage = () => {
           onClose={() => setSelectedRes(null)}
           onApprove={handleApprove}
           onCancel={handleCancel}
+          onReject={handleOpenReject}
         />
+      )}
+
+      {/* Rejection Confirmation Modal */}
+      {rejectModalReservation && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: '16px'
+          }}
+          onClick={handleCloseReject}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '480px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: 'linear-gradient(135deg, #991B1B 0%, #DC2626 100%)',
+                padding: '18px 24px',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '1.3rem' }}>⚠️</span>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>Reject Reservation</h3>
+              </div>
+              <button
+                onClick={handleCloseReject}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '28px',
+                  height: '28px',
+                  color: '#FFFFFF',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '20px 24px' }}>
+              <p style={{ margin: '0 0 14px', color: '#475569', fontSize: '0.9rem' }}>
+                Reject reservation <strong style={{ color: '#0F172A', fontFamily: 'monospace' }}>{rejectModalReservation.id.substring(0, 12)}</strong> for prosumer <strong style={{ color: '#0F172A' }}>{rejectModalReservation.prosumerId}</strong>?
+              </p>
+
+              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ color: '#64748B' }}>Station:</span>
+                  <span style={{ fontWeight: 600, color: '#1E293B' }}>{rejectModalReservation.stationId}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#64748B' }}>Slot Bay:</span>
+                  <span style={{ fontWeight: 600, color: '#1E293B' }}>{rejectModalReservation.bookingSlotId}</span>
+                </div>
+              </div>
+
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>
+                Reason for Rejection:
+              </label>
+              <select
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
+                  fontSize: '0.85rem',
+                  marginBottom: '10px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1E293B'
+                }}
+              >
+                <option value="Bay unavailable or scheduled grid maintenance">Bay unavailable or scheduled grid maintenance</option>
+                <option value="Station battery capacity constraint">Station battery capacity constraint</option>
+                <option value="Time slot overlap or scheduling conflict">Time slot overlap or scheduling conflict</option>
+                <option value="Prosumer verification details mismatch">Prosumer verification details mismatch</option>
+                <option value="Other / Grid operational constraint">Other / Grid operational constraint</option>
+              </select>
+
+              <textarea
+                rows={2}
+                placeholder="Custom reason / notes..."
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
+                  fontSize: '0.85rem',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  color: '#1E293B'
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                padding: '14px 24px',
+                background: '#F8FAFC',
+                borderTop: '1px solid #E2E8F0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px'
+              }}
+            >
+              <button
+                onClick={handleCloseReject}
+                disabled={rejecting}
+                style={{
+                  background: '#FFF',
+                  color: '#475569',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmReject}
+                disabled={rejecting}
+                style={{
+                  background: '#DC2626',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 18px',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.25)'
+                }}
+              >
+                {rejecting ? 'Rejecting...' : '✕ Confirm Rejection'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

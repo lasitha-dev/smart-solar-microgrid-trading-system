@@ -16,7 +16,6 @@ import { UserManagementPage } from './pages/UserManagementPage';
 import { StaffProfilePage } from './pages/StaffProfilePage';
 import { StationListPage } from './features/microgrid-nodes/pages/StationListPage';
 import ReservationListPage from './features/reservations/ReservationListPage';
-import SlotBookingPage from './features/reservations/SlotBookingPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
 
@@ -29,6 +28,14 @@ const BackofficeOnlyRoute = ({ children }) => {
   const { isBackoffice } = useAuth();
   if (!isBackoffice) {
     return <Navigate to="/profile" replace />;
+  }
+  return children;
+};
+
+const OperatorOnlyRoute = ({ children }) => {
+  const { isGridOperator } = useAuth();
+  if (!isGridOperator) {
+    return <Navigate to="/pending-approvals" replace />;
   }
   return children;
 };
@@ -81,8 +88,15 @@ export const App = () => {
             </BackofficeOnlyRoute>
           }
         />
-        <Route path="reservations" element={<ReservationListPage />} />
-        <Route path="book-slot" element={<SlotBookingPage />} />
+        <Route
+          path="reservations"
+          element={
+            <OperatorOnlyRoute>
+              <ReservationListPage />
+            </OperatorOnlyRoute>
+          }
+        />
+        <Route path="book-slot" element={<Navigate to="/" replace />} />
         <Route path="profile" element={<StaffProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

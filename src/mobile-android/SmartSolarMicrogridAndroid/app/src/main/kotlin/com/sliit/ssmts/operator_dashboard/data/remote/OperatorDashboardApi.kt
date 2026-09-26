@@ -65,6 +65,21 @@ interface OperatorDashboardApi {
     ): Response<ReservationItemDto>
 
     /**
+     * Rejects a pending reservation, cancelling it and releasing the slot and bay.
+     *
+     * @param reservationId Remote reservation identifier to reject.
+     * @param reason Optional explanation for the rejection.
+     * @param operatorId Optional Grid Operator identifier executing the rejection.
+     * @return Retrofit Response containing the rejected ReservationItemDto.
+     */
+    @PATCH("api/reservations/{id}/reject")
+    suspend fun rejectReservation(
+        @Path("id") reservationId: String,
+        @Query("reason") reason: String? = null,
+        @Query("operatorId") operatorId: String? = null
+    ): Response<ReservationItemDto>
+
+    /**
      * Submits a scanned QR payload to the central API for cryptographic signature validation.
      *
      * @param request Payload containing raw scanned QR token.

@@ -182,55 +182,36 @@ export const AdminLayout = () => {
             </>
           )}
 
-          <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '1rem 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
-            Energy & Reservations
-          </div>
+          {user?.role === 'GridOperator' && (
+            <>
+              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '1rem 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
+                Station Operations
+              </div>
 
-          <NavLink
-            to="/reservations"
-            onClick={() => setSidebarOpen(false)}
-            style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-              background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
-              borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
-              fontWeight: isActive ? 600 : 500,
-              fontSize: '0.9rem',
-              marginBottom: '0.4rem',
-              transition: 'all var(--transition-fast)'
-            })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Calendar size={18} style={{ color: 'var(--status-active)' }} />
-              <span>Energy Reservations</span>
-            </div>
-          </NavLink>
-
-          <NavLink
-            to="/book-slot"
-            onClick={() => setSidebarOpen(false)}
-            style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
-              background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
-              borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
-              fontWeight: isActive ? 600 : 500,
-              fontSize: '0.9rem',
-              marginBottom: '0.4rem',
-              transition: 'all var(--transition-fast)'
-            })}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Clock size={18} style={{ color: 'var(--solar-amber)' }} />
-              <span>Book Energy Slot</span>
-            </div>
-          </NavLink>
+              <NavLink
+                to="/reservations"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Calendar size={18} style={{ color: 'var(--status-active)' }} />
+                  <span>Energy Reservations</span>
+                </div>
+              </NavLink>
+            </>
+          )}
 
           <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: (user?.role === 'Backoffice' || user?.role === 'Administrator') ? '1rem 0.75rem 0.5rem' : '0 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
             Account Settings

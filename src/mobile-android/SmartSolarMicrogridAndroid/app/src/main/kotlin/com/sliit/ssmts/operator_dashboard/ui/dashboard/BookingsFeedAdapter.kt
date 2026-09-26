@@ -23,10 +23,12 @@ import java.util.Locale
  *
  * @property onItemClick Optional callback triggered when an operator selects a booking item.
  * @property onApproveClick Optional callback triggered when an operator clicks the approve button.
+ * @property onRejectClick Optional callback triggered when an operator clicks the reject button.
  */
 class BookingsFeedAdapter(
     private val onItemClick: ((Reservation) -> Unit)? = null,
-    private val onApproveClick: ((Reservation) -> Unit)? = null
+    private val onApproveClick: ((Reservation) -> Unit)? = null,
+    private val onRejectClick: ((Reservation) -> Unit)? = null
 ) : ListAdapter<Reservation, BookingsFeedAdapter.BookingViewHolder>(ReservationDiffCallback) {
 
     /**
@@ -42,7 +44,7 @@ class BookingsFeedAdapter(
             parent,
             false
         )
-        return BookingViewHolder(binding, onItemClick, onApproveClick)
+        return BookingViewHolder(binding, onItemClick, onApproveClick, onRejectClick)
     }
 
     /**
@@ -61,7 +63,8 @@ class BookingsFeedAdapter(
     class BookingViewHolder(
         private val binding: ItemDashboardBookingBinding,
         private val onItemClick: ((Reservation) -> Unit)?,
-        private val onApproveClick: ((Reservation) -> Unit)?
+        private val onApproveClick: ((Reservation) -> Unit)?,
+        private val onRejectClick: ((Reservation) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val timeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
@@ -84,13 +87,16 @@ class BookingsFeedAdapter(
 
             binding.badgeFeedStatus.setStatus(item.status.value)
 
-            if (item.status == ReservationStatus.PENDING && onApproveClick != null) {
-                binding.btnApproveBooking.visibility = View.VISIBLE
+            if (item.status == ReservationStatus.PENDING && (onApproveClick != null || onRejectClick != null)) {
+                binding.layoutOperatorActions.visibility = View.VISIBLE
                 binding.btnApproveBooking.setOnClickListener {
-                    onApproveClick.invoke(item)
+                    onApproveClick?.invoke(item)
+                }
+                binding.btnRejectBooking.setOnClickListener {
+                    onRejectClick?.invoke(item)
                 }
             } else {
-                binding.btnApproveBooking.visibility = View.GONE
+                binding.layoutOperatorActions.visibility = View.GONE
             }
 
             binding.root.setOnClickListener {

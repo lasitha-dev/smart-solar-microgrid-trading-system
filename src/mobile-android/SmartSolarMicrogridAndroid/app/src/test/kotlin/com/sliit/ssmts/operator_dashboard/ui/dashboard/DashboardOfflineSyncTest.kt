@@ -202,5 +202,19 @@ class DashboardOfflineSyncTest {
                 )
             )
         }
+
+        override suspend fun rejectReservation(reservationId: String, reason: String?, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.CANCELLED,
+                    estimatedKwh = 10.0
+                )
+            )
+        }
     }
 }

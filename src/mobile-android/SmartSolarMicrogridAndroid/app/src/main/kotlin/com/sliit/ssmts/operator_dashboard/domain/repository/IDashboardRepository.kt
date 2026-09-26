@@ -61,4 +61,5 @@ interface IDashboardRepository {
      * @return NetworkResult containing the approved Reservation domain model.
      */
     suspend fun approveReservation(reservationId: String, operatorId: String? = null): NetworkResult<Reservation>
+    suspend fun rejectReservation(reservationId: String, reason: String? = null, operatorId: String? = null): NetworkResult<Reservation>
 }

@@ -102,24 +102,51 @@
                 tools:text="35.00 kWh" />
         </LinearLayout>
 
-        <!-- Operator Action: Approve Pending Reservation -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnApproveBooking"
-            style="@style/Widget.MaterialComponents.Button"
+        <!-- Operator Actions: Reject and Approve Pending Reservation -->
+        <LinearLayout
+            android:id="@+id/layoutOperatorActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_sm"
-            android:backgroundTint="@color/emerald_accent"
-            android:text="@string/btn_approve_reservation"
-            android:textColor="@color/slate_surface"
-            android:textSize="@dimen/text_size_caption"
-            android:textStyle="bold"
+            android:orientation="horizontal"
             android:visibility="gone"
-            app:cornerRadius="@dimen/radius_md"
-            app:icon="@drawable/ic_check_circle"
-            app:iconGravity="textStart"
-            app:iconTint="@color/slate_surface"
-            tools:visibility="visible" />
+            tools:visibility="visible">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRejectBooking"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="Reject"
+                android:textColor="@color/error_red"
+                android:textSize="@dimen/text_size_caption"
+                android:textStyle="bold"
+                app:strokeColor="@color/error_red"
+                app:strokeWidth="@dimen/stroke_thin"
+                app:cornerRadius="@dimen/radius_md"
+                app:icon="@drawable/ic_cancel"
+                app:iconGravity="textStart"
+                app:iconTint="@color/error_red" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApproveBooking"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:backgroundTint="@color/emerald_accent"
+                android:text="@string/btn_approve_reservation"
+                android:textColor="@color/slate_surface"
+                android:textSize="@dimen/text_size_caption"
+                android:textStyle="bold"
+                app:cornerRadius="@dimen/radius_md"
+                app:icon="@drawable/ic_check_circle"
+                app:iconGravity="textStart"
+                app:iconTint="@color/slate_surface" />
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

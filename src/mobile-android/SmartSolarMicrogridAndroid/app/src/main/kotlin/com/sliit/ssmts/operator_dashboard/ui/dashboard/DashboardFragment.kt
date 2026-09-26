@@ -105,6 +105,9 @@ class DashboardFragment : Fragment() {
             onItemClick = null,
             onApproveClick = { reservation ->
                 showApproveConfirmation(reservation)
+            },
+            onRejectClick = { reservation ->
+                showRejectConfirmation(reservation)
             }
         )
         binding.rvBookingsFeed.layoutManager = LinearLayoutManager(requireContext())
@@ -236,6 +239,39 @@ class DashboardFragment : Fragment() {
                         Snackbar.make(binding.root, R.string.msg_approve_success, Snackbar.LENGTH_SHORT).show()
                     } else {
                         Snackbar.make(binding.root, errorMsg ?: "Approval failed.", Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Prompts the operator with a confirmation and reason dialog before rejecting a pending reservation.
+     *
+     * @param reservation Reservation domain entity awaiting operator rejection.
+     */
+    private fun showRejectConfirmation(reservation: Reservation) {
+        val input = android.widget.EditText(requireContext()).apply {
+            hint = "Reason for rejection (optional)"
+            setTextColor(requireContext().getColor(R.color.text_primary))
+            setHintTextColor(requireContext().getColor(R.color.text_secondary))
+            setPadding(40, 30, 40, 30)
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Reject Reservation")
+            .setMessage("Are you sure you want to reject this reservation for ${reservation.prosumerNic}? The allocated slot and battery bay will be released.")
+            .setView(input)
+            .setPositiveButton("Reject") { _, _ ->
+                val reason = input.text.toString().trim()
+                binding.progressBar.isVisible = true
+                viewModel.rejectReservation(reservation.id, if (reason.isNotBlank()) reason else null) { success, errorMsg ->
+                    binding.progressBar.isVisible = false
+                    if (success) {
+                        Snackbar.make(binding.root, "Reservation rejected successfully.", Snackbar.LENGTH_SHORT).show()
+                    } else {
+                        Snackbar.make(binding.root, errorMsg ?: "Rejection failed.", Snackbar.LENGTH_LONG).show()
                     }
                 }
             }

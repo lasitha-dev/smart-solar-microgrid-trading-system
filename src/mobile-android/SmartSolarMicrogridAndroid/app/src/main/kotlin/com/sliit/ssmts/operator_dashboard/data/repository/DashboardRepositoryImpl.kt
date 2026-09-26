@@ -257,6 +257,54 @@ class DashboardRepositoryImpl(
         }
     }
 
+    /**
+     * Rejects a pending reservation via the central API, releases slot and bay, and updates local cache.
+     *
+     * @param reservationId Identifier of the reservation being rejected.
+     * @param reason Optional rejection reason.
+     * @param operatorId Optional Grid Operator identifier performing the rejection.
+     * @return NetworkResult containing the cancelled Reservation domain model.
+     */
+    override suspend fun rejectReservation(reservationId: String, reason: String?, operatorId: String?): NetworkResult<Reservation> = withContext(dispatcher) {
+        try {
+            val response = api.rejectReservation(reservationId, reason, operatorId)
+            if (response.isSuccessful && response.body() != null) {
+                val dto = response.body()!!
+                val resId = if (dto.reservationId.isNotBlank()) dto.reservationId else reservationId
+                val entity = ReservationCacheEntity(
+                    reservationId = resId,
+                    prosumerNic = dto.prosumerNic,
+                    stationName = dto.stationName,
+                    scheduledTime = parseIsoToMillis(dto.scheduledDateTime),
+                    allocatedBay = dto.allocatedBayId,
+                    status = if (dto.status.isNotBlank()) dto.status else "Cancelled",
+                    qrPayload = dto.qrCode,
+                    estimatedKwh = dto.estimatedKwh,
+                    meteredKwh = dto.meteredEnergyKwh,
+                    lastSyncedAt = System.currentTimeMillis()
+                )
+                dao.upsertReservations(listOf(entity))
+                NetworkResult.Success(entity.toDomain())
+            } else {
+                val errorMsg = try {
+                    val rawJson = response.errorBody()?.string()
+                    if (!rawJson.isNullOrBlank()) {
+                        val json = org.json.JSONObject(rawJson)
+                        json.optString("message", response.message())
+                    } else response.message()
+                } catch (_: Exception) {
+                    response.message()
+                }
+                NetworkResult.Error(
+                    code = "HTTP_${response.code()}",
+                    message = if (!errorMsg.isNullOrBlank()) errorMsg else "Failed to reject reservation."
+                )
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
+        }
+    }
+
     private fun parseIsoToMillis(iso: String?): Long {
         if (iso.isNullOrBlank()) return System.currentTimeMillis()
         return try {

@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import StatusBadge from './components/StatusBadge';
 
-const ReservationDetailModal = ({ reservation, onClose, onApprove, onCancel }) => {
+const ReservationDetailModal = ({ reservation, onClose, onApprove, onCancel, onReject }) => {
   const [copied, setCopied] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [showCancelInput, setShowCancelInput] = useState(false);
@@ -403,6 +403,26 @@ const ReservationDetailModal = ({ reservation, onClose, onApprove, onCancel }) =
             >
               Close
             </button>
+
+            {reservation.status === 'Pending' && onReject && (
+              <button
+                onClick={() => onReject(reservation)}
+                disabled={actionLoading}
+                style={{
+                  background: '#DC2626',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 18px',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.2)'
+                }}
+              >
+                ✕ Reject
+              </button>
+            )}
 
             {reservation.status === 'Pending' && onApprove && (
               <button
