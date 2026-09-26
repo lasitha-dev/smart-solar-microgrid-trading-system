@@ -13,6 +13,8 @@ import com.sliit.ssmts.reservation_workflow.data.remote.ReservationApi
 import com.sliit.ssmts.reservation_workflow.data.remote.interceptor.AuthHeaderInterceptor
 import com.sliit.ssmts.reservation_workflow.data.repository.ReservationRepositoryImpl
 import com.sliit.ssmts.reservation_workflow.domain.repository.IReservationRepository
+import com.sliit.ssmts.util.Constants
+import com.sliit.ssmts.util.SessionManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,21 +23,29 @@ import java.util.concurrent.TimeUnit
 
 object DependencyProvider {
 
-    // Connected via USB using `adb reverse`
-    private const val BASE_URL = "http://localhost:5000/" 
-
     private var retrofit: Retrofit? = null
     private var repository: IReservationRepository? = null
 
-    private fun getRetrofit(): Retrofit {
+    private fun getBaseUrl(context: Context?): String {
+        if (context != null) {
+            val prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
+            val customUrl = prefs.getString(Constants.KEY_CUSTOM_BASE_URL, null)
+            if (!customUrl.isNullOrBlank()) {
+                return if (customUrl.endsWith("/")) customUrl else "$customUrl/"
+            }
+        }
+        return Constants.DEFAULT_BASE_URL
+    }
+
+    private fun getRetrofit(context: Context? = null): Retrofit {
         if (retrofit == null) {
             val logging = HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }
 
             val authInterceptor = AuthHeaderInterceptor {
-                // Mock JWT token for development
-                "mock_token_123" 
+                val token = context?.let { SessionManager(it).getAuthToken() }
+                token ?: "mock_token_123"
             }
 
             val client = OkHttpClient.Builder()
@@ -46,7 +56,7 @@ object DependencyProvider {
                 .build()
 
             retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(getBaseUrl(context))
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -54,15 +64,15 @@ object DependencyProvider {
         return retrofit!!
     }
 
-    fun getReservationApi(): ReservationApi {
-        return getRetrofit().create(ReservationApi::class.java)
+    fun getReservationApi(context: Context? = null): ReservationApi {
+        return getRetrofit(context).create(ReservationApi::class.java)
     }
 
     fun getReservationRepository(context: Context): IReservationRepository {
         if (repository == null) {
             val db = SsmtsDatabase.getDatabase(context)
             repository = ReservationRepositoryImpl(
-                api = getReservationApi(),
+                api = getReservationApi(context),
                 dao = db.reservationDao()
             )
         }

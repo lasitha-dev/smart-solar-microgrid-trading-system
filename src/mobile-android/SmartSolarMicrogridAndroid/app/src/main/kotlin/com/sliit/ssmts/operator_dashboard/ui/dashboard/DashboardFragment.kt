@@ -38,10 +38,11 @@ class DashboardFragment : Fragment() {
     private lateinit var feedAdapter: BookingsFeedAdapter
 
     private val viewModel: DashboardViewModel by viewModels {
-        val database = SsmtsDatabase.getInstance(requireContext().applicationContext)
-        val sessionManager = SessionManager(requireContext().applicationContext)
+        val appContext = requireContext().applicationContext
+        val database = SsmtsDatabase.getInstance(appContext)
+        val sessionManager = SessionManager(appContext)
         val api = ApiClient.createOperatorDashboardApi(
-            baseUrl = "https://10.0.2.2:7143/",
+            baseUrl = ApiClient.getBaseUrl(appContext),
             tokenProvider = { sessionManager.getAuthToken() }
         )
         val repository = DashboardRepositoryImpl(api, database.reservationCacheDao())

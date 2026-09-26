@@ -40,7 +40,7 @@ class OperatorScannerActivity : AppCompatActivity() {
             val database = SsmtsDatabase.getInstance(applicationContext)
             val sessionManager = com.sliit.ssmts.util.SessionManager(applicationContext)
             val api = ApiClient.createOperatorDashboardApi(
-                baseUrl = "https://10.0.2.2:7143/",
+                baseUrl = ApiClient.getBaseUrl(applicationContext),
                 tokenProvider = { sessionManager.getAuthToken() }
             )
             val repository = OperatorVerificationRepositoryImpl(

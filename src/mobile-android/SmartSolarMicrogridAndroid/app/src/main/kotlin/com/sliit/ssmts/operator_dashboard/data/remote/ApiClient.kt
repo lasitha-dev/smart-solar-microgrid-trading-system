@@ -79,16 +79,29 @@ object ApiClient {
     }
 
     /**
+     * Resolves the active base URL, checking for custom developer overrides in SharedPreferences.
+     *
+     * @param context Application or activity context.
+     * @return Formatted base URL string ending with a trailing slash.
+     */
+    fun getBaseUrl(context: android.content.Context): String {
+        val prefs = context.getSharedPreferences(com.sliit.ssmts.util.Constants.PREFS_NAME, android.content.Context.MODE_PRIVATE)
+        val customUrl = prefs.getString(com.sliit.ssmts.util.Constants.KEY_CUSTOM_BASE_URL, null)
+        val baseUrl = if (!customUrl.isNullOrBlank()) customUrl else com.sliit.ssmts.util.Constants.DEFAULT_BASE_URL
+        return if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
+    }
+
+    /**
      * Constructs the Retrofit service client for OperatorDashboardApi.
      *
-     * @param baseUrl Base URL for the central C# Web API (e.g., "https://10.0.2.2:7143/").
+     * @param baseUrl Base URL for the central C# Web API (defaults to Constants.DEFAULT_BASE_URL).
      * @param tokenProvider Provider supplying active bearer tokens.
      * @param enableLogging Whether to include OkHttp logging (defaults to true).
      * @param okHttpClient Optional custom OkHttpClient instance (defaults to standard builder).
      * @return Initialized OperatorDashboardApi interface.
      */
     fun createOperatorDashboardApi(
-        baseUrl: String,
+        baseUrl: String = com.sliit.ssmts.util.Constants.DEFAULT_BASE_URL,
         tokenProvider: AuthTokenProvider = AuthTokenProvider { null },
         enableLogging: Boolean = true,
         okHttpClient: OkHttpClient? = null

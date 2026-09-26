@@ -18,6 +18,7 @@ using SmartSolarMicrogrid.Api.Helpers;
 using SmartSolarMicrogrid.Api.Models;
 using SmartSolarMicrogrid.Api.Repositories;
 using SmartSolarMicrogrid.Api.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SmartSolarMicrogrid.Api.Controllers;
 
@@ -37,6 +38,7 @@ public class ReservationsController : ControllerBase
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public ReservationsController(
         IOperatorVerificationService verificationService,
         IDashboardQueryService dashboardQueryService,

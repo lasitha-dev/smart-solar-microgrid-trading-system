@@ -40,13 +40,27 @@ const ReservationListPage = () => {
     { id: 'res-demo-005', prosumerId: 'PSM-20011234567', stationId: 'Station B – Hill Top Grid', bookingSlotId: 'BAY-2', scheduledDateTime: new Date(Date.now() + 5 * 86400000).toISOString(), status: 'Cancelled', requestedAt: new Date(Date.now() - 2 * 86400000).toISOString(), qrCode: null },
   ];
 
+  const normalizeReservation = (r) => ({
+    id: r.id || r.reservationId || '',
+    prosumerId: r.prosumerId || r.prosumerNic || '',
+    stationId: r.stationId || r.stationName || '',
+    bookingSlotId: r.bookingSlotId || r.allocatedBayId || '',
+    scheduledDateTime: r.scheduledDateTime || new Date().toISOString(),
+    status: r.status || 'Pending',
+    qrCode: r.qrCode || null,
+    requestedAt: r.requestedAt || r.scheduledDateTime || new Date().toISOString(),
+    estimatedKwh: r.estimatedKwh ?? 0,
+    meteredEnergyKwh: r.meteredEnergyKwh ?? null
+  });
+
   const fetchReservations = async () => {
     try {
       setLoading(true);
       setError(null);
       const res = await reservationService.getAllReservations();
-      if (res.success) {
-        setReservations(res.data || []);
+      const rawList = Array.isArray(res) ? res : (res && Array.isArray(res.data) ? res.data : null);
+      if (rawList) {
+        setReservations(rawList.map(normalizeReservation));
       } else {
         // Fallback to mock data for demo
         setReservations(MOCK_RESERVATIONS);
@@ -62,16 +76,15 @@ const ReservationListPage = () => {
     }
   };
 
-
   const handleApprove = async (id) => {
     setActionInProgress((prev) => ({ ...prev, [id]: true }));
     try {
       const res = await reservationService.approveReservation(id, operatorId);
-      if (res.success) {
+      if (res?.success || res?.status === 'Approved' || res?.valid) {
         showToast(`Reservation ${id.substring(0, 8)} approved with QR token!`, 'success');
         await fetchReservations();
       } else {
-        showToast(res.message || 'Approval failed.', 'error');
+        showToast(res?.message || 'Approval failed.', 'error');
       }
     } catch (err) {
       showToast(err.message || 'Approval error occurred.', 'error');
@@ -84,11 +97,11 @@ const ReservationListPage = () => {
     setActionInProgress((prev) => ({ ...prev, [id]: true }));
     try {
       const res = await reservationService.cancelReservation(id, reason);
-      if (res.success) {
+      if (res?.success || res?.status === 'Cancelled') {
         showToast(`Reservation cancelled successfully.`, 'info');
         await fetchReservations();
       } else {
-        showToast(res.message || 'Cancellation failed.', 'error');
+        showToast(res?.message || 'Cancellation failed.', 'error');
       }
     } catch (err) {
       showToast(err.message || 'Cancellation error.', 'error');
@@ -101,11 +114,11 @@ const ReservationListPage = () => {
     setSeeding(true);
     try {
       const res = await reservationService.seedSlots();
-      if (res.success) {
+      if (res?.success || res) {
         showToast('Successfully seeded 10 days of energy slots for Station A!', 'success');
         await fetchReservations();
       } else {
-        showToast(res.message || 'Slot seeding failed.', 'error');
+        showToast(res?.message || 'Slot seeding failed.', 'error');
       }
     } catch (err) {
       showToast(err.message || 'Seeding error.', 'error');
