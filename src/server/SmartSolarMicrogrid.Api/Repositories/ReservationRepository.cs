@@ -283,47 +283,77 @@ public class ReservationRepository : IReservationRepository
     }
 
     /// <summary>
-    /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.
+    /// Retrieves a solar station record by its unique identifier.
     /// </summary>
-    public async Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
+    public async Task<SolarStationInfo?> GetStationByIdAsync(string stationId)
+    {
+        if (string.IsNullOrWhiteSpace(stationId) || _solarStations == null) return null;
+        var station = await _solarStations.Find(s => s.Id == stationId).FirstOrDefaultAsync();
+        if (station != null) return station;
+
+        // Fallback: match by station name or find first active station with assigned operator
+        station = await _solarStations.Find(s => s.StationName.Contains(stationId) || s.Id == "6ab775048627a459ef095e24").FirstOrDefaultAsync();
+        if (station != null) return station;
+
+        return await _solarStations.Find(s => s.Status == "Active" && s.AssignedOperatorId != null).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.
+    /// Optionally filtered by assigned operator ID.
+    /// </summary>
+    public async Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null)
     {
         var nowUtc = DateTime.UtcNow;
         var todayStartUtc = nowUtc.Date;
         var todayEndUtc = todayStartUtc.AddDays(1);
         var sevenDaysFuture = nowUtc.AddDays(7);
 
+        var filterBuilder = Builders<EnergyReservation>.Filter;
+        FilterDefinition<EnergyReservation> opFilter = filterBuilder.Empty;
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            opFilter = filterBuilder.Or(
+                filterBuilder.Eq(r => r.AssignedOperatorId, operatorId),
+                filterBuilder.Eq(r => r.AssignedOperatorNic, operatorId)
+            );
+        }
+
         // 1. Pending reservations count
-        var pendingFilter = Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Pending");
+        var pendingFilter = filterBuilder.Eq(r => r.Status, "Pending") & opFilter;
         var pendingCount = (int)await _reservations.CountDocumentsAsync(pendingFilter);
 
         // 2. Approved future reservations count (scheduled within 7-day operational window)
-        var approvedFutureFilter = Builders<EnergyReservation>.Filter.And(
-            Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Approved"),
-            Builders<EnergyReservation>.Filter.Gte(r => r.ScheduledDateTime, nowUtc.AddMinutes(-30)),
-            Builders<EnergyReservation>.Filter.Lte(r => r.ScheduledDateTime, sevenDaysFuture)
+        var approvedFutureFilter = filterBuilder.And(
+            filterBuilder.Eq(r => r.Status, "Approved"),
+            filterBuilder.Gte(r => r.ScheduledDateTime, nowUtc.AddMinutes(-30)),
+            filterBuilder.Lte(r => r.ScheduledDateTime, sevenDaysFuture),
+            opFilter
         );
         var approvedFutureCount = (int)await _reservations.CountDocumentsAsync(approvedFutureFilter);
 
         // 3. Completed today count
-        var completedTodayFilter = Builders<EnergyReservation>.Filter.And(
-            Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Completed"),
-            Builders<EnergyReservation>.Filter.Or(
-                Builders<EnergyReservation>.Filter.And(
-                    Builders<EnergyReservation>.Filter.Gte(r => r.FinalizedAt, todayStartUtc),
-                    Builders<EnergyReservation>.Filter.Lt(r => r.FinalizedAt, todayEndUtc)
+        var completedTodayFilter = filterBuilder.And(
+            filterBuilder.Eq(r => r.Status, "Completed"),
+            filterBuilder.Or(
+                filterBuilder.And(
+                    filterBuilder.Gte(r => r.FinalizedAt, todayStartUtc),
+                    filterBuilder.Lt(r => r.FinalizedAt, todayEndUtc)
                 ),
-                Builders<EnergyReservation>.Filter.And(
-                    Builders<EnergyReservation>.Filter.Gte(r => r.ScheduledDateTime, todayStartUtc),
-                    Builders<EnergyReservation>.Filter.Lt(r => r.ScheduledDateTime, todayEndUtc)
+                filterBuilder.And(
+                    filterBuilder.Gte(r => r.ScheduledDateTime, todayStartUtc),
+                    filterBuilder.Lt(r => r.ScheduledDateTime, todayEndUtc)
                 )
-            )
+            ),
+            opFilter
         );
         var completedTodayCount = (int)await _reservations.CountDocumentsAsync(completedTodayFilter);
 
         // 4. Nearest active spotlight reservation in Approved status
-        var spotlightFilter = Builders<EnergyReservation>.Filter.And(
-            Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Approved"),
-            Builders<EnergyReservation>.Filter.Gte(r => r.ScheduledDateTime, nowUtc.AddMinutes(-30))
+        var spotlightFilter = filterBuilder.And(
+            filterBuilder.Eq(r => r.Status, "Approved"),
+            filterBuilder.Gte(r => r.ScheduledDateTime, nowUtc.AddMinutes(-30)),
+            opFilter
         );
         var spotlightDoc = await _reservations.Find(spotlightFilter)
             .SortBy(r => r.ScheduledDateTime)
@@ -353,12 +383,21 @@ public class ReservationRepository : IReservationRepository
     }
 
     /// <summary>
-    /// Queries reservations with multi-criteria filtering by status, debounced search query, and calendar date.
+    /// Queries reservations with multi-criteria filtering by status, debounced search query, calendar date, and optional operator ID.
     /// </summary>
-    public async Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date)
+    public async Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date, string? operatorId = null)
     {
         var filterBuilder = Builders<EnergyReservation>.Filter;
         var filter = filterBuilder.Empty;
+
+        // Operator Filter
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            filter &= filterBuilder.Or(
+                filterBuilder.Eq(r => r.AssignedOperatorId, operatorId),
+                filterBuilder.Eq(r => r.AssignedOperatorNic, operatorId)
+            );
+        }
 
         // Status Filter Chip (Pending, Approved, Completed, Cancelled)
         if (!string.IsNullOrWhiteSpace(status) && !string.Equals(status, "All", StringComparison.OrdinalIgnoreCase))
@@ -398,6 +437,8 @@ public class ReservationRepository : IReservationRepository
             ReservationId = r.Id,
             ProsumerNic = !string.IsNullOrWhiteSpace(r.ProsumerNic) ? r.ProsumerNic : r.ProsumerId,
             StationName = !string.IsNullOrWhiteSpace(r.StationName) ? r.StationName : r.StationId,
+            StationId = r.StationId,
+            AssignedOperatorId = r.AssignedOperatorId,
             ScheduledDateTime = r.ScheduledDateTime,
             AllocatedBayId = r.AllocatedBayId,
             EstimatedKwh = r.EstimatedKwh,

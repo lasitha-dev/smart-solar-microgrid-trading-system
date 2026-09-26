@@ -18,8 +18,10 @@ import {
   Save,
   AlertCircle,
   Compass,
-  Crosshair
+  Crosshair,
+  UserCheck
 } from 'lucide-react';
+import { adminService } from '../../../services/adminService';
 
 /**
  * Creates custom amber solar pin icon for Leaflet map without broken asset dependencies.
@@ -62,12 +64,32 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
     totalBatterySlots: 4,
     openTime: '06:00',
     closeTime: '20:00',
-    status: 'Active'
+    status: 'Active',
+    assignedOperatorId: ''
   });
 
+  const [operators, setOperators] = useState([]);
+  const [loadingOperators, setLoadingOperators] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
+
+  // Fetch active Grid Operators when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLoadingOperators(true);
+      adminService.getUsers({ role: 'GridOperator', status: 'Active', pageSize: 100 })
+        .then((data) => {
+          setOperators(Array.isArray(data) ? data : []);
+        })
+        .catch((err) => {
+          console.error('Failed to load active grid operators:', err);
+        })
+        .finally(() => {
+          setLoadingOperators(false);
+        });
+    }
+  }, [isOpen]);
 
   // Map references
   const mapContainerRef = useRef(null);
@@ -85,7 +107,8 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
         totalBatterySlots: initialData.totalBatterySlots ?? initialData.batterySlots?.length ?? 4,
         openTime: initialData.schedule?.openTime || '06:00',
         closeTime: initialData.schedule?.closeTime || '20:00',
-        status: initialData.status || 'Active'
+        status: initialData.status || 'Active',
+        assignedOperatorId: initialData.assignedOperatorId || ''
       });
     } else {
       setFormData({
@@ -97,7 +120,8 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
         totalBatterySlots: 4,
         openTime: '06:00',
         closeTime: '20:00',
-        status: 'Active'
+        status: 'Active',
+        assignedOperatorId: ''
       });
     }
     setError('');
@@ -253,10 +277,16 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
       return;
     }
 
+    if (!formData.assignedOperatorId) {
+      setError('Please assign an active Grid Operator to this microgrid station.');
+      return;
+    }
+
     // Prepare payload matching StationCreateDto / StationUpdateDto
     const payload = {
       ...(isEditing && { id: initialData.id, status: formData.status }),
       stationName: formData.stationName.trim(),
+      assignedOperatorId: formData.assignedOperatorId,
       location: {
         lat: latVal,
         lng: lngVal,
@@ -506,6 +536,33 @@ export const StationFormModal = ({ isOpen, onClose, onSave, initialData = null }
                 value={formData.address}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Assigned Grid Operator Selection */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <UserCheck size={16} style={{ color: '#10b981' }} />
+                <span>Assigned Grid Operator <span style={{ color: '#ef4444' }}>*</span></span>
+              </label>
+              <select
+                name="assignedOperatorId"
+                className="form-control"
+                value={formData.assignedOperatorId}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Select Active Grid Operator --</option>
+                {operators.map((op) => (
+                  <option key={op.id || op.userId} value={op.id || op.userId}>
+                    {op.fullName} ({op.nic}) - {op.email}
+                  </option>
+                ))}
+              </select>
+              {loadingOperators && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                  Loading active grid operators...
+                </span>
+              )}
             </div>
 
             {/* Capacity & Battery Slots */}

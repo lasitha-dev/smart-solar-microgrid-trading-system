@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.sliit.ssmts.R
 import com.sliit.ssmts.databinding.ActivityBookingSummaryBinding
+import com.sliit.ssmts.operator_dashboard.util.QrCodeGenerator
 import com.sliit.ssmts.reservation_workflow.di.DependencyProvider
 import com.sliit.ssmts.reservation_workflow.di.ViewModelFactory
 import com.sliit.ssmts.reservation_workflow.domain.model.Reservation
@@ -83,11 +84,23 @@ class BookingSummaryActivity : AppCompatActivity(),
                         binding.tvProsumerNic.text = reservation.prosumerId
                         
                         applyStatusBadge(reservation.status)
+                        applyApprovalAlert(reservation.status)
 
-                        // QR Code display
-                        if (!reservation.qrCode.isNullOrEmpty()) {
+                        // QR Code display & bitmap generation
+                        if (reservation.status == ReservationStatus.APPROVED && !reservation.qrCode.isNullOrEmpty()) {
                             binding.cardQrCode.visibility = View.VISIBLE
                             binding.tvQrToken.text = reservation.qrCode
+                            try {
+                                val bitmap = QrCodeGenerator.generateQrBitmap(
+                                    payload = reservation.qrCode,
+                                    dimensionPx = 512
+                                )
+                                binding.ivQrCode.setImageBitmap(bitmap)
+                                binding.ivQrCode.visibility = View.VISIBLE
+                            } catch (_: Exception) {
+                                binding.ivQrCode.visibility = View.GONE
+                            }
+
                             binding.btnCopyQrToken.setOnClickListener {
                                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 val clip = ClipData.newPlainText("QR Token", reservation.qrCode)
@@ -239,6 +252,41 @@ class BookingSummaryActivity : AppCompatActivity(),
         binding.tvStatusBadge.text = label
         binding.tvStatusBadge.setTextColor(ContextCompat.getColor(this, textColor))
         binding.cardStatusBadge.setCardBackgroundColor(ContextCompat.getColor(this, bgColor))
+    }
+
+    private fun applyApprovalAlert(status: ReservationStatus) {
+        when (status) {
+            ReservationStatus.PENDING -> {
+                binding.cardApprovalAlert.visibility = View.VISIBLE
+                binding.cardApprovalAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.status_pending_container))
+                binding.cardApprovalAlert.strokeColor = ContextCompat.getColor(this, R.color.status_pending_stroke)
+                binding.ivAlertIcon.setImageResource(R.drawable.ic_status_pending)
+                binding.ivAlertIcon.setColorFilter(ContextCompat.getColor(this, R.color.status_pending_text))
+                binding.tvAlertMessage.text = getString(R.string.alert_pending_approval)
+                binding.tvAlertMessage.setTextColor(ContextCompat.getColor(this, R.color.status_pending_text))
+            }
+            ReservationStatus.APPROVED -> {
+                binding.cardApprovalAlert.visibility = View.VISIBLE
+                binding.cardApprovalAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.status_completed_container))
+                binding.cardApprovalAlert.strokeColor = ContextCompat.getColor(this, R.color.status_completed_stroke)
+                binding.ivAlertIcon.setImageResource(R.drawable.ic_check_circle)
+                binding.ivAlertIcon.setColorFilter(ContextCompat.getColor(this, R.color.status_completed_text))
+                binding.tvAlertMessage.text = getString(R.string.alert_approved_confirmed)
+                binding.tvAlertMessage.setTextColor(ContextCompat.getColor(this, R.color.status_completed_text))
+            }
+            ReservationStatus.COMPLETED -> {
+                binding.cardApprovalAlert.visibility = View.VISIBLE
+                binding.cardApprovalAlert.setCardBackgroundColor(ContextCompat.getColor(this, R.color.status_completed_container))
+                binding.cardApprovalAlert.strokeColor = ContextCompat.getColor(this, R.color.status_completed_stroke)
+                binding.ivAlertIcon.setImageResource(R.drawable.ic_check_circle)
+                binding.ivAlertIcon.setColorFilter(ContextCompat.getColor(this, R.color.status_completed_text))
+                binding.tvAlertMessage.text = getString(R.string.alert_completed_finalized)
+                binding.tvAlertMessage.setTextColor(ContextCompat.getColor(this, R.color.status_completed_text))
+            }
+            else -> {
+                binding.cardApprovalAlert.visibility = View.GONE
+            }
+        }
     }
 
     override fun onCancelConfirmed(reason: String?) {

@@ -40,6 +40,21 @@ public interface IUserService
     Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> CreateStaffUserAsync(UserCreateDto request);
 
     /// <summary>
+    /// Updates a staff or Grid Operator user account profile.
+    /// </summary>
+    /// <param name="id">The unique MongoDB user document identifier.</param>
+    /// <param name="request">The staff user update payload.</param>
+    /// <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+    Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> UpdateStaffUserAsync(string id, UserUpdateDto request);
+
+    /// <summary>
+    /// Deletes a staff or Grid Operator user account with active reservation and station assignment guard checks.
+    /// </summary>
+    /// <param name="id">The unique MongoDB user document identifier.</param>
+    /// <returns>A tuple with success status, message, and HTTP status code.</returns>
+    Task<(bool Success, string Message, int StatusCode)> DeleteStaffUserAsync(string id);
+
+    /// <summary>
     /// Retrieves all system users with optional filtering by role and status.
     /// </summary>
     /// <param name="role">Optional filter by user role.</param>

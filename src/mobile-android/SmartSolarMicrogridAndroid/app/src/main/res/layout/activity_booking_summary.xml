@@ -45,6 +45,45 @@
                 android:textStyle="bold" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Approval Status Alert Banner (Member 3 & Member 4) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardApprovalAlert"
+            style="@style/Widget.Ssmts.Card.Metric"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="@dimen/radius_md"
+            app:strokeWidth="1dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/layoutApprovalAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/ivAlertIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_check_circle"
+                    app:tint="@color/emerald_accent" />
+
+                <TextView
+                    android:id="@+id/tvAlertMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Receipt Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.Ssmts.Card.Metric"
@@ -180,15 +219,28 @@
                     android:textColor="@color/text_primary"
                     android:textAppearance="?attr/textAppearanceTitleMedium" />
 
+                <!-- 2D High-Contrast QR Code Bitmap View -->
+                <ImageView
+                    android:id="@+id/ivQrCode"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@android:color/white"
+                    android:padding="8dp"
+                    android:contentDescription="@string/label_qr_code"
+                    android:scaleType="fitCenter" />
+
                 <TextView
                     android:id="@+id/tvQrToken"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:background="#F5F5F5"
                     android:padding="12dp"
                     android:fontFamily="monospace"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:textColor="@color/text_primary"
                     android:textIsSelectable="true" />
 

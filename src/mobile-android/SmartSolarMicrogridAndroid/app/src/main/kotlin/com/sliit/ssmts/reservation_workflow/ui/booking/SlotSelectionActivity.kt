@@ -172,9 +172,15 @@ class SlotSelectionActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val api = RetrofitClient.getStationApi(this@SlotSelectionActivity)
-                val response = api.getNearbyStations(lat = 6.9271, lng = 79.8612, radiusKm = 50.0)
-                val rawData = response.body()?.data
-                if (response.isSuccessful && !rawData.isNullOrEmpty()) {
+                val response = api.getAllStations()
+                val rawData = if (response.isSuccessful && !response.body()?.data.isNullOrEmpty()) {
+                    response.body()?.data
+                } else {
+                    val fallbackResponse = api.getNearbyStations(lat = 6.9271, lng = 79.8612, radiusKm = 1000.0)
+                    fallbackResponse.body()?.data
+                }
+
+                if (!rawData.isNullOrEmpty()) {
                     val liveList = rawData.filter { it.status != "Deactivated" }
                     if (liveList.isNotEmpty()) {
                         stations.clear()

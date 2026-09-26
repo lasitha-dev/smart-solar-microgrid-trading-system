@@ -295,25 +295,43 @@ public class FakeReservationRepository : IReservationRepository
         return Task.CompletedTask;
     }
 
-    public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
+    public Task<SolarStationInfo?> GetStationByIdAsync(string stationId)
+    {
+        return Task.FromResult<SolarStationInfo?>(new SolarStationInfo
+        {
+            Id = stationId,
+            StationName = "Kandy Solar Hub",
+            AssignedOperatorId = "op-1",
+            AssignedOperatorName = "Operator Silva",
+            AssignedOperatorNic = "901234567V"
+        });
+    }
+
+    public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null)
     {
         var nowUtc = DateTime.UtcNow;
         var todayStartUtc = nowUtc.Date;
         var todayEndUtc = todayStartUtc.AddDays(1);
         var sevenDaysFuture = nowUtc.AddDays(7);
 
-        var pendingCount = _store.Values.Count(r => r.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
-        var approvedFutureCount = _store.Values.Count(r =>
+        var query = _store.Values.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            query = query.Where(r => r.AssignedOperatorId == operatorId);
+        }
+
+        var pendingCount = query.Count(r => r.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
+        var approvedFutureCount = query.Count(r =>
             r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
             r.ScheduledDateTime >= nowUtc.AddMinutes(-30) &&
             r.ScheduledDateTime <= sevenDaysFuture);
 
-        var completedTodayCount = _store.Values.Count(r =>
+        var completedTodayCount = query.Count(r =>
             r.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) &&
             ((r.FinalizedAt >= todayStartUtc && r.FinalizedAt < todayEndUtc) ||
              (r.ScheduledDateTime >= todayStartUtc && r.ScheduledDateTime < todayEndUtc)));
 
-        var spotlightDoc = _store.Values
+        var spotlightDoc = query
             .Where(r => r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
                         r.ScheduledDateTime >= nowUtc.AddMinutes(-30))
             .OrderBy(r => r.ScheduledDateTime)
@@ -342,9 +360,14 @@ public class FakeReservationRepository : IReservationRepository
         });
     }
 
-    public Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date)
+    public Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date, string? operatorId = null)
     {
         var query = _store.Values.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            query = query.Where(r => r.AssignedOperatorId == operatorId);
+        }
 
         if (!string.IsNullOrWhiteSpace(status) && !status.Equals("All", StringComparison.OrdinalIgnoreCase))
         {
@@ -374,6 +397,8 @@ public class FakeReservationRepository : IReservationRepository
                 ReservationId = r.Id,
                 ProsumerNic = r.ProsumerNic,
                 StationName = r.StationName,
+                StationId = r.StationId,
+                AssignedOperatorId = r.AssignedOperatorId,
                 ScheduledDateTime = r.ScheduledDateTime,
                 AllocatedBayId = r.AllocatedBayId,
                 EstimatedKwh = r.EstimatedKwh,

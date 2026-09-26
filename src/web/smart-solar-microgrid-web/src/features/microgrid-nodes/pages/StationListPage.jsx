@@ -22,7 +22,8 @@ import {
   Search,
   CheckCircle2,
   XCircle,
-  HelpCircle
+  HelpCircle,
+  UserCheck
 } from 'lucide-react';
 
 export const StationListPage = () => {
@@ -251,6 +252,7 @@ export const StationListPage = () => {
                 <th>Capacity (kWh)</th>
                 <th>Battery Bays</th>
                 <th>Trading Hours</th>
+                <th>Assigned Operator</th>
                 <th>Status</th>
                 <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
@@ -258,14 +260,14 @@ export const StationListPage = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
                     <div className="spinner" style={{ margin: '0 auto 0.75rem auto' }} />
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading microgrid nodes...</p>
                   </td>
                 </tr>
               ) : filteredStations.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
                     <HelpCircle size={32} style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }} />
                     <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>No microgrid stations found</p>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
@@ -337,6 +339,27 @@ export const StationListPage = () => {
                             {station.schedule?.openTime || '06:00'} - {station.schedule?.closeTime || '20:00'}
                           </span>
                         </div>
+                      </td>
+
+                      {/* Assigned Grid Operator */}
+                      <td>
+                        {station.assignedOperatorName ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                            <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                              <UserCheck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
+                              <span>{station.assignedOperatorName}</span>
+                            </span>
+                            {station.assignedOperatorNic && (
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                NIC: {station.assignedOperatorNic}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: '0.8rem', color: '#f59e0b', fontStyle: 'italic' }}>
+                            Unassigned
+                          </span>
+                        )}
                       </td>
 
                       {/* Status Badge */}

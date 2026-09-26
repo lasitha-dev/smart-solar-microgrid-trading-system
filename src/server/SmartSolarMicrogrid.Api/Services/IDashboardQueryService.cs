@@ -11,8 +11,9 @@ public interface IDashboardQueryService
 {
     /// <summary>
     /// Computes aggregated metrics: pending count, approved future count, completed today count, and active spotlight.
+    /// Optionally filtered by assigned operator ID.
     /// </summary>
-    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync();
+    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null);
 
     /// <summary>
     /// Queries reservations matching status chips, debounced search keyword, and optional calendar date.

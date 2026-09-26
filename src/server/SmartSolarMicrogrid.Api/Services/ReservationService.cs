@@ -55,22 +55,37 @@ namespace SmartSolarMicrogrid.Api.Services
                 throw new BusinessRuleException("SLOT_UNAVAILABLE", "Slot was just taken by another user. Please select another slot.");
             }
 
+            // Lookup station to assign operator and station name
+            var station = await _repository.GetStationByIdAsync(dto.StationId);
+
             // Create reservation
             var reservation = new EnergyReservation
             {
                 ProsumerId = dto.ProsumerId,
                 ProsumerNic = dto.ProsumerId,
                 StationId = dto.StationId,
+                StationName = station?.StationName ?? dto.StationId,
+                AssignedOperatorId = station?.AssignedOperatorId,
+                AssignedOperatorNic = station?.AssignedOperatorNic,
                 BookingSlotId = dto.BookingSlotId,
+                AllocatedBayId = !string.IsNullOrWhiteSpace(slot.BatterySlotId) ? slot.BatterySlotId : "Bay-01",
                 ScheduledDateTime = dto.ScheduledDateTime,
                 Status = "Pending",
                 RequestedAt = now,
                 UpdatedAt = now
             };
 
-            await _repository.CreateAsync(reservation);
-
-            return reservation;
+            try
+            {
+                await _repository.CreateAsync(reservation);
+                return reservation;
+            }
+            catch
+            {
+                // Revert reserved slot status to Open if reservation creation fails
+                await _repository.UpdateSlotStatusAsync(dto.BookingSlotId, "Open");
+                throw;
+            }
         }
 
         public async Task<EnergyReservation> UpdateReservationAsync(string id, UpdateReservationDto dto)
@@ -168,7 +183,7 @@ namespace SmartSolarMicrogrid.Api.Services
             await _repository.UpdateSlotStatusAsync(reservation.BookingSlotId, "Open");
         }
 
-        public async Task ApproveReservationAsync(string id, string operatorId)
+        public async Task<EnergyReservation> ApproveReservationAsync(string id, string operatorId)
         {
             var reservation = await _repository.GetByIdAsync(id);
             if (reservation == null)
@@ -176,7 +191,13 @@ namespace SmartSolarMicrogrid.Api.Services
                 throw new NotFoundException("Reservation not found.");
             }
 
-            if (reservation.Status != "Pending")
+            // If already approved, return idempotently with existing QR code
+            if (string.Equals(reservation.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+            {
+                return reservation;
+            }
+
+            if (!string.Equals(reservation.Status, "Pending", StringComparison.OrdinalIgnoreCase))
             {
                 throw new BusinessRuleException("INVALID_STATE", "Only Pending reservations can be approved.");
             }
@@ -201,6 +222,7 @@ namespace SmartSolarMicrogrid.Api.Services
             }
 
             await _repository.UpdateAsync(reservation);
+            return reservation;
         }
 
         public async Task<EnergyReservation?> GetReservationByIdAsync(string id)

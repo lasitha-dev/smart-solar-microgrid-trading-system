@@ -90,6 +90,16 @@ public class SolarStationInfo
     [BsonElement("status")]
     public string Status { get; set; } = "Active";
 
+    [BsonRepresentation(BsonType.ObjectId)]
+    [BsonElement("assignedOperatorId")]
+    public string? AssignedOperatorId { get; set; }
+
+    [BsonElement("assignedOperatorName")]
+    public string? AssignedOperatorName { get; set; }
+
+    [BsonElement("assignedOperatorNic")]
+    public string? AssignedOperatorNic { get; set; }
+
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -27,7 +27,8 @@ import kotlinx.coroutines.launch
  * @property repository Injected repository abstraction for retrieving operational metrics and cached booking feeds.
  */
 class DashboardViewModel(
-    private val repository: IDashboardRepository
+    private val repository: IDashboardRepository,
+    private val operatorId: String? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<DashboardMetrics>>(UiState.Loading)
@@ -114,7 +115,7 @@ class DashboardViewModel(
                 _uiState.value = UiState.Loading
             }
 
-            repository.getDashboardMetricsStream(forceRefresh = forceRefresh).collect { result ->
+            repository.getDashboardMetricsStream(forceRefresh = forceRefresh, operatorId = operatorId).collect { result ->
                 when (result) {
                     is NetworkResult.Success -> {
                         _uiState.value = UiState.Success(result.data)
@@ -144,7 +145,7 @@ class DashboardViewModel(
         viewModelScope.launch {
             try {
                 try {
-                    repository.syncRemoteReservations()
+                    repository.syncRemoteReservations(operatorId = operatorId)
                 } catch (_: Exception) {
                     // Remote sync failure falls back to local cache gracefully
                 }
@@ -156,15 +157,41 @@ class DashboardViewModel(
     }
 
     /**
+     * Approves a pending reservation and updates the operational dashboard state.
+     *
+     * @param reservationId Identifier of the reservation to approve.
+     * @param onComplete Callback invoked with result success or error message.
+     */
+    fun approveReservation(reservationId: String, onComplete: ((Boolean, String?) -> Unit)? = null) {
+        viewModelScope.launch {
+            when (val result = repository.approveReservation(reservationId, operatorId)) {
+                is NetworkResult.Success -> {
+                    refresh()
+                    onComplete?.invoke(true, null)
+                }
+                is NetworkResult.Error -> {
+                    refresh()
+                    onComplete?.invoke(false, result.message)
+                }
+                is NetworkResult.Exception -> {
+                    refresh()
+                    onComplete?.invoke(false, result.throwable.localizedMessage ?: "Failed to approve reservation.")
+                }
+            }
+        }
+    }
+
+    /**
      * Factory for constructing DashboardViewModel instances with injected IDashboardRepository.
      */
     class Factory(
-        private val repository: IDashboardRepository
+        private val repository: IDashboardRepository,
+        private val operatorId: String? = null
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
-                return DashboardViewModel(repository) as T
+                return DashboardViewModel(repository, operatorId) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

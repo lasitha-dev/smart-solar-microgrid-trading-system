@@ -79,12 +79,18 @@ public interface IReservationRepository
     Task SeedSlotsAsync(string stationId);
 
     /// <summary>
-    /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.
+    /// Retrieves a solar station record by its unique identifier.
     /// </summary>
-    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync();
+    Task<SolarStationInfo?> GetStationByIdAsync(string stationId);
 
     /// <summary>
-    /// Queries reservations with multi-criteria filtering by status, debounced search query, and calendar date.
+    /// Computes aggregated metrics for the operational dashboard: pending, approved future (7-day window), completed today, and active spotlight.
+    /// Optionally scoped to a specific Grid Operator.
     /// </summary>
-    Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date);
+    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null);
+
+    /// <summary>
+    /// Queries reservations with multi-criteria filtering by status, debounced search query, calendar date, and optional operator ID.
+    /// </summary>
+    Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date, string? operatorId = null);
 }

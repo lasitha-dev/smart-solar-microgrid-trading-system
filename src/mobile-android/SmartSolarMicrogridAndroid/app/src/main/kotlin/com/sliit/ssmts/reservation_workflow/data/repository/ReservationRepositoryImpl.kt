@@ -152,6 +152,19 @@ class ReservationRepositoryImpl(
                 if (jsonObject.has("message") && !jsonObject.get("message").isJsonNull) {
                     return jsonObject.get("message").asString
                 }
+                if (jsonObject.has("title") && !jsonObject.get("title").isJsonNull) {
+                    return jsonObject.get("title").asString
+                }
+                if (jsonObject.has("errors") && jsonObject.get("errors").isJsonObject) {
+                    val errorsObj = jsonObject.getAsJsonObject("errors")
+                    val firstKey = errorsObj.keySet().firstOrNull()
+                    if (firstKey != null) {
+                        val arr = errorsObj.getAsJsonArray(firstKey)
+                        if (arr != null && arr.size() > 0) {
+                            return arr[0].asString
+                        }
+                    }
+                }
             } catch (_: Exception) {}
         }
         return bodyMessage ?: defaultMsg

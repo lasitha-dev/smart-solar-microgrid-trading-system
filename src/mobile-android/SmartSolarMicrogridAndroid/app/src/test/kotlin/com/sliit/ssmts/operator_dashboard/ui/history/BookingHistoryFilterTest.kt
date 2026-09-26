@@ -439,7 +439,7 @@ class BookingHistoryFilterTest {
         /**
          * Emits mock dashboard metrics stream.
          */
-        override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
+        override fun getDashboardMetricsStream(forceRefresh: Boolean, operatorId: String?): Flow<NetworkResult<DashboardMetrics>> = flow {
             emit(NetworkResult.Success(DashboardMetrics()))
         }
 
@@ -460,8 +460,22 @@ class BookingHistoryFilterTest {
         /**
          * Simulates syncing remote reservations.
          */
-        override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
+        override suspend fun syncRemoteReservations(operatorId: String?): NetworkResult<Unit> {
             return NetworkResult.Success(Unit)
+        }
+
+        override suspend fun approveReservation(reservationId: String, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.APPROVED,
+                    estimatedKwh = 10.0
+                )
+            )
         }
     }
 }

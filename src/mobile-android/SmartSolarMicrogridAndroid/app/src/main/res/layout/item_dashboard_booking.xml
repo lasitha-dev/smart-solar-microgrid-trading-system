@@ -102,5 +102,24 @@
                 tools:text="35.00 kWh" />
         </LinearLayout>
 
+        <!-- Operator Action: Approve Pending Reservation -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApproveBooking"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:backgroundTint="@color/emerald_accent"
+            android:text="@string/btn_approve_reservation"
+            android:textColor="@color/slate_surface"
+            android:textSize="@dimen/text_size_caption"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/radius_md"
+            app:icon="@drawable/ic_check_circle"
+            app:iconGravity="textStart"
+            app:iconTint="@color/slate_surface"
+            tools:visibility="visible" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

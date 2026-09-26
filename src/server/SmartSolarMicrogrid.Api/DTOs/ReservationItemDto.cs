@@ -13,6 +13,10 @@ public class ReservationItemDto
 
     public string StationName { get; set; } = string.Empty;
 
+    public string? StationId { get; set; }
+
+    public string? AssignedOperatorId { get; set; }
+
     public DateTime ScheduledDateTime { get; set; }
 
     public string AllocatedBayId { get; set; } = string.Empty;
@@ -50,4 +54,9 @@ public class ReservationFilterQueryDto
     /// Optional Prosumer ID to retrieve prosumer-specific reservations.
     /// </summary>
     public string? ProsumerId { get; set; }
+
+    /// <summary>
+    /// Optional Grid Operator ID to retrieve reservations assigned to this operator.
+    /// </summary>
+    public string? OperatorId { get; set; }
 }

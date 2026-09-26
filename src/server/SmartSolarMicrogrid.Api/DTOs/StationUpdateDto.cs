@@ -48,4 +48,9 @@ public class StationUpdateDto
     /// Gets or sets the operational lifecycle status of the node (Active, Inactive, Maintenance).
     /// </summary>
     public string? Status { get; set; }
+
+    /// <summary>
+    /// Gets or sets the updated unique MongoDB user identifier of the assigned Grid Operator.
+    /// </summary>
+    public string? AssignedOperatorId { get; set; }
 }

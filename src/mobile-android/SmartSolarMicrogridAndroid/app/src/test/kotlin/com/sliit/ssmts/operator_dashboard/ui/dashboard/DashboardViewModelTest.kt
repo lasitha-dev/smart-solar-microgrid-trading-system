@@ -291,7 +291,7 @@ class DashboardViewModelTest {
         /**
          * Emits configured metrics result stream.
          */
-        override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
+        override fun getDashboardMetricsStream(forceRefresh: Boolean, operatorId: String?): Flow<NetworkResult<DashboardMetrics>> = flow {
             lastForceRefreshRequested = forceRefresh
             emit(metricsResult)
         }
@@ -320,9 +320,26 @@ class DashboardViewModelTest {
         /**
          * Records remote sync invocation.
          */
-        override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
+        override suspend fun syncRemoteReservations(operatorId: String?): NetworkResult<Unit> {
             syncRemoteCalled = true
             return NetworkResult.Success(Unit)
+        }
+
+        /**
+         * Approves reservation dummy implementation.
+         */
+        override suspend fun approveReservation(reservationId: String, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.APPROVED,
+                    estimatedKwh = 10.0
+                )
+            )
         }
     }
 }

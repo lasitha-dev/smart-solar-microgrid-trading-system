@@ -98,4 +98,9 @@ public class StationCreateDto
     /// Gets or sets the operational schedule and active days.
     /// </summary>
     public StationScheduleDto Schedule { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the unique MongoDB user identifier of the assigned Grid Operator.
+    /// </summary>
+    public string? AssignedOperatorId { get; set; }
 }

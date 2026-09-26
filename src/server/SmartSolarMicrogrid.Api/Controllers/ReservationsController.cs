@@ -53,13 +53,14 @@ public class ReservationsController : ControllerBase
 
     /// <summary>
     /// Aggregates operational dashboard metrics including live pending count, approved future count, and active spotlight.
+    /// Optionally filtered by operatorId query parameter.
     /// GET /api/reservations/dashboard-metrics
     /// </summary>
     [HttpGet("dashboard-metrics")]
     [ProducesResponseType(typeof(DashboardMetricsResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetDashboardMetrics()
+    public async Task<IActionResult> GetDashboardMetrics([FromQuery] string? operatorId = null)
     {
-        var metrics = await _dashboardQueryService.GetDashboardMetricsAsync();
+        var metrics = await _dashboardQueryService.GetDashboardMetricsAsync(operatorId);
         return Ok(metrics);
     }
 
@@ -196,12 +197,27 @@ public class ReservationsController : ControllerBase
     /// PATCH /api/reservations/{id}/approve
     /// </summary>
     [HttpPatch("{id}/approve")]
-    public async Task<IActionResult> ApproveReservation(string id, [FromQuery] string operatorId)
+    [ProducesResponseType(typeof(ReservationItemDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ApproveReservation(string id, [FromQuery] string? operatorId = null)
     {
         try
         {
-            await _reservationService.ApproveReservationAsync(id, operatorId);
-            return Ok(ApiResponse<object>.SuccessResponse(new {}, "Reservation approved successfully"));
+            var reservation = await _reservationService.ApproveReservationAsync(id, operatorId ?? string.Empty);
+            var itemDto = new ReservationItemDto
+            {
+                ReservationId = reservation.Id ?? id,
+                ProsumerNic = !string.IsNullOrWhiteSpace(reservation.ProsumerNic) ? reservation.ProsumerNic : reservation.ProsumerId,
+                StationName = reservation.StationName,
+                StationId = reservation.StationId,
+                AssignedOperatorId = reservation.AssignedOperatorId,
+                ScheduledDateTime = reservation.ScheduledDateTime,
+                AllocatedBayId = reservation.AllocatedBayId,
+                EstimatedKwh = reservation.EstimatedKwh,
+                MeteredEnergyKwh = reservation.MeteredEnergyKwh,
+                Status = reservation.Status,
+                QrCode = reservation.QrCode
+            };
+            return Ok(itemDto);
         }
         catch (BusinessRuleException ex)
         {

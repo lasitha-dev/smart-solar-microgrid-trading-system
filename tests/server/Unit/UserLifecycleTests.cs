@@ -8,6 +8,7 @@
 
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using MongoDB.Driver;
 using Moq;
 using SmartSolarMicrogrid.Api.DTOs;
 using SmartSolarMicrogrid.Api.Models;
@@ -444,5 +445,145 @@ public class UserLifecycleTests
         result.Success.Should().BeFalse();
         result.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
         result.Message.Should().Contain("Deactivated");
+    }
+
+    [Fact]
+    public async Task UpdateStaffUser_UpdatesProfile_ReturnsOk200()
+    {
+        // Arrange
+        var operatorUser = new User
+        {
+            Id = "60d5ec49f1b2c42d8c3b4a59",
+            Nic = "199012345678",
+            Username = "grid_op1",
+            Email = "op1@microgrid.lk",
+            FullName = "Operator Perera",
+            Phone = "0771234567",
+            Address = "No 5, Kandy",
+            Role = UserRole.GridOperator,
+            Status = AccountStatus.Active
+        };
+
+        var userList = new List<User> { operatorUser };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        var updateDto = new UserUpdateDto
+        {
+            FullName = "Senior Operator Perera",
+            Email = "op1.senior@microgrid.lk",
+            Phone = "0779876543",
+            Address = "No 10, Station Road, Kandy"
+        };
+
+        // Act
+        var result = await userService.UpdateStaffUserAsync(operatorUser.Id, updateDto);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Data.Should().NotBeNull();
+        result.Data!.FullName.Should().Be("Senior Operator Perera");
+        result.Data.Email.Should().Be("op1.senior@microgrid.lk");
+    }
+
+    [Fact]
+    public async Task DeleteStaffUser_OperatorHasNoActiveReservations_ReturnsOk200()
+    {
+        // Arrange
+        var operatorUser = new User
+        {
+            Id = "60d5ec49f1b2c42d8c3b4a59",
+            Nic = "199012345678",
+            Username = "grid_op1",
+            Role = UserRole.GridOperator,
+            Status = AccountStatus.Active
+        };
+
+        var userList = new List<User> { operatorUser };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        // Act
+        var result = await userService.DeleteStaffUserAsync(operatorUser.Id);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        result.Message.Should().Contain("deleted successfully");
+    }
+
+    [Fact]
+    public async Task DeleteStaffUser_OperatorHasActiveReservations_ReturnsConflict409()
+    {
+        // Arrange
+        var operatorUser = new User
+        {
+            Id = "60d5ec49f1b2c42d8c3b4a59",
+            Nic = "199012345678",
+            Username = "grid_op1",
+            FullName = "Operator Perera",
+            Role = UserRole.GridOperator,
+            Status = AccountStatus.Active
+        };
+
+        var userList = new List<User> { operatorUser };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+
+        // Mock 2 active reservations for this operator
+        var mockReservations = new Mock<IMongoCollection<EnergyReservation>>();
+        mockReservations.Setup(r => r.CountDocumentsAsync(
+                It.IsAny<FilterDefinition<EnergyReservation>>(),
+                It.IsAny<CountOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(2L);
+        mockContext.Setup(ctx => ctx.EnergyReservations).Returns(mockReservations.Object);
+
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        // Act
+        var result = await userService.DeleteStaffUserAsync(operatorUser.Id);
+
+        // Assert: FAT Service Invariant blocks deletion
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+        result.Message.Should().Contain("active or approved reservations");
+    }
+
+    [Fact]
+    public async Task DeleteStaffUser_OperatorAssignedToStation_ReturnsConflict409()
+    {
+        // Arrange
+        var operatorUser = new User
+        {
+            Id = "60d5ec49f1b2c42d8c3b4a59",
+            Nic = "199012345678",
+            Username = "grid_op1",
+            FullName = "Operator Perera",
+            Role = UserRole.GridOperator,
+            Status = AccountStatus.Active
+        };
+
+        var userList = new List<User> { operatorUser };
+        var (mockContext, _) = TestDbHelper.CreateMockDbContext(userList);
+
+        // 0 active reservations, but assigned to 1 microgrid station
+        var mockStations = new Mock<IMongoCollection<SolarStationInfo>>();
+        mockStations.Setup(s => s.CountDocumentsAsync(
+                It.IsAny<FilterDefinition<SolarStationInfo>>(),
+                It.IsAny<CountOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1L);
+        mockContext.Setup(ctx => ctx.SolarStations).Returns(mockStations.Object);
+
+        var userService = new UserService(mockContext.Object, _tokenServiceMock.Object, _emailServiceMock.Object);
+
+        // Act
+        var result = await userService.DeleteStaffUserAsync(operatorUser.Id);
+
+        // Assert: FAT Service Invariant blocks deletion
+        result.Success.Should().BeFalse();
+        result.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+        result.Message.Should().Contain("assigned to 1 microgrid station(s)");
     }
 }

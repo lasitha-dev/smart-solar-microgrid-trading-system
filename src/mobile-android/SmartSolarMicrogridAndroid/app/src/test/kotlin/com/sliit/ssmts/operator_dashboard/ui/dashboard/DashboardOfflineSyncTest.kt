@@ -151,7 +151,7 @@ class DashboardOfflineSyncTest {
         /**
          * Emits configured metrics result stream.
          */
-        override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
+        override fun getDashboardMetricsStream(forceRefresh: Boolean, operatorId: String?): Flow<NetworkResult<DashboardMetrics>> = flow {
             lastForceRefreshParam = forceRefresh
             emit(metricsResult)
         }
@@ -180,13 +180,27 @@ class DashboardOfflineSyncTest {
         /**
          * Simulates syncing remote reservations with error triggering capabilities.
          */
-        override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
+        override suspend fun syncRemoteReservations(operatorId: String?): NetworkResult<Unit> {
             syncReservationsCalled = true
             syncReservationsCallCount++
             if (throwExceptionOnSync) {
                 throw IOException("Simulated network outage")
             }
             return syncResult
+        }
+
+        override suspend fun approveReservation(reservationId: String, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.APPROVED,
+                    estimatedKwh = 10.0
+                )
+            )
         }
     }
 }

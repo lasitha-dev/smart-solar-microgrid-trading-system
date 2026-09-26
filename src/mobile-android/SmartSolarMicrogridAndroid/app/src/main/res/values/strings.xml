@@ -389,4 +389,13 @@
     <string name="btn_view_history">View My Booking History</string>
     <string name="msg_token_copied">QR Token copied to clipboard</string>
     <string name="btn_confirm">Confirm</string>
+
+    <!-- Reservation Status Alert & Approval (Member 3 & Member 4) -->
+    <string name="btn_approve_reservation">Approve Booking</string>
+    <string name="msg_approve_success">Reservation approved successfully!</string>
+    <string name="alert_pending_approval">⏳ Awaiting Grid Operator Approval. You will receive confirmation and your QR check-in pass once approved by the station operator.</string>
+    <string name="alert_approved_confirmed">✅ Reservation Confirmed! Present the QR code below to the Grid Operator upon arrival at the microgrid station.</string>
+    <string name="alert_completed_finalized">⚡ Transfer Finalized! This energy session has been completed by the Grid Operator.</string>
+    <string name="title_operator_approval">Approve Reservation</string>
+    <string name="confirm_approve_booking">Confirm approval for this reservation? This will generate the prosumer check-in QR token.</string>
 </resources>

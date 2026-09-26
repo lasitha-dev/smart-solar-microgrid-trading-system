@@ -34,4 +34,12 @@ interface StationApi {
         @Query("lng") lng: Double,
         @Query("radiusKm") radiusKm: Double = 15.0
     ): Response<ApiResponse<List<MicrogridStation>>>
+
+    /**
+     * Retrieves all solar microgrid stations registered in the system.
+     *
+     * @return Retrofit [Response] wrapping standard [ApiResponse] with a list of [MicrogridStation] objects.
+     */
+    @GET("api/stations")
+    suspend fun getAllStations(): Response<ApiResponse<List<MicrogridStation>>>
 }

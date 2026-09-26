@@ -21,17 +21,18 @@ public class EnergyReservation
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
 
-    [BsonRepresentation(BsonType.ObjectId)]
     public string ProsumerId { get; set; } = string.Empty;
 
     public string ProsumerNic { get; set; } = string.Empty;
 
-    [BsonRepresentation(BsonType.ObjectId)]
     public string StationId { get; set; } = string.Empty;
 
     public string StationName { get; set; } = string.Empty;
 
-    [BsonRepresentation(BsonType.ObjectId)]
+    public string? AssignedOperatorId { get; set; }
+
+    public string? AssignedOperatorNic { get; set; }
+
     public string BookingSlotId { get; set; } = string.Empty;
 
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
@@ -61,7 +62,6 @@ public class EnergyReservation
 
     public string? CancelReason { get; set; }
 
-    [BsonRepresentation(BsonType.ObjectId)]
     public string? FinalizedBy { get; set; }
 
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]

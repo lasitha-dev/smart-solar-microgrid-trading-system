@@ -80,6 +80,21 @@ public class StationResponseDto
     public string Status { get; set; } = "Active";
 
     /// <summary>
+    /// Gets or sets the unique MongoDB user identifier of the assigned Grid Operator.
+    /// </summary>
+    public string? AssignedOperatorId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the assigned Grid Operator.
+    /// </summary>
+    public string? AssignedOperatorName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the NIC of the assigned Grid Operator.
+    /// </summary>
+    public string? AssignedOperatorNic { get; set; }
+
+    /// <summary>
     /// Gets or sets the UTC creation timestamp.
     /// </summary>
     public DateTime CreatedAt { get; set; }

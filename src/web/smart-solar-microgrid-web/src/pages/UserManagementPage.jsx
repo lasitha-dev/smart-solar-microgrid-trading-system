@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../services/adminService';
 import { CreateStaffModal } from '../components/CreateStaffModal';
+import { EditStaffModal } from '../components/EditStaffModal';
 import { RejectReasonModal } from '../components/RejectReasonModal';
 import { UserDetailsModal } from '../components/UserDetailsModal';
 import { LocationMapModal } from '../components/LocationMapModal';
@@ -27,7 +28,9 @@ import {
   Shield,
   Activity,
   MapPin,
-  Calendar
+  Calendar,
+  Edit,
+  Trash2
 } from 'lucide-react';
 
 export const UserManagementPage = () => {
@@ -45,6 +48,9 @@ export const UserManagementPage = () => {
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
@@ -112,6 +118,38 @@ export const UserManagementPage = () => {
       fetchUsers();
     } catch (err) {
       setError(`Deactivation failed: ${err.message}`);
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = async (user) => {
+    const id = user.id || user.userId;
+    const confirmDelete = window.confirm(
+      `Are you sure you want to permanently delete staff account '${user.fullName || user.username}'?\n\nNote: If this operator has active/approved reservations or is assigned to a microgrid station, deletion will be rejected.`
+    );
+    if (!confirmDelete) return;
+
+    setDeleteLoading(true);
+    setError('');
+    setActionSuccess('');
+    try {
+      await adminService.deleteStaffUser(id);
+      setActionSuccess(`Staff account '${user.fullName || user.username}' was successfully deleted.`);
+      setTimeout(() => setActionSuccess(''), 4000);
+      fetchUsers();
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.Message ||
+        err.message ||
+        'Failed to delete user account.';
+      setError(`Deletion Blocked: ${errorMsg}`);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -390,6 +428,17 @@ export const UserManagementPage = () => {
                         <Eye size={15} />
                       </button>
 
+                      {/* Edit Button for Staff / Operators / Backoffice */}
+                      {(user.role === 'GridOperator' || user.role === 'Backoffice' || user.role === 'Administrator') && (
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => handleEditClick(user)}
+                          title="Edit Staff / Operator Details"
+                        >
+                          <Edit size={15} />
+                        </button>
+                      )}
+
                       {isPending && (
                         <button
                           className="btn btn-success btn-sm"
@@ -419,6 +468,19 @@ export const UserManagementPage = () => {
                           title="Reactivate User"
                         >
                           <CheckCircle size={15} />
+                        </button>
+                      )}
+
+                      {/* Delete Button for Staff / Operators / Backoffice */}
+                      {(user.role === 'GridOperator' || user.role === 'Backoffice' || user.role === 'Administrator') && (
+                        <button
+                          className="btn btn-outline btn-sm"
+                          style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                          onClick={() => handleDeleteClick(user)}
+                          disabled={deleteLoading}
+                          title="Delete Staff Account"
+                        >
+                          <Trash2 size={15} />
                         </button>
                       )}
                     </div>
@@ -471,6 +533,20 @@ export const UserManagementPage = () => {
           fetchUsers();
           setTimeout(() => setActionSuccess(''), 4000);
         }}
+      />
+
+      <EditStaffModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingUser(null);
+        }}
+        onStaffUpdated={() => {
+          setActionSuccess('Staff account updated successfully!');
+          fetchUsers();
+          setTimeout(() => setActionSuccess(''), 4000);
+        }}
+        user={editingUser}
       />
 
       <UserDetailsModal

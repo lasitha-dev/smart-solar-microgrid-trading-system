@@ -278,6 +278,117 @@ public class UserService : IUserService
     }
 
     /// <summary>
+    /// Updates an existing Backoffice administrator or Grid Operator user account profile.
+    /// </summary>
+    /// <param name="id">The unique MongoDB document identifier.</param>
+    /// <param name="request">The staff user update payload.</param>
+    /// <returns>A tuple with success status, message, HTTP status code, and updated user DTO.</returns>
+    public async Task<(bool Success, string Message, int StatusCode, UserResponseDto? Data)> UpdateStaffUserAsync(string id, UserUpdateDto request)
+    {
+        if (string.IsNullOrWhiteSpace(id) || request == null)
+        {
+            return (false, "User ID and payload are required.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var user = await _dbContext.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        if (user == null)
+        {
+            return (false, "User account not found.", StatusCodes.Status404NotFound, null);
+        }
+
+        if (user.Role == UserRole.Prosumer)
+        {
+            return (false, "Prosumer profiles cannot be modified via staff update endpoint.", StatusCodes.Status400BadRequest, null);
+        }
+
+        var trimmedEmail = request.Email.Trim().ToLowerInvariant();
+
+        // If email changed, check uniqueness
+        if (!string.Equals(user.Email, trimmedEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            var emailFilter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Regex(u => u.Email, new BsonRegularExpression($"^{trimmedEmail}$", "i")),
+                Builders<User>.Filter.Ne(u => u.Id, id)
+            );
+            var existingByEmail = await _dbContext.Users.Find(emailFilter).FirstOrDefaultAsync();
+            if (existingByEmail != null)
+            {
+                return (false, $"A user with email '{trimmedEmail}' already exists in the system.", StatusCodes.Status409Conflict, null);
+            }
+            user.Email = trimmedEmail;
+        }
+
+        user.FullName = request.FullName.Trim();
+        user.Phone = request.Phone.Trim();
+        user.Address = request.Address.Trim();
+
+        if (request.Role.HasValue && request.Role.Value != UserRole.Prosumer)
+        {
+            user.Role = request.Role.Value;
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.Users.ReplaceOneAsync(u => u.Id == id, user);
+
+        // Update station record if operator name changed
+        if (user.Role == UserRole.GridOperator)
+        {
+            var stationUpdate = Builders<SolarStationInfo>.Update
+                .Set(s => s.AssignedOperatorName, user.FullName);
+            await _dbContext.SolarStations.UpdateManyAsync(s => s.AssignedOperatorId == id, stationUpdate);
+        }
+
+        return (true, $"User account '{user.Username}' updated successfully.", StatusCodes.Status200OK, MapToDto(user));
+    }
+
+    /// <summary>
+    /// Deletes a Backoffice administrator or Grid Operator account.
+    /// Strictly enforces the FAT Service Invariant: Grid Operators with active reservations (Pending or Approved)
+    /// or active station assignments cannot be deleted and return HTTP 409 Conflict.
+    /// </summary>
+    /// <param name="id">The unique MongoDB document identifier.</param>
+    /// <returns>A tuple with success status, descriptive message, and HTTP status code.</returns>
+    public async Task<(bool Success, string Message, int StatusCode)> DeleteStaffUserAsync(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return (false, "User ID is required.", StatusCodes.Status400BadRequest);
+        }
+
+        var user = await _dbContext.Users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        if (user == null)
+        {
+            return (false, "User account not found.", StatusCodes.Status404NotFound);
+        }
+
+        if (user.Role == UserRole.GridOperator)
+        {
+            // FAT Service Invariant: Check for active or approved reservations
+            var activeReservationsFilter = Builders<EnergyReservation>.Filter.And(
+                Builders<EnergyReservation>.Filter.Eq(r => r.AssignedOperatorId, id),
+                Builders<EnergyReservation>.Filter.In(r => r.Status, new[] { "Pending", "Approved" })
+            );
+            var activeCount = await _dbContext.EnergyReservations.CountDocumentsAsync(activeReservationsFilter);
+            if (activeCount > 0)
+            {
+                return (false, $"Cannot delete Grid Operator '{user.FullName}'. Operator has {activeCount} active or approved reservations.", StatusCodes.Status409Conflict);
+            }
+
+            // FAT Service Invariant: Check if operator is currently assigned to any microgrid stations
+            var assignedStationsFilter = Builders<SolarStationInfo>.Filter.Eq(s => s.AssignedOperatorId, id);
+            var assignedStationsCount = await _dbContext.SolarStations.CountDocumentsAsync(assignedStationsFilter);
+            if (assignedStationsCount > 0)
+            {
+                return (false, $"Cannot delete Grid Operator '{user.FullName}'. Operator is assigned to {assignedStationsCount} microgrid station(s). Reassign stations before deleting.", StatusCodes.Status409Conflict);
+            }
+        }
+
+        await _dbContext.Users.DeleteOneAsync(u => u.Id == id);
+        return (true, $"User account '{user.Username}' deleted successfully.", StatusCodes.Status200OK);
+    }
+
+    /// <summary>
     /// Retrieves all system users with optional filtering by role and status.
     /// </summary>
     /// <param name="role">Optional filter by user role.</param>

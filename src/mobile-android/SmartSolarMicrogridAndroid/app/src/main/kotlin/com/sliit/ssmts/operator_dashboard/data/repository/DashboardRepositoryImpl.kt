@@ -44,9 +44,10 @@ class DashboardRepositoryImpl(
      * Emits operational metrics, optionally enforcing a remote synchronization over the network.
      *
      * @param forceRefresh Set to true to bypass cache and immediately trigger a central API sync.
+     * @param operatorId Optional Grid Operator user ID to filter station-specific operational metrics.
      * @return Flow emitting NetworkResult containing DashboardMetrics.
      */
-    override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
+    override fun getDashboardMetricsStream(forceRefresh: Boolean, operatorId: String?): Flow<NetworkResult<DashboardMetrics>> = flow {
         val now = System.currentTimeMillis()
         val calendar = Calendar.getInstance().apply {
             timeInMillis = now
@@ -92,7 +93,7 @@ class DashboardRepositoryImpl(
         }
 
         try {
-            val response = api.getDashboardMetrics()
+            val response = api.getDashboardMetrics(operatorId = operatorId)
             if (response.isSuccessful && response.body() != null) {
                 val dto = response.body()!!
                 val spotlight = dto.activeSpotlight?.let { s ->
@@ -174,11 +175,12 @@ class DashboardRepositoryImpl(
     /**
      * Synchronizes local SQLite reservation cache with the central C# Web API.
      *
+     * @param operatorId Optional Grid Operator identifier to restrict sync to assigned station.
      * @return NetworkResult indicating synchronization success or failure.
      */
-    override suspend fun syncRemoteReservations(): NetworkResult<Unit> = withContext(dispatcher) {
+    override suspend fun syncRemoteReservations(operatorId: String?): NetworkResult<Unit> = withContext(dispatcher) {
         try {
-            val response = api.getReservations()
+            val response = api.getReservations(operatorId = operatorId)
             if (response.isSuccessful && response.body() != null) {
                 val dtoList = response.body()!!
                 val entities = dtoList.map { dto ->
@@ -201,6 +203,53 @@ class DashboardRepositoryImpl(
                 NetworkResult.Error(
                     code = "HTTP_${response.code()}",
                     message = response.message().ifBlank { "Failed to synchronize remote reservations." }
+                )
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
+        }
+    }
+
+    /**
+     * Approves a pending reservation via the central API and updates the local cache.
+     *
+     * @param reservationId Identifier of the reservation being approved.
+     * @param operatorId Optional Grid Operator identifier performing the approval.
+     * @return NetworkResult containing the approved Reservation domain model.
+     */
+    override suspend fun approveReservation(reservationId: String, operatorId: String?): NetworkResult<Reservation> = withContext(dispatcher) {
+        try {
+            val response = api.approveReservation(reservationId, operatorId)
+            if (response.isSuccessful && response.body() != null) {
+                val dto = response.body()!!
+                val resId = if (dto.reservationId.isNotBlank()) dto.reservationId else reservationId
+                val entity = ReservationCacheEntity(
+                    reservationId = resId,
+                    prosumerNic = dto.prosumerNic,
+                    stationName = dto.stationName,
+                    scheduledTime = parseIsoToMillis(dto.scheduledDateTime),
+                    allocatedBay = dto.allocatedBayId,
+                    status = if (dto.status.isNotBlank()) dto.status else "Approved",
+                    qrPayload = dto.qrCode,
+                    estimatedKwh = dto.estimatedKwh,
+                    meteredKwh = dto.meteredEnergyKwh,
+                    lastSyncedAt = System.currentTimeMillis()
+                )
+                dao.upsertReservations(listOf(entity))
+                NetworkResult.Success(entity.toDomain())
+            } else {
+                val errorMsg = try {
+                    val rawJson = response.errorBody()?.string()
+                    if (!rawJson.isNullOrBlank()) {
+                        val json = org.json.JSONObject(rawJson)
+                        json.optString("message", response.message())
+                    } else response.message()
+                } catch (_: Exception) {
+                    response.message()
+                }
+                NetworkResult.Error(
+                    code = "HTTP_${response.code()}",
+                    message = if (!errorMsg.isNullOrBlank()) errorMsg else "Failed to approve reservation."
                 )
             }
         } catch (e: Exception) {

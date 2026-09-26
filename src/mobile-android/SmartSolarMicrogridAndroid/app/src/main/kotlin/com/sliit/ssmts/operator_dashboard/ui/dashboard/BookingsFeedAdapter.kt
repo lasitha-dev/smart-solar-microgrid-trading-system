@@ -5,6 +5,7 @@
 package com.sliit.ssmts.operator_dashboard.ui.dashboard
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sliit.ssmts.R
 import com.sliit.ssmts.databinding.ItemDashboardBookingBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
+import com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -20,9 +22,11 @@ import java.util.Locale
  * Adapter presenting real-time active slots and pending reservations for the grid operator.
  *
  * @property onItemClick Optional callback triggered when an operator selects a booking item.
+ * @property onApproveClick Optional callback triggered when an operator clicks the approve button.
  */
 class BookingsFeedAdapter(
-    private val onItemClick: ((Reservation) -> Unit)? = null
+    private val onItemClick: ((Reservation) -> Unit)? = null,
+    private val onApproveClick: ((Reservation) -> Unit)? = null
 ) : ListAdapter<Reservation, BookingsFeedAdapter.BookingViewHolder>(ReservationDiffCallback) {
 
     /**
@@ -38,7 +42,7 @@ class BookingsFeedAdapter(
             parent,
             false
         )
-        return BookingViewHolder(binding, onItemClick)
+        return BookingViewHolder(binding, onItemClick, onApproveClick)
     }
 
     /**
@@ -56,7 +60,8 @@ class BookingsFeedAdapter(
      */
     class BookingViewHolder(
         private val binding: ItemDashboardBookingBinding,
-        private val onItemClick: ((Reservation) -> Unit)?
+        private val onItemClick: ((Reservation) -> Unit)?,
+        private val onApproveClick: ((Reservation) -> Unit)?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val timeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
@@ -78,6 +83,15 @@ class BookingsFeedAdapter(
             binding.tvFeedEnergy.text = context.getString(R.string.label_estimated_kwh, item.estimatedKwh)
 
             binding.badgeFeedStatus.setStatus(item.status.value)
+
+            if (item.status == ReservationStatus.PENDING && onApproveClick != null) {
+                binding.btnApproveBooking.visibility = View.VISIBLE
+                binding.btnApproveBooking.setOnClickListener {
+                    onApproveClick.invoke(item)
+                }
+            } else {
+                binding.btnApproveBooking.visibility = View.GONE
+            }
 
             binding.root.setOnClickListener {
                 onItemClick?.invoke(item)

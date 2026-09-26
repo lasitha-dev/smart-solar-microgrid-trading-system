@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.Api.Data;
 using SmartSolarMicrogrid.Api.DTOs;
+using SmartSolarMicrogrid.Api.Exceptions;
 using SmartSolarMicrogrid.Api.Models;
+using SmartSolarMicrogrid.Api.Models.Enums;
 
 namespace SmartSolarMicrogrid.Api.Services;
 
@@ -57,6 +59,28 @@ public class StationService : IStationService
             });
         }
 
+        string? operatorId = null;
+        string? operatorName = null;
+        string? operatorNic = null;
+
+        if (!string.IsNullOrWhiteSpace(dto.AssignedOperatorId))
+        {
+            var opUser = await _dbContext.Users
+                .Find(u => u.Id == dto.AssignedOperatorId)
+                .FirstOrDefaultAsync();
+
+            if (opUser != null)
+            {
+                if (opUser.Role != UserRole.GridOperator)
+                {
+                    throw new BusinessRuleException("INVALID_OPERATOR_ROLE", $"Assigned user '{opUser.FullName}' must have the GridOperator role.");
+                }
+                operatorId = opUser.Id;
+                operatorName = opUser.FullName;
+                operatorNic = opUser.Nic;
+            }
+        }
+
         var station = new SolarStationInfo
         {
             StationName = dto.StationName.Trim(),
@@ -77,6 +101,9 @@ public class StationService : IStationService
                     : new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" }
             },
             Status = "Active",
+            AssignedOperatorId = operatorId,
+            AssignedOperatorName = operatorName,
+            AssignedOperatorNic = operatorNic,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -196,6 +223,33 @@ public class StationService : IStationService
             }
 
             station.Status = targetStatus;
+        }
+
+        if (dto.AssignedOperatorId != null)
+        {
+            if (string.IsNullOrWhiteSpace(dto.AssignedOperatorId))
+            {
+                station.AssignedOperatorId = null;
+                station.AssignedOperatorName = null;
+                station.AssignedOperatorNic = null;
+            }
+            else
+            {
+                var opUser = await _dbContext.Users
+                    .Find(u => u.Id == dto.AssignedOperatorId)
+                    .FirstOrDefaultAsync();
+
+                if (opUser != null)
+                {
+                    if (opUser.Role != UserRole.GridOperator)
+                    {
+                        throw new BusinessRuleException("INVALID_OPERATOR_ROLE", $"Assigned user '{opUser.FullName}' must have the GridOperator role.");
+                    }
+                    station.AssignedOperatorId = opUser.Id;
+                    station.AssignedOperatorName = opUser.FullName;
+                    station.AssignedOperatorNic = opUser.Nic;
+                }
+            }
         }
 
         station.UpdatedAt = DateTime.UtcNow;
@@ -345,6 +399,9 @@ public class StationService : IStationService
                 DaysActive = station.Schedule?.DaysActive ?? new List<string>()
             },
             Status = station.Status,
+            AssignedOperatorId = station.AssignedOperatorId,
+            AssignedOperatorName = station.AssignedOperatorName,
+            AssignedOperatorNic = station.AssignedOperatorNic,
             CreatedAt = station.CreatedAt,
             UpdatedAt = station.UpdatedAt
         };
