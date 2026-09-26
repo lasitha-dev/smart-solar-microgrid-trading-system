@@ -25,11 +25,13 @@ public class ReservationRepository : IReservationRepository
 {
     private readonly IMongoCollection<EnergyReservation> _reservations;
     private readonly IMongoCollection<EnergyBookingSlot> _slots;
+    private readonly IMongoCollection<SolarStationInfo>? _solarStations;
 
     public ReservationRepository(IMongoDbContext context)
     {
         _reservations = context.EnergyReservations;
         _slots = context.EnergyBookingSlots;
+        _solarStations = context.SolarStations;
     }
 
     /// <summary>
@@ -140,9 +142,62 @@ public class ReservationRepository : IReservationRepository
                      Builders<EnergyBookingSlot>.Filter.Gte(s => s.SlotDate, targetDateUtc) &
                      Builders<EnergyBookingSlot>.Filter.Lt(s => s.SlotDate, nextDateUtc);
 
-        return await _slots.Find(filter)
+        var existingSlots = await _slots.Find(filter)
             .SortBy(s => s.StartTime)
             .ToListAsync();
+
+        if (existingSlots != null && existingSlots.Count > 0)
+        {
+            return existingSlots;
+        }
+
+        // On-demand slot generation: If no booking slots exist for this station & date, generate them based on the station's configuration
+        var station = _solarStations != null
+            ? await _solarStations.Find(s => s.Id == stationId).FirstOrDefaultAsync()
+            : null;
+
+        var bays = station?.BatterySlots?.Where(b => b.IsAvailable).Select(b => b.SlotId).ToList();
+        if (bays == null || bays.Count == 0)
+        {
+            bays = new List<string> { "BAY-01", "BAY-02", "BAY-03", "BAY-04" };
+        }
+
+        var defaultIntervals = new (TimeSpan Start, TimeSpan End)[]
+        {
+            (new TimeSpan(8, 0, 0), new TimeSpan(9, 0, 0)),
+            (new TimeSpan(10, 0, 0), new TimeSpan(11, 0, 0)),
+            (new TimeSpan(13, 0, 0), new TimeSpan(14, 0, 0)),
+            (new TimeSpan(15, 0, 0), new TimeSpan(16, 0, 0))
+        };
+
+        var slotsToInsert = new List<EnergyBookingSlot>();
+        var now = DateTime.UtcNow;
+
+        for (int i = 0; i < defaultIntervals.Length; i++)
+        {
+            var bayId = bays[i % bays.Count];
+            slotsToInsert.Add(new EnergyBookingSlot
+            {
+                StationId = stationId,
+                SlotDate = targetDateUtc,
+                StartTime = defaultIntervals[i].Start,
+                EndTime = defaultIntervals[i].End,
+                BatterySlotId = bayId,
+                Status = "Open",
+                CreatedAt = now,
+                UpdatedAt = now
+            });
+        }
+
+        try
+        {
+            await _slots.InsertManyAsync(slotsToInsert);
+            return slotsToInsert;
+        }
+        catch
+        {
+            return await _slots.Find(filter).SortBy(s => s.StartTime).ToListAsync();
+        }
     }
 
     /// <summary>
