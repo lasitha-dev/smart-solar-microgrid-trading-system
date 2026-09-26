@@ -125,7 +125,11 @@ public class StationService : IStationService
             .Find(s => s.Id == id)
             .FirstOrDefaultAsync();
 
-        return station != null ? MapToResponse(station) : null;
+        if (station == null) return null;
+
+        await EnrichStationBayAvailabilityAsync(station);
+
+        return MapToResponse(station);
     }
 
     /// <summary>
@@ -138,6 +142,11 @@ public class StationService : IStationService
             .Find(_ => true)
             .SortByDescending(s => s.CreatedAt)
             .ToListAsync();
+
+        foreach (var station in stations)
+        {
+            await EnrichStationBayAvailabilityAsync(station);
+        }
 
         return stations.Select(MapToResponse).ToList();
     }
@@ -284,6 +293,7 @@ public class StationService : IStationService
 
         foreach (var station in stations)
         {
+            await EnrichStationBayAvailabilityAsync(station);
             var distance = CalculateHaversineDistanceKm(lat, lng, station.Location.Lat, station.Location.Lng);
 
             if (distance <= effectiveRadius)
@@ -293,6 +303,40 @@ public class StationService : IStationService
         }
 
         return nearbyList.OrderBy(s => s.DistanceKm).ToList();
+    }
+
+    /// <summary>
+    /// Synchronizes station battery bay availability against active Approved reservations.
+    /// If an Approved reservation is currently occupying a bay, IsAvailable is set to false.
+    /// Once Completed, Cancelled, or Rejected, the bay is restored to true.
+    /// </summary>
+    private async Task EnrichStationBayAvailabilityAsync(SolarStationInfo station)
+    {
+        if (station == null || station.BatterySlots == null || station.BatterySlots.Count == 0) return;
+
+        var activeApprovedFilter = Builders<EnergyReservation>.Filter.And(
+            Builders<EnergyReservation>.Filter.Eq(r => r.StationId, station.Id),
+            Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Approved")
+        );
+
+        var activeApprovedReservations = await _dbContext.EnergyReservations
+            .Find(activeApprovedFilter)
+            .ToListAsync();
+
+        var occupiedBayIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var res in activeApprovedReservations)
+        {
+            if (!string.IsNullOrWhiteSpace(res.AllocatedBayId))
+            {
+                occupiedBayIds.Add(res.AllocatedBayId.Replace("-", "").Trim());
+            }
+        }
+
+        foreach (var bay in station.BatterySlots)
+        {
+            var normalizedBayId = bay.SlotId.Replace("-", "").Trim();
+            bay.IsAvailable = !occupiedBayIds.Contains(normalizedBayId);
+        }
     }
 
     /// <summary>

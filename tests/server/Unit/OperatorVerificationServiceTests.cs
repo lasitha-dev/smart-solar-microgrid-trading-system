@@ -409,4 +409,9 @@ public class FakeReservationRepository : IReservationRepository
 
         return Task.FromResult(results);
     }
+
+    public Task UpdateStationBayAvailabilityAsync(string stationId, string bayId, bool isAvailable)
+    {
+        return Task.CompletedTask;
+    }
 }

@@ -230,6 +230,49 @@ public class ReservationsController : ControllerBase
     }
 
     /// <summary>
+    /// Rejects a reservation, releasing the booking slot and station bay availability.
+    /// PATCH /api/reservations/{id}/reject
+    /// </summary>
+    [HttpPatch("{id}/reject")]
+    [ProducesResponseType(typeof(ReservationItemDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RejectReservation(string id, [FromQuery] string? reason = null, [FromQuery] string? operatorId = null)
+    {
+        try
+        {
+            var effectiveOperatorId = operatorId;
+            if (string.IsNullOrWhiteSpace(effectiveOperatorId) && Request.Headers.TryGetValue("X-Operator-Id", out var headerOperatorId))
+            {
+                effectiveOperatorId = headerOperatorId.ToString();
+            }
+
+            var reservation = await _reservationService.RejectReservationAsync(id, reason, effectiveOperatorId);
+            var itemDto = new ReservationItemDto
+            {
+                ReservationId = reservation.Id ?? id,
+                ProsumerNic = !string.IsNullOrWhiteSpace(reservation.ProsumerNic) ? reservation.ProsumerNic : reservation.ProsumerId,
+                StationName = reservation.StationName,
+                StationId = reservation.StationId,
+                AssignedOperatorId = reservation.AssignedOperatorId,
+                ScheduledDateTime = reservation.ScheduledDateTime,
+                AllocatedBayId = reservation.AllocatedBayId,
+                EstimatedKwh = reservation.EstimatedKwh,
+                MeteredEnergyKwh = reservation.MeteredEnergyKwh,
+                Status = reservation.Status,
+                QrCode = reservation.QrCode
+            };
+            return Ok(itemDto);
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message, ex.Code));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ApiResponse<object>.ErrorResponse(ex.Message, "NOT_FOUND"));
+        }
+    }
+
+    /// <summary>
     /// Seeds sample slots across upcoming 10 days for testing.
     /// POST /api/reservations/seed
     /// </summary>

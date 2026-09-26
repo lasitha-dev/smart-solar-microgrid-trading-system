@@ -447,4 +447,28 @@ public class ReservationRepository : IReservationRepository
             QrCode = r.QrCode
         }).ToList();
     }
+
+    /// <summary>
+    /// Updates the availability flag of a specific physical battery slot (bay) in a solar station.
+    /// </summary>
+    public async Task UpdateStationBayAvailabilityAsync(string stationId, string bayId, bool isAvailable)
+    {
+        if (string.IsNullOrWhiteSpace(stationId) || string.IsNullOrWhiteSpace(bayId) || _solarStations == null)
+            return;
+
+        var station = await GetStationByIdAsync(stationId);
+        if (station == null || station.BatterySlots == null) return;
+
+        var normalizedBay = bayId.Trim();
+        var bay = station.BatterySlots.FirstOrDefault(b => 
+            string.Equals(b.SlotId, normalizedBay, StringComparison.OrdinalIgnoreCase) ||
+            b.SlotId.Replace("-", "").Equals(normalizedBay.Replace("-", ""), StringComparison.OrdinalIgnoreCase));
+
+        if (bay != null)
+        {
+            bay.IsAvailable = isAvailable;
+            station.UpdatedAt = DateTime.UtcNow;
+            await _solarStations.ReplaceOneAsync(s => s.Id == station.Id, station);
+        }
+    }
 }

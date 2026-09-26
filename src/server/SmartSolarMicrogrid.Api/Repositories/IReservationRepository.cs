@@ -93,4 +93,9 @@ public interface IReservationRepository
     /// Queries reservations with multi-criteria filtering by status, debounced search query, calendar date, and optional operator ID.
     /// </summary>
     Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date, string? operatorId = null);
+
+    /// <summary>
+    /// Updates the availability flag of a specific physical battery slot (bay) in a solar station.
+    /// </summary>
+    Task UpdateStationBayAvailabilityAsync(string stationId, string bayId, bool isAvailable);
 }

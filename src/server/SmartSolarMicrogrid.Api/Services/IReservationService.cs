@@ -16,6 +16,7 @@ namespace SmartSolarMicrogrid.Api.Services
         Task<EnergyReservation> UpdateReservationAsync(string id, UpdateReservationDto dto);
         Task CancelReservationAsync(string id, string? reason);
         Task<EnergyReservation> ApproveReservationAsync(string id, string operatorId);
+        Task<EnergyReservation> RejectReservationAsync(string id, string? reason, string? operatorId);
         Task<EnergyReservation?> GetReservationByIdAsync(string id);
         Task<IEnumerable<EnergyReservation>> GetProsumerReservationsAsync(string prosumerId, string? status = null);
         Task<IEnumerable<EnergyBookingSlot>> GetAvailableSlotsAsync(string stationId, DateTime date);

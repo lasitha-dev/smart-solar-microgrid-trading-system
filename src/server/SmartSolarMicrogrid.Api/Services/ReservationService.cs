@@ -181,6 +181,12 @@ namespace SmartSolarMicrogrid.Api.Services
 
             // Release slot back to Open
             await _repository.UpdateSlotStatusAsync(reservation.BookingSlotId, "Open");
+
+            // Release station bay back to available
+            if (!string.IsNullOrWhiteSpace(reservation.StationId) && !string.IsNullOrWhiteSpace(reservation.AllocatedBayId))
+            {
+                await _repository.UpdateStationBayAvailabilityAsync(reservation.StationId, reservation.AllocatedBayId, true);
+            }
         }
 
         public async Task<EnergyReservation> ApproveReservationAsync(string id, string operatorId)
@@ -222,6 +228,56 @@ namespace SmartSolarMicrogrid.Api.Services
             }
 
             await _repository.UpdateAsync(reservation);
+
+            // Mark station bay as occupied/unavailable upon approval
+            if (!string.IsNullOrWhiteSpace(reservation.StationId) && !string.IsNullOrWhiteSpace(reservation.AllocatedBayId))
+            {
+                await _repository.UpdateStationBayAvailabilityAsync(reservation.StationId, reservation.AllocatedBayId, false);
+            }
+
+            return reservation;
+        }
+
+        public async Task<EnergyReservation> RejectReservationAsync(string id, string? reason, string? operatorId)
+        {
+            var reservation = await _repository.GetByIdAsync(id);
+            if (reservation == null)
+            {
+                throw new NotFoundException("Reservation not found.");
+            }
+
+            if (string.Equals(reservation.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessRuleException("INVALID_STATE", "Completed reservations cannot be rejected.");
+            }
+
+            if (string.Equals(reservation.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                return reservation;
+            }
+
+            var now = DateTime.UtcNow;
+            reservation.Status = "Cancelled";
+            reservation.CancelReason = !string.IsNullOrWhiteSpace(reason)
+                ? reason
+                : (!string.IsNullOrWhiteSpace(operatorId) ? $"Rejected by operator {operatorId}" : "Rejected by grid operator");
+            reservation.CancelledAt = now;
+            reservation.UpdatedAt = now;
+
+            await _repository.UpdateAsync(reservation);
+
+            // Release slot back to Open
+            if (!string.IsNullOrWhiteSpace(reservation.BookingSlotId))
+            {
+                await _repository.UpdateSlotStatusAsync(reservation.BookingSlotId, "Open");
+            }
+
+            // Release station bay back to available
+            if (!string.IsNullOrWhiteSpace(reservation.StationId) && !string.IsNullOrWhiteSpace(reservation.AllocatedBayId))
+            {
+                await _repository.UpdateStationBayAvailabilityAsync(reservation.StationId, reservation.AllocatedBayId, true);
+            }
+
             return reservation;
         }
 
