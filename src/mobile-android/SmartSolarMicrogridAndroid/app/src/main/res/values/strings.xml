@@ -389,6 +389,7 @@
     <string name="btn_view_history">View My Booking History</string>
     <string name="msg_token_copied">QR Token copied to clipboard</string>
     <string name="btn_confirm">Confirm</string>
+    <string name="btn_return_home">Return to Home Dashboard</string>
 
     <!-- Reservation Status Alert & Approval (Member 3 & Member 4) -->
     <string name="btn_approve_reservation">Approve Booking</string>

@@ -65,6 +65,8 @@ class SlotSelectionActivity : AppCompatActivity() {
         setContentView(binding.root)
         
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
         // Check if a station ID was passed via Map intent
         val passedStationId = intent.getStringExtra(EXTRA_STATION_ID) ?: intent.getStringExtra("STATION_ID")
@@ -225,6 +227,10 @@ class SlotSelectionActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
         if (item.itemId == 100) {
             val intent = Intent(this, BookingHistoryActivity::class.java)
             startActivity(intent)

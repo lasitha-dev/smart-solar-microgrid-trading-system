@@ -55,6 +55,7 @@ class BookingSummaryActivity : AppCompatActivity(),
         setContentView(binding.root)
         
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
         
         // Extract reservation data from Intent
@@ -173,6 +174,15 @@ class BookingSummaryActivity : AppCompatActivity(),
             val intent = Intent(this, BookingHistoryActivity::class.java)
             startActivity(intent)
         }
+
+        // Return to Home Dashboard button
+        binding.btnReturnHome.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.ui.home.HomeActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -181,6 +191,10 @@ class BookingSummaryActivity : AppCompatActivity(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
         return when (item.itemId) {
             R.id.action_seed_slots -> {
                 lifecycleScope.launch {
