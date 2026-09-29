@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite verifying swipe-to-refresh coordination, remote reservation
  * cache synchronization, and offline fallback resilience on DashboardViewModel.
  */

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Repository implementation for IOperatorVerificationRepository executing remote
  * QR verification, defensive metered energy validation, and local SQLite audit persistence.
  */

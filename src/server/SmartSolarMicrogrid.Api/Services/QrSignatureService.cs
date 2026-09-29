@@ -1,4 +1,8 @@
-// Description: Concrete cryptographic service computing and validating HMAC-SHA256 signatures for QR transaction payloads.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Concrete cryptographic service computing and validating HMAC-SHA256 signatures for QR transaction payloads.
+ */
 
 using System.Globalization;
 using System.Security.Cryptography;

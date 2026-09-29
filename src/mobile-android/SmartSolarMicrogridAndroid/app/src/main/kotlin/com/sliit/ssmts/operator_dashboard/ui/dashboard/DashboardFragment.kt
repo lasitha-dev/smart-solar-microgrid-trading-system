@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Operational Dashboard Fragment rendering live counters, active spotlight card,
  * countdown timers, offline indicator banner, and real-time operational booking feeds (FR-M4-01, FR-M4-02).
  */

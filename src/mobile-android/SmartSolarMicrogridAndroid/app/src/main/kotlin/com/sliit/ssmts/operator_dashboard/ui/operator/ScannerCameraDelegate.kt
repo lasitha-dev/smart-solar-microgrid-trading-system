@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Hardware camera delegate encapsulating CameraX lifecycle bindings, surface provider
  * integration, torch toggle control, and defensive exception handling (Rule 3 SRP delegate).
  */
@@ -32,15 +34,19 @@ class ScannerCameraDelegate(
     var isTorchEnabled: Boolean = false
         private set
 
+    private var qrAnalyzer: QrCodeImageAnalyzer? = null
+
     /**
-     * Initializes CameraX lifecycle provider and binds the preview use case to the viewfinder surface.
+     * Initializes CameraX lifecycle provider and binds the preview and QR analysis use cases to the viewfinder.
      *
      * @param lifecycleOwner Android LifecycleOwner to bind the camera session to.
      * @param surfaceProvider Surface provider receiving the viewfinder camera feed.
+     * @param onQrCodeDetected Optional callback invoked when a QR code is detected in camera frames.
      */
     fun startCamera(
         lifecycleOwner: LifecycleOwner,
-        surfaceProvider: Preview.SurfaceProvider
+        surfaceProvider: Preview.SurfaceProvider,
+        onQrCodeDetected: ((String) -> Unit)? = null
     ) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
@@ -51,19 +57,42 @@ class ScannerCameraDelegate(
                     it.setSurfaceProvider(surfaceProvider)
                 }
 
+                val useCases = mutableListOf<androidx.camera.core.UseCase>(preview)
+
+                if (onQrCodeDetected != null) {
+                    val analyzer = QrCodeImageAnalyzer(onQrCodeDetected)
+                    qrAnalyzer = analyzer
+                    val imageAnalysis = androidx.camera.core.ImageAnalysis.Builder()
+                        .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+                        .also { analysis ->
+                            analysis.setAnalyzer(ContextCompat.getMainExecutor(context), analyzer)
+                        }
+                    useCases.add(imageAnalysis)
+                }
+
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
                 cameraProvider?.unbindAll()
                 camera = cameraProvider?.bindToLifecycle(
                     lifecycleOwner,
                     cameraSelector,
-                    preview
+                    *useCases.toTypedArray()
                 )
                 cameraControl = camera?.cameraControl
             } catch (_: Exception) {
                 // Defensive fallback prevents crashes on emulators or unsupported camera hardware
             }
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    /**
+     * Toggles frame decoding analysis on and off to avoid duplicate scans while dialogs are open.
+     *
+     * @param enabled True to enable QR detection; false to pause.
+     */
+    fun setScanningEnabled(enabled: Boolean) {
+        qrAnalyzer?.setScanningEnabled(enabled)
     }
 
     /**

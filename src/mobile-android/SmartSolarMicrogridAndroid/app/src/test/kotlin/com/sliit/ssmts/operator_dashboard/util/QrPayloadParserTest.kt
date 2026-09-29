@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for QrPayloadParser verifying canonical token extraction,
  * delimiter checks, whitespace trimming, and predictable error taxonomy on malformed inputs.
  */

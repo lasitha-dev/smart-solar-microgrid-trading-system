@@ -1,4 +1,8 @@
-// Description: Unit tests validating HMAC-SHA256 signature generation, payload formatting, tamper detection, and error parsing.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Unit tests validating HMAC-SHA256 signature generation, payload formatting, tamper detection, and error parsing.
+ */
 
 using Microsoft.Extensions.Options;
 using SmartSolarMicrogrid.Api.Configuration;

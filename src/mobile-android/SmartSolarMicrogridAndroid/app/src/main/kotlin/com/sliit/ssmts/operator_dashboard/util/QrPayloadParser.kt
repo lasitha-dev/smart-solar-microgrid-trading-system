@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Defensive parser and sanitizer utility validating raw camera QR strings,
  * ensuring delimiter counts and canonical schema compliance before network verification.
  */

@@ -1,4 +1,8 @@
-// Description: Service contract for HMAC-SHA256 signature generation, payload formatting, parsing, and cryptographic verification.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Service contract for HMAC-SHA256 signature generation, payload formatting, parsing, and cryptographic verification.
+ */
 
 using SmartSolarMicrogrid.Api.Models;
 

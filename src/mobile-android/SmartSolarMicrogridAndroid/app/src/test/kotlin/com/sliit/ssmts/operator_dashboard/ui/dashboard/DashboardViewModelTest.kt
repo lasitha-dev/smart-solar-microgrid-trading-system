@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Mandatory unit test suite for DashboardViewModel verifying Coroutine Test Dispatcher
  * state transitions from Loading to Success, count precision, error handling, and refresh flow.
  */

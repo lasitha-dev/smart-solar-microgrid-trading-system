@@ -1,4 +1,8 @@
-// Description: Service contract defining queries for operational dashboard metrics and filtered reservation feeds.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Service contract defining queries for operational dashboard metrics and filtered reservation feeds.
+ */
 
 using SmartSolarMicrogrid.Api.DTOs;
 

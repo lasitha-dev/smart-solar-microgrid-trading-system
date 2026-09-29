@@ -1,4 +1,8 @@
-// Description: Service contract defining business workflows for QR verification handshake and energy transfer finalization.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Service contract defining business workflows for QR verification handshake and energy transfer finalization.
+ */
 
 using SmartSolarMicrogrid.Api.DTOs;
 

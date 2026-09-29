@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for OperatorScannerActivity validating camera permission safety,
  * UI components initialization, torch toggle state changes, and navigation handling (FR-M4-05.2).
  */

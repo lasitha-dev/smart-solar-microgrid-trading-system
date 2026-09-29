@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Activity assembling the searchable, filterable reservation history screen with debounced search,
  * 5-state filter chips, empty states, and pull-to-refresh synchronization (FR-M4-03).
  */

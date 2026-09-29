@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Room Database configuration for ssmts_local.db managing local SQLite tables
  * tbl_user_sessions, tbl_reservations_cache, and tbl_operator_audit_cache.
  */

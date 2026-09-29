@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Comprehensive end-to-end integration test validating the entire Grid Operator lifecycle
  * for viva examination: dashboard metrics, active spotlight countdown, search/filters, Fast Test QR handshake,
  * metered energy finalization, dual SQLite cache commit, and reactive UI synchronization.

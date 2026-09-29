@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Reactive event coordinator broadcasting energy transfer completion events
  * across activities and fragments to trigger SQLite cache updates and dashboard counter recalculations (FR-M4-07.4).
  */

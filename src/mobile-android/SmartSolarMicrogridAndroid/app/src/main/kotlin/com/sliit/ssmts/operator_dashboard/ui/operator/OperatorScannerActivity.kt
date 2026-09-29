@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Native CameraX QR viewfinder activity managing camera lifecycle, framing guides,
  * torch toggle, and defensive runtime permission verification (FR-M4-05.2).
  */
@@ -149,10 +151,14 @@ class OperatorScannerActivity : AppCompatActivity() {
     }
 
     /**
-     * Initializes CameraX lifecycle provider and binds preview use case to viewfinder surface.
+     * Initializes CameraX lifecycle provider and binds preview and real-time analysis use cases.
      */
     private fun startCamera() {
-        cameraDelegate.startCamera(this, binding.previewViewFinder.surfaceProvider)
+        cameraDelegate.startCamera(this, binding.previewViewFinder.surfaceProvider) { payload ->
+            runOnUiThread {
+                processScannedPayload(payload)
+            }
+        }
     }
 
     /**
@@ -217,10 +223,15 @@ class OperatorScannerActivity : AppCompatActivity() {
     }
 
     private fun renderUiState(state: ScannerUiState) {
-        binding.layoutVerificationLoading.isVisible = (state is ScannerUiState.Verifying || state is ScannerUiState.Finalizing)
+        val isLoading = (state is ScannerUiState.Verifying || state is ScannerUiState.Finalizing)
+        binding.layoutVerificationLoading.isVisible = isLoading
+        cameraDelegate.setScanningEnabled(state is ScannerUiState.Idle)
         modalCoordinator.dispatchState(
             state = state,
-            onReset = { viewModel.resetScannerState() },
+            onReset = {
+                viewModel.resetScannerState()
+                cameraDelegate.setScanningEnabled(true)
+            },
             onFinalize = { id, kwh, notes -> viewModel.finalizeEnergyTransfer(id, kwh, notes) }
         )
     }

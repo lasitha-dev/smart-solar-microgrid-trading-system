@@ -1,4 +1,8 @@
-// Description: Data Transfer Objects for QR code verification request and validation response contracts.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Data Transfer Objects for QR code verification request and validation response contracts.
+ */
 
 namespace SmartSolarMicrogrid.Api.DTOs;
 

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for OperatorVerificationRepositoryImpl verifying QR code validation,
  * defensive metered energy bounds checking, SQLite cache updates, and audit logging against MockWebServer.
  */

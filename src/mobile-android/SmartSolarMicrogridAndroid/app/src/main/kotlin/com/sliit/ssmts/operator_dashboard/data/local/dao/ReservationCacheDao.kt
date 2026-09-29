@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Room Data Access Object (DAO) for tbl_reservations_cache providing local queries,
  * offline search, filtering, and metric aggregations for Member 4.
  */

@@ -1,4 +1,8 @@
-// Description: Configuration options defining HMAC-SHA256 secret keys, payload prefixes, and verification tolerances.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Configuration options defining HMAC-SHA256 secret keys, payload prefixes, and verification tolerances.
+ */
 
 namespace SmartSolarMicrogrid.Api.Configuration;
 

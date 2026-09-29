@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Sealed state interface modeling reactive states for the Grid Operator QR scanner,
  * server verification handshake, and rejection dialogs (Rule 3 & FR-M4-06).
  */

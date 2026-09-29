@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for DashboardViewModel validating operational booking feeds (FR-M4-02),
  * tab selection transitions, and reactive partitioning of today's active slots and pending reservations.
  */

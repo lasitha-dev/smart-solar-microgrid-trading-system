@@ -1,4 +1,8 @@
-// Description: Unit tests validating operator QR verification handshake, business rules, and energy transfer finalization.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Unit tests validating operator QR verification handshake, business rules, and energy transfer finalization.
+ */
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for OperatorScannerActivity validating Fast Test QR simulation triggers,
  * payload injection pipeline, and defensive client-side parsing behavior (Rule 6.3 & FR-M4-05).
  */

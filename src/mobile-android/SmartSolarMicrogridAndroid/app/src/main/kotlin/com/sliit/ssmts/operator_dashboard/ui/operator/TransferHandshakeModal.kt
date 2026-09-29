@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: BottomSheet dialog modal displaying verified reservation metadata, prosumer NIC,
  * and bay assignment, prompting the operator to proceed to energy transfer (FR-M4-06.4).
  */

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: ViewModel managing state for operational metrics counter cards, active booking spotlight,
  * offline fallback indication, swipe-to-refresh synchronization, and real-time operational feeds (FR-M4-01, FR-M4-02).
  */

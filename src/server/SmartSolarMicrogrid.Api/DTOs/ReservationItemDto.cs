@@ -1,4 +1,8 @@
-// Description: Data Transfer Objects representing individual reservation items, feeds, history, and query parameters.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Data Transfer Objects representing individual reservation items, feeds, history, and query parameters.
+ */
 
 namespace SmartSolarMicrogrid.Api.DTOs;
 

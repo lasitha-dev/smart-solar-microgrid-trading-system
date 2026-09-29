@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for UiState sealed interface verifying state transitions,
  * property extensions, pattern matching exhaustiveness, and error payload propagation.
  */

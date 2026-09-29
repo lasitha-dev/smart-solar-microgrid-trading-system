@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: BottomSheet dialog providing defensive decimal input validation for actual
  * metered energy (0.01 - 999.99 kWh) and dispatching energy transfer finalization (FR-M4-07.1).
  */

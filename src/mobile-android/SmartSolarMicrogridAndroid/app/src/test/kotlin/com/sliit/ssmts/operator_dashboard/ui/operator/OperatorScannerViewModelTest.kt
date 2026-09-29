@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for OperatorScannerViewModel asserting coroutine state transitions
  * between Idle, Verifying, Handshake, and Rejection states during QR verification (FR-M4-06).
  */

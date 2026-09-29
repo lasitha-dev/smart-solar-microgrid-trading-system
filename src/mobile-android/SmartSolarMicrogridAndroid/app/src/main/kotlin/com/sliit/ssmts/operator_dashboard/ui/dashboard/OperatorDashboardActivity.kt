@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Main launcher activity hosting the Operational Dashboard fragment,
  * providing top toolbar navigation to Booking History and the floating FAB to the native Camera QR Scanner (FR-M4-01, FR-M4-03, FR-M4-04).
  */

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: ListAdapter implementation utilizing DiffUtil to bind and render real-time operational
  * booking feed items on the dashboard (FR-M4-02).
  */

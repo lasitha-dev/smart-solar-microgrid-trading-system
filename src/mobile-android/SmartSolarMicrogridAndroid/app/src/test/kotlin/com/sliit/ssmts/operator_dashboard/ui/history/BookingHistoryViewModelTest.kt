@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for BookingHistoryViewModel validating 300ms search debouncing,
  * distinct query deduplication, status chip filtering, and repository state streaming (FR-M4-03.2).
  */

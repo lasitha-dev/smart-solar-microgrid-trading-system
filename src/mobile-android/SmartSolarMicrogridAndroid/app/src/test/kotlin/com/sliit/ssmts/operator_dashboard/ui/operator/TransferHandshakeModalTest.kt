@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: UI unit test suite for TransferHandshakeModal verifying inflation, field data binding,
  * and user interaction button dispatching under Robolectric (FR-M4-06.4).
  */

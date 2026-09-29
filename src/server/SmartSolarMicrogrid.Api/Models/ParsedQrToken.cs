@@ -1,4 +1,8 @@
-// Description: Internal domain model holding the extracted and sanitized parameters of a parsed QR token.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Internal domain model holding the extracted and sanitized parameters of a parsed QR token.
+ */
 
 namespace SmartSolarMicrogrid.Api.Models;
 
