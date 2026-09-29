@@ -239,7 +239,7 @@ const ReservationListPage = () => {
               </span>
             </div>
             <p style={{ margin: '6px 0 0', opacity: 0.85, fontSize: '0.9rem' }}>
-              Energy Slot Reservation &amp; Dispatch Monitoring • Student IT22221414
+              Energy Slot Reservation &amp; Dispatch Monitoring •
             </p>
           </div>
 

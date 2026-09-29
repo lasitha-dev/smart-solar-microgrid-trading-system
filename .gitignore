@@ -71,3 +71,6 @@ Thumbs.db
 .vscode/
 *.sln.docstates
 OPERATOR_STATION_ASSIGNMENT_PLAN.md
+
+docs/reports/member_4_source_code
+scripts/generate_member_4_source_report.py
