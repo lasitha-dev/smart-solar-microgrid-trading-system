@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Modular dialog helper formatting and presenting operator verification
  * rejection alerts with mapped domain error codes (FR-M4-06.3).
  */

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Pure domain model representing operational dashboard metric counters and active booking spotlight widget data.
  */
 package com.sliit.ssmts.operator_dashboard.domain.model

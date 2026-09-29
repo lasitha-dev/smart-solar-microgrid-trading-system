@@ -1,4 +1,8 @@
-// Description: Concrete service orchestrating dashboard metrics aggregation and multi-criteria reservation filtering.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Concrete service orchestrating dashboard metrics aggregation and multi-criteria reservation filtering.
+ */
 
 using SmartSolarMicrogrid.Api.DTOs;
 using SmartSolarMicrogrid.Api.Repositories;
@@ -19,20 +23,22 @@ public class DashboardQueryService : IDashboardQueryService
 
     /// <summary>
     /// Computes aggregated metrics: pending count, approved future count, completed today count, and active spotlight.
+    /// Optionally filtered by operator ID.
     /// </summary>
-    public async Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
+    public async Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null)
     {
-        return await _reservationRepository.GetDashboardMetricsAsync();
+        return await _reservationRepository.GetDashboardMetricsAsync(operatorId);
     }
 
     /// <summary>
-    /// Queries reservations matching status chips, debounced search keyword, and optional calendar date.
+    /// Queries reservations matching status chips, debounced search keyword, calendar date, and optional operator ID.
     /// </summary>
     public async Task<List<ReservationItemDto>> GetFilteredReservationsAsync(ReservationFilterQueryDto query)
     {
         return await _reservationRepository.GetFilteredReservationsAsync(
             query.Status,
             query.Search,
-            query.Date);
+            query.Date,
+            query.OperatorId);
     }
 }

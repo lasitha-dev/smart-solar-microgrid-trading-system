@@ -1,4 +1,8 @@
-// Description: Service contract defining queries for operational dashboard metrics and filtered reservation feeds.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Service contract defining queries for operational dashboard metrics and filtered reservation feeds.
+ */
 
 using SmartSolarMicrogrid.Api.DTOs;
 
@@ -11,8 +15,9 @@ public interface IDashboardQueryService
 {
     /// <summary>
     /// Computes aggregated metrics: pending count, approved future count, completed today count, and active spotlight.
+    /// Optionally filtered by assigned operator ID.
     /// </summary>
-    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync();
+    Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null);
 
     /// <summary>
     /// Queries reservations matching status chips, debounced search keyword, and optional calendar date.

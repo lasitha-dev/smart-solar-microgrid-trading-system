@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for BookingHistoryAdapter verifying DiffUtil item identity and structural
  * equality, view binding, and conditional display of metered kWh on completed transactions (FR-M4-03.5).
  */

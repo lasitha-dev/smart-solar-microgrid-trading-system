@@ -1,4 +1,8 @@
-// Description: Concrete service implementing FAT service business rules, cryptographic checks, and status transitions.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Concrete service implementing FAT service business rules, cryptographic checks, and status transitions.
+ */
 
 using Microsoft.Extensions.Options;
 using SmartSolarMicrogrid.Api.Configuration;
@@ -201,6 +205,18 @@ public class OperatorVerificationService : IOperatorVerificationService
         {
             return (false, null, "ERR_COMMIT_FAILED",
                 "Failed to commit transaction state change to the database.");
+        }
+
+        // Release the booked energy slot back to Open so it can be booked again
+        if (!string.IsNullOrWhiteSpace(reservation.BookingSlotId))
+        {
+            await _reservationRepository.UpdateSlotStatusAsync(reservation.BookingSlotId, "Open");
+        }
+
+        // Release station battery bay back to available
+        if (!string.IsNullOrWhiteSpace(reservation.StationId) && !string.IsNullOrWhiteSpace(reservation.AllocatedBayId))
+        {
+            await _reservationRepository.UpdateStationBayAvailabilityAsync(reservation.StationId, reservation.AllocatedBayId, true);
         }
 
         var response = new FinalizeTransferResponseDto

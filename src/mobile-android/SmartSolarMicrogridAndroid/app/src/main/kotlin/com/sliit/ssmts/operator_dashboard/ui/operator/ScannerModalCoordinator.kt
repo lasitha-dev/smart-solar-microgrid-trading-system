@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Modular UI coordinator orchestrating the presentation, callback dispatching,
  * and lifecycle detachment of operator verification modals and simulation dialogs (Rule 3 SRP delegate).
  */

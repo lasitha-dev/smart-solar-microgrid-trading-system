@@ -65,5 +65,21 @@ export const adminService = {
   createStaffUser: async (staffData) => {
     const response = await api.post('/admin/users', staffData);
     return response.data;
+  },
+
+  /**
+   * Updates an existing staff or Grid Operator user profile.
+   */
+  updateStaffUser: async (userId, staffData) => {
+    const response = await api.put(`/admin/users/${userId}`, staffData);
+    return response.data;
+  },
+
+  /**
+   * Permanently deletes a staff user account (subject to 409 active reservation & station checks).
+   */
+  deleteStaffUser: async (userId) => {
+    const response = await api.delete(`/admin/users/${userId}`);
+    return response.data;
   }
 };

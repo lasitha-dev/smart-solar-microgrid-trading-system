@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: UI unit test suite for TransferReceiptModal verifying view binding, metric formatting,
  * status badge rendering, and button callbacks under Robolectric (FR-M4-07.4).
  */

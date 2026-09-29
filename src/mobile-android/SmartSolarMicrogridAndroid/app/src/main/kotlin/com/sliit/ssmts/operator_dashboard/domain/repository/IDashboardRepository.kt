@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Inverted repository interface defining operational metrics queries and local cache synchronization streams.
  */
 package com.sliit.ssmts.operator_dashboard.domain.repository
@@ -17,9 +19,10 @@ interface IDashboardRepository {
      * Emits operational metrics, optionally enforcing a remote synchronization over the network.
      *
      * @param forceRefresh Set to true to bypass cache and immediately trigger a central API sync.
+     * @param operatorId Optional Grid Operator user ID to filter station-specific operational metrics.
      * @return Flow emitting NetworkResult containing DashboardMetrics.
      */
-    fun getDashboardMetricsStream(forceRefresh: Boolean = false): Flow<NetworkResult<DashboardMetrics>>
+    fun getDashboardMetricsStream(forceRefresh: Boolean = false, operatorId: String? = null): Flow<NetworkResult<DashboardMetrics>>
 
     /**
      * Observes local reservation cache records matching optional status and keyword criteria.
@@ -47,7 +50,18 @@ interface IDashboardRepository {
     /**
      * Synchronizes local SQLite reservation cache with the central C# Web API.
      *
+     * @param operatorId Optional Grid Operator identifier to restrict sync to assigned station.
      * @return NetworkResult indicating synchronization success or failure.
      */
-    suspend fun syncRemoteReservations(): NetworkResult<Unit>
+    suspend fun syncRemoteReservations(operatorId: String? = null): NetworkResult<Unit>
+
+    /**
+     * Approves a pending reservation via the central API and updates the local cache.
+     *
+     * @param reservationId Identifier of the reservation being approved.
+     * @param operatorId Optional Grid Operator identifier performing the approval.
+     * @return NetworkResult containing the approved Reservation domain model.
+     */
+    suspend fun approveReservation(reservationId: String, operatorId: String? = null): NetworkResult<Reservation>
+    suspend fun rejectReservation(reservationId: String, reason: String? = null, operatorId: String? = null): NetworkResult<Reservation>
 }

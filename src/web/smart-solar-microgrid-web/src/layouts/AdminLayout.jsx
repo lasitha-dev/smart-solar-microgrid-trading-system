@@ -21,7 +21,9 @@ import {
   Menu,
   X,
   Zap,
-  Radio
+  Radio,
+  Calendar,
+  Clock
 } from 'lucide-react';
 
 export const AdminLayout = () => {
@@ -154,6 +156,60 @@ export const AdminLayout = () => {
                   <span>User Directory</span>
                 </div>
               </NavLink>
+
+              <NavLink
+                to="/admin/stations"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Zap size={18} style={{ color: 'var(--solar-amber)' }} />
+                  <span>Microgrid Stations</span>
+                </div>
+              </NavLink>
+            </>
+          )}
+
+          {user?.role === 'GridOperator' && (
+            <>
+              <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 700, padding: '1rem 0.75rem 0.5rem', letterSpacing: '0.08em' }}>
+                Station Operations
+              </div>
+
+              <NavLink
+                to="/reservations"
+                onClick={() => setSidebarOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                  background: isActive ? 'var(--bg-surface-hover)' : 'transparent',
+                  borderLeft: isActive ? '3px solid var(--solar-amber)' : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  marginBottom: '0.4rem',
+                  transition: 'all var(--transition-fast)'
+                })}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Calendar size={18} style={{ color: 'var(--status-active)' }} />
+                  <span>Energy Reservations</span>
+                </div>
+              </NavLink>
             </>
           )}
 
@@ -241,14 +297,14 @@ export const AdminLayout = () => {
       </aside>
 
       {/* Main Page Wrapper */}
-      <div className="main-content">
+      <div className="main-content" style={{ minWidth: 0, overflowX: 'hidden' }}>
         {/* Top Navbar */}
         <header className="top-navbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-sm mobile-menu-toggle"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{ display: 'inline-flex' }}
+              aria-label="Toggle navigation menu"
             >
               {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -260,7 +316,7 @@ export const AdminLayout = () => {
         </header>
 
         {/* Dynamic Nested Content */}
-        <main className="page-body">
+        <main className="page-body" style={{ minWidth: 0 }}>
           <Outlet context={{ refreshPendingCount: fetchPendingCount }} />
         </main>
       </div>

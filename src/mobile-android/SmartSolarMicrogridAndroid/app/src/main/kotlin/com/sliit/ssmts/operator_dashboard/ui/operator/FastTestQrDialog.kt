@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Material dialog component allowing evaluators to select and inject predefined
  * or custom QR payload scenarios into the operator verification flow (Rule 6.3 & FR-M4-05).
  */

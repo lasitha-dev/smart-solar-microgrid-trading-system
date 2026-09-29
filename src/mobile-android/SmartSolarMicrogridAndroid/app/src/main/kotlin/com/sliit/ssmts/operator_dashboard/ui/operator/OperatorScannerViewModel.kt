@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: ViewModel managing the Grid Operator QR code verification handshake, state
  * transitions, and delegation to central Web API endpoints (Rule 3, DIP & FR-M4-06).
  */

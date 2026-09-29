@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Data Transfer Objects for energy transfer finalization requests and completion receipt responses.
  */
 package com.sliit.ssmts.operator_dashboard.data.remote.dto

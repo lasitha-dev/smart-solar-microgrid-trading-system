@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Custom color-coded status badge TextView displaying standardized status styles,
  * background containers, and typography according to FR-M4-03.4 design specifications.
  */

@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for BookingHistoryViewModel validating 300ms search debouncing,
  * distinct query deduplication, status chip filtering, and repository state streaming (FR-M4-03.2).
  */
@@ -220,7 +222,7 @@ class BookingHistoryViewModelTest {
         /**
          * Emits mock dashboard metrics stream.
          */
-        override fun getDashboardMetricsStream(forceRefresh: Boolean): Flow<NetworkResult<DashboardMetrics>> = flow {
+        override fun getDashboardMetricsStream(forceRefresh: Boolean, operatorId: String?): Flow<NetworkResult<DashboardMetrics>> = flow {
             emit(NetworkResult.Success(DashboardMetrics()))
         }
 
@@ -241,9 +243,37 @@ class BookingHistoryViewModelTest {
         /**
          * Records remote sync invocation.
          */
-        override suspend fun syncRemoteReservations(): NetworkResult<Unit> {
+        override suspend fun syncRemoteReservations(operatorId: String?): NetworkResult<Unit> {
             syncCalled = true
             return NetworkResult.Success(Unit)
+        }
+
+        override suspend fun approveReservation(reservationId: String, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.APPROVED,
+                    estimatedKwh = 10.0
+                )
+            )
+        }
+
+        override suspend fun rejectReservation(reservationId: String, reason: String?, operatorId: String?): NetworkResult<Reservation> {
+            return NetworkResult.Success(
+                Reservation(
+                    id = reservationId,
+                    prosumerNic = "200012345678",
+                    stationName = "Test Station",
+                    scheduledTimeMillis = System.currentTimeMillis(),
+                    allocatedBay = "BAY-01",
+                    status = com.sliit.ssmts.operator_dashboard.domain.model.ReservationStatus.CANCELLED,
+                    estimatedKwh = 10.0
+                )
+            )
         }
     }
 }

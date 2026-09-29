@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Pure domain reservation model and status enumeration decoupled from database entities and DTOs.
  */
 package com.sliit.ssmts.operator_dashboard.domain.model

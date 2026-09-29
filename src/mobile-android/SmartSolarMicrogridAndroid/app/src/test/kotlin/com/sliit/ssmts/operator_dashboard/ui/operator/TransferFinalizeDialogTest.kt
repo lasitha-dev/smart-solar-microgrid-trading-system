@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: UI unit test suite for TransferFinalizeDialog verifying defensive numeric validation
  * (0.01 - 999.99 kWh) and finalization callback dispatching under Robolectric (FR-M4-07.1).
  */

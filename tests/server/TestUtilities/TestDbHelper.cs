@@ -85,7 +85,31 @@ public static class TestDbHelper
             })
             .ReturnsAsync(new DeleteResult.Acknowledged(1));
 
+        // Mock ReplaceOneAsync
+        mockCollection.Setup(c => c.ReplaceOneAsync(
+                It.IsAny<FilterDefinition<User>>(),
+                It.IsAny<User>(),
+                It.IsAny<ReplaceOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ReplaceOneResult.Acknowledged(1, 1, null));
+
+        var mockReservations = new Mock<IMongoCollection<EnergyReservation>>();
+        mockReservations.Setup(r => r.CountDocumentsAsync(
+                It.IsAny<FilterDefinition<EnergyReservation>>(),
+                It.IsAny<CountOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0L);
+
+        var mockStations = new Mock<IMongoCollection<SolarStationInfo>>();
+        mockStations.Setup(s => s.CountDocumentsAsync(
+                It.IsAny<FilterDefinition<SolarStationInfo>>(),
+                It.IsAny<CountOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0L);
+
         mockContext.Setup(ctx => ctx.Users).Returns(mockCollection.Object);
+        mockContext.Setup(ctx => ctx.EnergyReservations).Returns(mockReservations.Object);
+        mockContext.Setup(ctx => ctx.SolarStations).Returns(mockStations.Object);
 
         return (mockContext, mockCollection);
     }

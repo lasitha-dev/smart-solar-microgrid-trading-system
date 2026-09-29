@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for OperatorAuditDao verifying Room SQLite in-memory operations,
  * offline audit record insertion, sync status transitions, and pending retry queries.
  */

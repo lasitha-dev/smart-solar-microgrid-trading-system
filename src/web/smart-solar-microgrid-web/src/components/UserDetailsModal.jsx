@@ -87,7 +87,7 @@ export const UserDetailsModal = ({ isOpen, onClose, user, onViewMap }) => {
           </div>
 
           <div className="card-body">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.5rem' }}>
+            <div className="responsive-grid-2" style={{ gap: '1.25rem', marginBottom: '1.5rem' }}>
               <div>
                 <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 600, marginBottom: '0.25rem' }}>
                   Account Status

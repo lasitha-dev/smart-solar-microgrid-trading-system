@@ -1,4 +1,8 @@
-// Description: Data Transfer Objects for energy transfer finalization request and receipt response contracts.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Data Transfer Objects for energy transfer finalization request and receipt response contracts.
+ */
 
 namespace SmartSolarMicrogrid.Api.DTOs;
 

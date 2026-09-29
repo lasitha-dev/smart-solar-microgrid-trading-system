@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Predefined simulation scenarios providing canonical, conflicting, and malformed
  * QR payload tokens to facilitate single-device viva demonstrations (Rule 6.3 & FR-M4-05).
  */

@@ -170,7 +170,7 @@ export const CreateStaffModal = ({ isOpen, onClose, onStaffCreated }) => {
               <span>An automated onboarding email with login credentials (username & temporary password) will be delivered to the specified email address upon creation.</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="responsive-grid-2" style={{ marginBottom: '1rem' }}>
               <div className="form-group">
                 <label className="form-label">National Identity Card (NIC) *</label>
                 <input
@@ -224,7 +224,7 @@ export const CreateStaffModal = ({ isOpen, onClose, onStaffCreated }) => {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="responsive-grid-2" style={{ marginBottom: '1rem' }}>
               <div className="form-group">
                 <label className="form-label">Phone Number *</label>
                 <input
@@ -360,7 +360,7 @@ export const CreateStaffModal = ({ isOpen, onClose, onStaffCreated }) => {
               </div>
 
               {/* Manual Coordinates Input Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div className="responsive-grid-2" style={{ gap: '0.75rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label" style={{ fontSize: '0.72rem' }}>Latitude (°N)</label>
                   <input
@@ -389,7 +389,7 @@ export const CreateStaffModal = ({ isOpen, onClose, onStaffCreated }) => {
             </div>
 
             {/* Password and Confirm Password with Live Validation */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="responsive-grid-2" style={{ marginBottom: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Initial Password *</label>
                 <input

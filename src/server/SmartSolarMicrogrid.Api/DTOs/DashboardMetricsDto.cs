@@ -1,4 +1,8 @@
-// Description: Data Transfer Objects representing operational dashboard metrics and active booking spotlight data.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Data Transfer Objects representing operational dashboard metrics and active booking spotlight data.
+ */
 
 namespace SmartSolarMicrogrid.Api.DTOs;
 

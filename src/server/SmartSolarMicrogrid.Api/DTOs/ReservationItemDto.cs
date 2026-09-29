@@ -1,4 +1,8 @@
-// Description: Data Transfer Objects representing individual reservation items, feeds, history, and query parameters.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Data Transfer Objects representing individual reservation items, feeds, history, and query parameters.
+ */
 
 namespace SmartSolarMicrogrid.Api.DTOs;
 
@@ -12,6 +16,10 @@ public class ReservationItemDto
     public string ProsumerNic { get; set; } = string.Empty;
 
     public string StationName { get; set; } = string.Empty;
+
+    public string? StationId { get; set; }
+
+    public string? AssignedOperatorId { get; set; }
 
     public DateTime ScheduledDateTime { get; set; }
 
@@ -45,4 +53,14 @@ public class ReservationFilterQueryDto
     /// Optional ISO date string filtering current daily bookings.
     /// </summary>
     public DateTime? Date { get; set; }
+
+    /// <summary>
+    /// Optional Prosumer ID to retrieve prosumer-specific reservations.
+    /// </summary>
+    public string? ProsumerId { get; set; }
+
+    /// <summary>
+    /// Optional Grid Operator ID to retrieve reservations assigned to this operator.
+    /// </summary>
+    public string? OperatorId { get; set; }
 }

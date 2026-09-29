@@ -38,6 +38,20 @@ object RetrofitClient {
         }
     }
 
+    @Volatile
+    private var stationApiInstance: com.sliit.ssmts.microgrid_nodes.data.remote.StationApi? = null
+
+    /**
+     * Obtains the configured [StationApi] instance for querying nearby stations.
+     */
+    fun getStationApi(context: Context): com.sliit.ssmts.microgrid_nodes.data.remote.StationApi {
+        return stationApiInstance ?: synchronized(this) {
+            stationApiInstance ?: buildRetrofit(context).create(com.sliit.ssmts.microgrid_nodes.data.remote.StationApi::class.java).also {
+                stationApiInstance = it
+            }
+        }
+    }
+
     /**
      * Resolves the active base URL, checking for custom developer overrides in SharedPreferences.
      */

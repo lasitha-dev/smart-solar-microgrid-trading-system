@@ -13,8 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/slate_surface"
-        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         app:navigationIconTint="@color/solar_amber_primary"
+        app:navigationContentDescription="@string/btn_back"
         app:title="@string/title_booking_history"
         app:titleTextColor="@color/text_primary" />
 

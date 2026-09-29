@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: ListAdapter implementation utilizing DiffUtil to bind and render historical energy
  * trading reservations with estimated and actual metered kWh comparisons (FR-M4-03).
  */

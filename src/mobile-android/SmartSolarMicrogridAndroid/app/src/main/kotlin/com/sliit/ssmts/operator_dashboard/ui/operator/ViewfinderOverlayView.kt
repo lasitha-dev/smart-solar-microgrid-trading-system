@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Custom overlay rendering viewfinder framing box, transparent cutout,
  * and corner alignment guides for the camera QR scanner (FR-M4-05.2).
  */

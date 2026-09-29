@@ -55,15 +55,16 @@ export const LocationMapModal = ({ isOpen, onClose, user }) => {
         <div className="card-body" style={{ padding: '1.25rem' }}>
           {/* Details Bar */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto',
-            gap: '1rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
             background: 'var(--bg-main)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
             padding: '0.9rem 1.1rem',
-            marginBottom: '1rem',
-            alignItems: 'center'
+            marginBottom: '1rem'
           }}>
             <div>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>

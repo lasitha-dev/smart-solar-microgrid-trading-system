@@ -1,4 +1,8 @@
-// Description: Unit tests validating operator QR verification handshake, business rules, and energy transfer finalization.
+/*
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
+ * Description: Unit tests validating operator QR verification handshake, business rules, and energy transfer finalization.
+ */
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -230,25 +234,108 @@ public class FakeReservationRepository : IReservationRepository
         return Task.CompletedTask;
     }
 
-    public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync()
+    public Task<IEnumerable<EnergyReservation>> GetAllAsync(string? prosumerId = null, string? status = null)
+    {
+        var query = _store.Values.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(prosumerId) && !prosumerId.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.ProsumerId == prosumerId || r.ProsumerNic == prosumerId);
+        }
+        if (!string.IsNullOrWhiteSpace(status) && !status.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+        }
+        return Task.FromResult<IEnumerable<EnergyReservation>>(query.ToList());
+    }
+
+    public Task UpdateAsync(EnergyReservation reservation)
+    {
+        _store[reservation.Id] = reservation;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(string id)
+    {
+        _store.Remove(id);
+        return Task.CompletedTask;
+    }
+
+    private readonly Dictionary<string, EnergyBookingSlot> _slots = new();
+
+    public Task<EnergyBookingSlot?> GetSlotByIdAsync(string slotId)
+    {
+        _slots.TryGetValue(slotId, out var slot);
+        return Task.FromResult(slot);
+    }
+
+    public Task<IEnumerable<EnergyBookingSlot>> GetAvailableSlotsAsync(string stationId, DateTime date)
+    {
+        var day = date.Date;
+        var slots = _slots.Values.Where(s => s.StationId == stationId && s.SlotDate.Date == day);
+        return Task.FromResult<IEnumerable<EnergyBookingSlot>>(slots.ToList());
+    }
+
+    public Task UpdateSlotStatusAsync(string slotId, string status)
+    {
+        if (_slots.TryGetValue(slotId, out var slot))
+        {
+            slot.Status = status;
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task<bool> TryReserveSlotAsync(string slotId)
+    {
+        if (_slots.TryGetValue(slotId, out var slot) && slot.Status == "Open")
+        {
+            slot.Status = "Reserved";
+            return Task.FromResult(true);
+        }
+        return Task.FromResult(false);
+    }
+
+    public Task SeedSlotsAsync(string stationId)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task<SolarStationInfo?> GetStationByIdAsync(string stationId)
+    {
+        return Task.FromResult<SolarStationInfo?>(new SolarStationInfo
+        {
+            Id = stationId,
+            StationName = "Kandy Solar Hub",
+            AssignedOperatorId = "op-1",
+            AssignedOperatorName = "Operator Silva",
+            AssignedOperatorNic = "901234567V"
+        });
+    }
+
+    public Task<DashboardMetricsResponseDto> GetDashboardMetricsAsync(string? operatorId = null)
     {
         var nowUtc = DateTime.UtcNow;
         var todayStartUtc = nowUtc.Date;
         var todayEndUtc = todayStartUtc.AddDays(1);
         var sevenDaysFuture = nowUtc.AddDays(7);
 
-        var pendingCount = _store.Values.Count(r => r.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
-        var approvedFutureCount = _store.Values.Count(r =>
+        var query = _store.Values.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            query = query.Where(r => r.AssignedOperatorId == operatorId);
+        }
+
+        var pendingCount = query.Count(r => r.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
+        var approvedFutureCount = query.Count(r =>
             r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
             r.ScheduledDateTime >= nowUtc.AddMinutes(-30) &&
             r.ScheduledDateTime <= sevenDaysFuture);
 
-        var completedTodayCount = _store.Values.Count(r =>
+        var completedTodayCount = query.Count(r =>
             r.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase) &&
             ((r.FinalizedAt >= todayStartUtc && r.FinalizedAt < todayEndUtc) ||
              (r.ScheduledDateTime >= todayStartUtc && r.ScheduledDateTime < todayEndUtc)));
 
-        var spotlightDoc = _store.Values
+        var spotlightDoc = query
             .Where(r => r.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase) &&
                         r.ScheduledDateTime >= nowUtc.AddMinutes(-30))
             .OrderBy(r => r.ScheduledDateTime)
@@ -277,9 +364,14 @@ public class FakeReservationRepository : IReservationRepository
         });
     }
 
-    public Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date)
+    public Task<List<ReservationItemDto>> GetFilteredReservationsAsync(string? status, string? search, DateTime? date, string? operatorId = null)
     {
         var query = _store.Values.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(operatorId))
+        {
+            query = query.Where(r => r.AssignedOperatorId == operatorId);
+        }
 
         if (!string.IsNullOrWhiteSpace(status) && !status.Equals("All", StringComparison.OrdinalIgnoreCase))
         {
@@ -309,6 +401,8 @@ public class FakeReservationRepository : IReservationRepository
                 ReservationId = r.Id,
                 ProsumerNic = r.ProsumerNic,
                 StationName = r.StationName,
+                StationId = r.StationId,
+                AssignedOperatorId = r.AssignedOperatorId,
                 ScheduledDateTime = r.ScheduledDateTime,
                 AllocatedBayId = r.AllocatedBayId,
                 EstimatedKwh = r.EstimatedKwh,
@@ -318,5 +412,10 @@ public class FakeReservationRepository : IReservationRepository
             }).ToList();
 
         return Task.FromResult(results);
+    }
+
+    public Task UpdateStationBayAvailabilityAsync(string stationId, string bayId, bool isAvailable)
+    {
+        return Task.CompletedTask;
     }
 }

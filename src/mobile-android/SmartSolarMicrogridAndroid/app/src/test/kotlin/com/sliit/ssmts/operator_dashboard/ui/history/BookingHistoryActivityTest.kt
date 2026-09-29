@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: UI unit test suite for BookingHistoryActivity verifying screen launch, Toolbar setup,
  * chip group initialization, search input, and empty state rendering with Robolectric (FR-M4-03).
  */

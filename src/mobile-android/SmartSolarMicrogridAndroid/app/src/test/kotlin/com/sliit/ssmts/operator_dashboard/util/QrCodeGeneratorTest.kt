@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for QrCodeGenerator verifying canonical payload syntax,
  * delimiter injection resistance, non-null bitmap dimensions, and high-contrast pixel rendering.
  */

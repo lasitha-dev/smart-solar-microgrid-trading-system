@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_seed_slots"
+        android:title="Seed API Slots"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_demo_blocked"
+        android:title="Demo: 12-Hour Block"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_demo_allowed"
+        android:title="Demo: Normal Cancel"
+        app:showAsAction="never" />
+</menu>

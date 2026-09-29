@@ -329,7 +329,7 @@ export const StaffProfilePage = () => {
       )}
 
       {/* Main Grid Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '1.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '1.75rem' }}>
         
         {/* Left Column: Account Details & Editable Profile */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
@@ -341,7 +341,7 @@ export const StaffProfilePage = () => {
               <h3 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 700 }}>System Identity & Credentials</h3>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <div className="responsive-grid-2" style={{ gap: '1.25rem' }}>
               <div>
                 <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--text-dim)', letterSpacing: '0.04em' }}>
                   NATIONAL IDENTITY CARD (NIC)

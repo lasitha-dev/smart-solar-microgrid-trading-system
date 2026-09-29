@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Operational Dashboard Fragment rendering live counters, active spotlight card,
  * countdown timers, offline indicator banner, and real-time operational booking feeds (FR-M4-01, FR-M4-02).
  */
@@ -15,6 +17,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.sliit.ssmts.R
 import com.sliit.ssmts.operator_dashboard.data.local.SsmtsDatabase
 import com.sliit.ssmts.operator_dashboard.data.remote.ApiClient
@@ -22,6 +26,7 @@ import com.sliit.ssmts.operator_dashboard.data.repository.DashboardRepositoryImp
 import com.sliit.ssmts.databinding.FragmentDashboardBinding
 import com.sliit.ssmts.operator_dashboard.domain.model.ActiveSpotlightReservation
 import com.sliit.ssmts.operator_dashboard.domain.model.DashboardMetrics
+import com.sliit.ssmts.operator_dashboard.domain.model.Reservation
 import com.sliit.ssmts.operator_dashboard.ui.common.UiState
 import com.sliit.ssmts.operator_dashboard.util.TimeFormatter
 import com.sliit.ssmts.util.SessionManager
@@ -38,14 +43,16 @@ class DashboardFragment : Fragment() {
     private lateinit var feedAdapter: BookingsFeedAdapter
 
     private val viewModel: DashboardViewModel by viewModels {
-        val database = SsmtsDatabase.getInstance(requireContext().applicationContext)
-        val sessionManager = SessionManager(requireContext().applicationContext)
+        val appContext = requireContext().applicationContext
+        val database = SsmtsDatabase.getInstance(appContext)
+        val sessionManager = SessionManager(appContext)
         val api = ApiClient.createOperatorDashboardApi(
-            baseUrl = "https://10.0.2.2:7143/",
+            baseUrl = ApiClient.getBaseUrl(appContext),
             tokenProvider = { sessionManager.getAuthToken() }
         )
         val repository = DashboardRepositoryImpl(api, database.reservationCacheDao())
-        DashboardViewModel.Factory(repository)
+        val operatorId = sessionManager.getActiveUserId()
+        DashboardViewModel.Factory(repository, operatorId)
     }
 
     /**
@@ -75,6 +82,7 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupInteractions()
         observeViewModel()
+        viewModel.refresh()
     }
 
     private fun setupInteractions() {
@@ -95,7 +103,15 @@ class DashboardFragment : Fragment() {
             viewModel.loadMetrics(forceRefresh = true)
         }
 
-        feedAdapter = BookingsFeedAdapter()
+        feedAdapter = BookingsFeedAdapter(
+            onItemClick = null,
+            onApproveClick = { reservation ->
+                showApproveConfirmation(reservation)
+            },
+            onRejectClick = { reservation ->
+                showRejectConfirmation(reservation)
+            }
+        )
         binding.rvBookingsFeed.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBookingsFeed.adapter = feedAdapter
 
@@ -206,6 +222,63 @@ class DashboardFragment : Fragment() {
             binding.layoutSpotlightContent.isVisible = false
             binding.tvSpotlightEmpty.isVisible = true
         }
+    }
+
+    /**
+     * Prompts the operator with a confirmation dialog before committing reservation approval.
+     *
+     * @param reservation Reservation domain entity awaiting operator validation.
+     */
+    private fun showApproveConfirmation(reservation: Reservation) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.title_operator_approval)
+            .setMessage(getString(R.string.confirm_approve_booking))
+            .setPositiveButton(R.string.confirm) { _, _ ->
+                binding.progressBar.isVisible = true
+                viewModel.approveReservation(reservation.id) { success, errorMsg ->
+                    binding.progressBar.isVisible = false
+                    if (success) {
+                        Snackbar.make(binding.root, R.string.msg_approve_success, Snackbar.LENGTH_SHORT).show()
+                    } else {
+                        Snackbar.make(binding.root, errorMsg ?: "Approval failed.", Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Prompts the operator with a confirmation and reason dialog before rejecting a pending reservation.
+     *
+     * @param reservation Reservation domain entity awaiting operator rejection.
+     */
+    private fun showRejectConfirmation(reservation: Reservation) {
+        val input = android.widget.EditText(requireContext()).apply {
+            hint = "Reason for rejection (optional)"
+            setTextColor(requireContext().getColor(R.color.text_primary))
+            setHintTextColor(requireContext().getColor(R.color.text_secondary))
+            setPadding(40, 30, 40, 30)
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Reject Reservation")
+            .setMessage("Are you sure you want to reject this reservation for ${reservation.prosumerNic}? The allocated slot and battery bay will be released.")
+            .setView(input)
+            .setPositiveButton("Reject") { _, _ ->
+                val reason = input.text.toString().trim()
+                binding.progressBar.isVisible = true
+                viewModel.rejectReservation(reservation.id, if (reason.isNotBlank()) reason else null) { success, errorMsg ->
+                    binding.progressBar.isVisible = false
+                    if (success) {
+                        Snackbar.make(binding.root, "Reservation rejected successfully.", Snackbar.LENGTH_SHORT).show()
+                    } else {
+                        Snackbar.make(binding.root, errorMsg ?: "Rejection failed.", Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     /**

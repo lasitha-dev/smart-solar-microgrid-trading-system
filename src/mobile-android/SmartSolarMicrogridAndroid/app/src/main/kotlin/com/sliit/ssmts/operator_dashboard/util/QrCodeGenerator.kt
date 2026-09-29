@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Native QR code generator utility utilizing ZXing to render cryptographically
  * structured, high-contrast QR tokens for approved microgrid energy reservations.
  */

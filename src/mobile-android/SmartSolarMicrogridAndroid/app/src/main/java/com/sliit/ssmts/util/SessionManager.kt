@@ -33,6 +33,15 @@ class SessionManager(context: Context) {
     }
 
     /**
+     * Synchronously retrieves the cached active user ID.
+     */
+    fun getActiveUserId(): String? {
+        return runBlocking {
+            sessionDao.getActiveSession()?.userId
+        }
+    }
+
+    /**
      * Checks whether an active user session exists in local storage.
      */
     suspend fun isLoggedIn(): Boolean {

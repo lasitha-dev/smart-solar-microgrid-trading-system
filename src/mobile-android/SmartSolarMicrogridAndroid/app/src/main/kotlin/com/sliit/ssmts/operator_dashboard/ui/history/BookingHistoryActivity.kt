@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Activity assembling the searchable, filterable reservation history screen with debounced search,
  * 5-state filter chips, empty states, and pull-to-refresh synchronization (FR-M4-03).
  */
@@ -36,7 +38,7 @@ class BookingHistoryActivity : AppCompatActivity() {
         val database = SsmtsDatabase.getInstance(applicationContext)
         val sessionManager = SessionManager(applicationContext)
         val api = ApiClient.createOperatorDashboardApi(
-            baseUrl = "https://10.0.2.2:7143/",
+            baseUrl = ApiClient.getBaseUrl(applicationContext),
             tokenProvider = { sessionManager.getAuthToken() }
         )
         val repository = DashboardRepositoryImpl(api, database.reservationCacheDao())

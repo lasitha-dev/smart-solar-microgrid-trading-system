@@ -189,4 +189,62 @@ public class AdminController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, ApiResponseDto<UserResponseDto>.Ok(data, message));
     }
+
+    /// <summary>
+    /// Updates a staff or Grid Operator user account profile.
+    /// </summary>
+    /// <param name="id">The unique MongoDB user document identifier.</param>
+    /// <param name="request">The staff user update payload.</param>
+    /// <returns>HTTP 200 with updated user details; HTTP 400 on error; HTTP 404 if not found; HTTP 409 on conflict.</returns>
+    [HttpPut("users/{id}")]
+    [ProducesResponseType(typeof(ApiResponseDto<UserResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> UpdateStaffUser([FromRoute] string id, [FromBody] UserUpdateDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return BadRequest(ApiResponseDto<object>.Fail(errors));
+        }
+
+        var (success, message, statusCode, data) = await _userService.UpdateStaffUserAsync(id, request);
+
+        if (!success)
+        {
+            _logger.LogWarning("Staff update failed for user ID '{Id}': {Reason} (HTTP {StatusCode})",
+                id, message, statusCode);
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        _logger.LogInformation("Backoffice administrator updated staff user ID '{Id}' ({Username}).", id, data!.Username);
+        return Ok(ApiResponseDto<UserResponseDto>.Ok(data, message));
+    }
+
+    /// <summary>
+    /// Deletes a staff or Grid Operator user account.
+    /// Returns HTTP 409 Conflict if a Grid Operator has active reservations or assigned stations.
+    /// </summary>
+    /// <param name="id">The unique MongoDB user document identifier.</param>
+    /// <returns>HTTP 200 with success message; HTTP 404 if not found; HTTP 409 on business rule conflict.</returns>
+    [HttpDelete("users/{id}")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeleteStaffUser([FromRoute] string id)
+    {
+        var (success, message, statusCode) = await _userService.DeleteStaffUserAsync(id);
+
+        if (!success)
+        {
+            _logger.LogWarning("Staff deletion rejected for user ID '{Id}': {Reason} (HTTP {StatusCode})",
+                id, message, statusCode);
+            return StatusCode(statusCode, ApiResponseDto<object>.Fail(message));
+        }
+
+        _logger.LogInformation("Backoffice administrator deleted staff user ID '{Id}'.", id);
+        return Ok(ApiResponseDto<object>.Ok(new { }, message));
+    }
 }

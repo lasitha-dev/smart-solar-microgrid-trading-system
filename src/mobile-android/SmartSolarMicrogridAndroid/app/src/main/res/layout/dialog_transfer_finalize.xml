@@ -61,6 +61,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
         android:hint="@string/label_metered_input"
+        app:placeholderText="@string/hint_metered_kwh"
+        app:placeholderTextColor="@color/text_muted"
+        app:expandedHintEnabled="false"
         app:boxBackgroundColor="@color/slate_input_bg"
         app:boxStrokeColor="@color/solar_amber_primary"
         app:errorEnabled="true"
@@ -73,11 +76,9 @@
             android:id="@+id/etMeteredKwh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_metered_kwh"
             android:inputType="numberDecimal"
             android:maxLines="1"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
             android:textSize="@dimen/text_size_subhead" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,6 +90,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_sm"
         android:hint="@string/label_operator_notes"
+        app:placeholderText="@string/hint_operator_notes"
+        app:placeholderTextColor="@color/text_muted"
+        app:expandedHintEnabled="false"
         app:boxBackgroundColor="@color/slate_input_bg"
         app:boxStrokeColor="@color/slate_stroke">
 
@@ -96,11 +100,9 @@
             android:id="@+id/etOperatorNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_operator_notes"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="3"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
             android:textSize="@dimen/text_size_body" />
     </com.google.android.material.textfield.TextInputLayout>
 

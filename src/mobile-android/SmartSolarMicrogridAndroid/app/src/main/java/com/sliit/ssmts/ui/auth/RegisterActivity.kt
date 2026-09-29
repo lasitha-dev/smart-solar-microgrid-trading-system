@@ -73,6 +73,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        binding.btnRegisterBack.setOnClickListener {
+            finish()
+        }
+
         binding.btnSelectLocationOnMap.setOnClickListener {
             openLocationPickerScreen()
         }

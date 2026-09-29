@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for ScannerModalCoordinator validating dialog and modal presentations,
  * argument bundle population, and callback propagation under Robolectric (Rule 3 SRP).
  */

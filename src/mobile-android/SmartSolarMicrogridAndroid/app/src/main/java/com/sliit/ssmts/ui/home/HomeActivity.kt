@@ -59,6 +59,24 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Navigate to Member 2 Nearby Microgrid Stations Map Activity
+        binding.cardNavigateNearbyStations.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.microgrid_nodes.ui.map.NearbyStationsActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Navigate to Member 3 Slot Selection Screen
+        binding.cardNavigateBookSlot.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.reservation_workflow.ui.booking.SlotSelectionActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Navigate to Member 3 Prosumer Booking History Screen
+        binding.cardNavigateBookingHistory.setOnClickListener {
+            val intent = Intent(this, com.sliit.ssmts.reservation_workflow.ui.history.BookingHistoryActivity::class.java)
+            startActivity(intent)
+        }
+
         // Navigate to Member 4 Operator Dashboard Console
         binding.cardNavigateOperatorConsole.setOnClickListener {
             val intent = Intent(this, com.sliit.ssmts.operator_dashboard.ui.dashboard.OperatorDashboardActivity::class.java)

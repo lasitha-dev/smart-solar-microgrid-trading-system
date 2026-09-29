@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Domain models encapsulating QR server verification handshake outcomes and energy transfer finalization results.
  */
 package com.sliit.ssmts.operator_dashboard.domain.model

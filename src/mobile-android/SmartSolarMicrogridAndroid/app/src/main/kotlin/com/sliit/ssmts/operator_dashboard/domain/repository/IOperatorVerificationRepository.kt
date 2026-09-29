@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Inverted repository interface defining operator QR verification handshake and energy transfer finalization actions.
  */
 package com.sliit.ssmts.operator_dashboard.domain.repository

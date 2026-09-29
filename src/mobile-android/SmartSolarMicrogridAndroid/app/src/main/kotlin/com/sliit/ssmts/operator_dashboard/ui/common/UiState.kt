@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Generic sealed interface representing reactive UI states across the Member 4 subsystem.
  */
 package com.sliit.ssmts.operator_dashboard.ui.common

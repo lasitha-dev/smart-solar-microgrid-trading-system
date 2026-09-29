@@ -2,7 +2,8 @@
  * Student Name: SILVA M N U (IT22169112) & A.L.M Athulathmudali (IT21129544)
  * Module: SE4040 Enterprise Application Development (2026)
  * Component: Smart Solar Microgrid Trading System - Integrated Android App
- * Description: Unified Gradle build configuration supporting Auth & Account Lifecycle (Member 1)
+ * Description: Unified Gradle build configuration supporting Auth & Account Lifecycle (Member 1),
+ *              Microgrid Nodes & Maps (Member 2), Reservation Workflow (Member 3),
  *              and Operator Verification & Operational Dashboard (Member 4).
  */
 
@@ -27,6 +28,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        manifestPlaceholders["MAPS_API_KEY"] = (project.findProperty("MAPS_API_KEY") as? String)
+            ?: "AIzaSyDummyKeyForDevelopmentAndGrading123456"
     }
 
     buildTypes {
@@ -72,6 +76,9 @@ dependencies {
     // Jetpack Navigation Component
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    // OpenStreetMap osmdroid (Member 2)
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Lifecycle (ViewModel, LiveData, Runtime)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)

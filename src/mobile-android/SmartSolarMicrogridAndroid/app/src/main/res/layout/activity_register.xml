@@ -19,19 +19,31 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing_lg">
 
+        <!-- Top Back Navigation -->
+        <ImageButton
+            android:id="@+id/btnRegisterBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_back"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            app:tint="@color/text_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Header -->
         <TextView
             android:id="@+id/tvRegisterHeader"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_sm"
             android:text="@string/register_title"
             android:textColor="@color/solar_amber_primary"
             android:textSize="@dimen/text_2xl"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/btnRegisterBack" />
 
         <TextView
             android:id="@+id/tvRegisterSubheader"

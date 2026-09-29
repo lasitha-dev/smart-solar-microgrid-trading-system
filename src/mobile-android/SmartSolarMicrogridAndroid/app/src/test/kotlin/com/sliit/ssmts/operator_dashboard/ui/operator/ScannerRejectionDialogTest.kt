@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for ScannerRejectionDialog verifying error code mapping
  * and dialog dismissal callback handling under Robolectric (FR-M4-06.3).
  */

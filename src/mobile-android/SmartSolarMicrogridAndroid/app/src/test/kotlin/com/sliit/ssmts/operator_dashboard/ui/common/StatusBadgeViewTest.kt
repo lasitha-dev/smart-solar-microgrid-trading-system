@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Unit test suite for StatusBadgeView verifying correct background drawables,
  * text colors, labels, and string parsing across all 4 reservation states (FR-M4-03.4).
  */

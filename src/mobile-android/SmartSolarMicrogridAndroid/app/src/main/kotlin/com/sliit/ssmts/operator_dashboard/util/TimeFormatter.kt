@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Time and countdown formatting utility providing human-readable representations
  * for upcoming booking countdowns and offline cache synchronization timestamps.
  */

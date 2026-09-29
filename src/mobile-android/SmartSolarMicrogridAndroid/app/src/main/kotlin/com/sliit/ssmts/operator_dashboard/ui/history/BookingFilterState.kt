@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Type-safe enumeration of interactive filter chip states for booking history (FR-M4-03.3).
  */
 package com.sliit.ssmts.operator_dashboard.ui.history

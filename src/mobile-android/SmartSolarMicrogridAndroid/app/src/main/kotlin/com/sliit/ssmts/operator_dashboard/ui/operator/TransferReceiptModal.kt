@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: BottomSheet dialog modal rendering the finalized energy transfer completion receipt,
  * metered kWh metrics, operator signature, and local cache synchronization confirmation (FR-M4-07.4).
  */

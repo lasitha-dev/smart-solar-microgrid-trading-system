@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: SQLite entity representation for tbl_reservations_cache enabling offline persistence,
  * caching, and local queries for the Member 4 Operational Dashboard subsystem.
  */

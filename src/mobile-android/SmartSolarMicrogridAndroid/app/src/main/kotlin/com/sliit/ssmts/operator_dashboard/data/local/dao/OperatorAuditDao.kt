@@ -1,4 +1,6 @@
 /**
+ * Name: A.L.M Athulathmudali
+ * IT no: IT21129544
  * Description: Room Data Access Object (DAO) for tbl_operator_audit_cache tracking local verification
  * and finalization audit records for offline retry and audit logs.
  */
